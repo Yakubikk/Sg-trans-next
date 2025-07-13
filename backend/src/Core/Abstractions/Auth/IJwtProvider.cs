@@ -4,5 +4,8 @@ namespace Core.Abstractions.Auth;
 
 public interface IJwtProvider
 {
-    string Generate(User user);
+    Task<string> GenerateAccessTokenAsync(User user);
+    string GenerateRefreshToken();
+    bool ValidateAccessToken(string token);
+    bool ValidateRefreshToken(string token);
 }
