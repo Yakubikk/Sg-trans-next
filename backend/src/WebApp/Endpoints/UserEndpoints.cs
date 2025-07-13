@@ -1,6 +1,10 @@
+using System.Security.Claims;
+using Core.Users;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using UseCases.Contracts.Users;
 using UseCases.Services;
+using WebApp.Extensions;
 
 namespace WebApp.Endpoints;
 
@@ -11,6 +15,8 @@ public static class UsersEndpoints
         app.MapPost("register", Register);
 
         app.MapPost("login", Login);
+
+        app.MapGet("me", (Delegate)Me).RequireAuthorization().RequirePermissions(Permission.CreateCourse);
 
         return app;
     }
@@ -34,5 +40,11 @@ public static class UsersEndpoints
         context.Response.Cookies.Append("secretCookie", token);
 
         return Results.Ok(token);
+    }
+
+    private static async Task<IResult> Me(HttpContext context)
+    {
+        var s = context.User.FindFirstValue("userId");
+        return Results.Ok(s);
     }
 }
