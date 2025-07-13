@@ -1,6 +1,7 @@
 namespace Core.Parts;
 
-public class SideFrame
+public class SideFrame : Part
 {
-    
+    public int ServiceLifeYears { get; set; }
+    public DateOnly ExtendedUntil { get; set; }
 }

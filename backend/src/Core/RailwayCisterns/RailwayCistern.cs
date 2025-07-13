@@ -12,7 +12,7 @@ public class RailwayCistern
     public double CapacityVolume { get; set; }
     public double FillingVolume { get; set; }
     public double InitialTareWeight { get; set; }
-    public DateOnly CommissioningDate { get; set; }
+    // public DateOnly CommissioningDate { get; set; }
     public string FactoryNumber { get; set; }
     public string RegistrationNumber { get; set; }
     public DateOnly RegistrationDate { get; set; }

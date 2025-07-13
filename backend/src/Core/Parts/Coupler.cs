@@ -1,6 +1,6 @@
 namespace Core.Parts;
 
-public class Coupler
+public class Coupler : Part
 {
     
 }

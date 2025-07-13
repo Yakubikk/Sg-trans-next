@@ -1,41 +1,81 @@
+using Core.Abstractions.Auth;
+using Infrastructure;
+using Infrastructure.Authentication;
+using Microsoft.AspNetCore.CookiePolicy;
+using WebApp.Extensions;
+using Persistence;
+using Persistence.Mappings;
+using UseCases;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+var services = builder.Services;
+var configuration = builder.Configuration;
+
+services.AddApiAuthentication(configuration);
+
+services.AddEndpointsApiExplorer();
+
 builder.Services.AddOpenApi();
+
+services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
+services.Configure<AuthorizationOptions>(configuration.GetSection(nameof(AuthorizationOptions)));
+
+services
+    .AddPersistence(configuration)
+    .AddApplication()
+    .AddInfrastructure();
+
+builder.Services.AddProblemDetails();
+
+services.AddAutoMapper(typeof(DataBaseMappings));
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.MapOpenApi();
+app.UseSwaggerUI(options =>
 {
-    app.MapOpenApi();
-}
+    options.SwaggerEndpoint("/openapi/v1.json", "Car Rent API V1");
+    options.RoutePrefix = string.Empty;
+}); 
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
-var summaries = new[]
+app.UseCookiePolicy(new CookiePolicyOptions
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    MinimumSameSitePolicy = SameSiteMode.Strict,
+    HttpOnly = HttpOnlyPolicy.Always,
+    Secure = CookieSecurePolicy.Always
+});
 
-app.MapGet("/weatherforecast", () =>
+app.UseAuthentication();
+
+app.UseAuthorization();
+
+app.AddMappedEndpoints();
+
+app.MapGet("get", () =>
+{
+    return Results.Ok("ok");
+}).RequireAuthorization("AdminPolicy");
+
+using (var scope = app.Services.CreateScope())
+{
+    var scopeServiceProvider = scope.ServiceProvider;
+    try
     {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast");
+        var context = scopeServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var passwordHasher = scopeServiceProvider.GetRequiredService<IPasswordHasher>();
+
+        await DbInitializer.Initialize(context, passwordHasher);
+    }
+    catch (Exception ex)
+    {
+        var logger = scopeServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Произошла ошибка при заполнении базы данных.");
+    }
+}
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
