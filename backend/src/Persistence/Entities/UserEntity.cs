@@ -15,6 +15,10 @@ public class UserEntity
     public string Patronymic { get; set; } = string.Empty;
     
     public string PhoneNumber { get; set; } = string.Empty;
+    
+    public string? RefreshToken { get; set; } = string.Empty;
+    
+    public DateTime? RefreshTokenExpiry { get; set; } = null;
 
     public ICollection<RoleEntity> Roles { get; set; } = [];
 }

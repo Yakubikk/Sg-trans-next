@@ -15,6 +15,6 @@ public class PermissionService : IPermissionService
 
     public Task<HashSet<Permission>> GetPermissionsAsync(Guid userId)
     {
-        return _userRepository.GetUserPermissions(userId);
+        return _userRepository.GetUserPermissionsAsync(userId);
     }
 }

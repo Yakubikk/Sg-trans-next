@@ -9,4 +9,7 @@ public class User
     public string LastName { get; set; }
     public string Patronymic { get; set; }
     public string PhoneNumber { get; set; }
+    public string? RefreshToken { get; set; }
+    public DateTime? RefreshTokenExpiry { get; set; }
+    public ICollection<Role> Roles { get; set; }
 }

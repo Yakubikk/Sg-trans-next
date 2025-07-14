@@ -4,7 +4,12 @@ namespace Core.Abstractions.Repositories;
 
 public interface IUserRepository
 {
-    public Task Add(User user);
-    public Task<User> GetByEmail(string email);
-    Task<HashSet<Permission>> GetUserPermissions(Guid userId);
+    public Task AddAsync(User user);
+    public Task<User> GetUserByEmailAsync(string email);
+    public Task<HashSet<Permission>> GetUserPermissionsAsync(Guid userId);
+    public Task<User> GetUserByIdAsync(Guid userId);
+    public Task<ICollection<User>> GetAllUsersAsync();
+    public Task<User> UpdateUserAsync(User user);
+    public Task DeleteUserAsync(User user);
+    
 }

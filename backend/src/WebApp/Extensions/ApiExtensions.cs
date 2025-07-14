@@ -44,30 +44,30 @@ public static class ApiExtensions
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(jwtOptions!.SecretKey))
                 };
-
-                options.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = context =>
-                    {
-                        context.Token = context.Request.Cookies["secretCookie"];
-
-                        return Task.CompletedTask;
-                    }
-                };
+                //
+                // options.Events = new JwtBearerEvents
+                // {
+                //     OnMessageReceived = context =>
+                //     {
+                //         context.Token = context.Request.Cookies["secretCookie"];
+                //
+                //         return Task.CompletedTask;
+                //     }
+                // };
             });
 
         services.AddScoped<IPermissionService, PermissionService>();
         services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
-        services.AddAuthorization(options =>
-        {
-            options.AddPolicy("AdminPolicy", policy =>
-            {
-                policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
-
-                policy.Requirements.Add(new PermissionRequirement([Permission.CreateCourse]));
-            });
-        });
+        // services.AddAuthorization(options =>
+        // {
+        //     options.AddPolicy("AdminPolicy", policy =>
+        //     {
+        //         policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
+        //
+        //         policy.Requirements.Add(new PermissionRequirement([Permission.CreateCourse]));
+        //     });
+        // });
     }
 
     public static IEndpointConventionBuilder RequirePermissions<TBuilder>(

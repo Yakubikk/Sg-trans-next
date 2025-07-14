@@ -2,8 +2,8 @@ namespace Core.Users;
 
 public enum Permission
 {
-    ReadCourse = 1,
-    CreateCourse = 2,
-    UpdateCourse = 3,
-    DeleteCourse = 4
+    Read = 1,
+    Create = 2,
+    Update = 3,
+    Delete = 4
 }
