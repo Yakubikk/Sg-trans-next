@@ -5,20 +5,18 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
+  patronymic: string;
+  phoneNumber: string;
   role: Role;
-  isActive: boolean;
-  isBanned: boolean;
-  createdAt: string;
-  updatedAt: string;
-  lastLoginAt?: string;
-  avatar?: string;
 }
 
 export interface CreateUserRequest {
   email: string;
+  password: string;
   firstName: string;
   lastName: string;
-  password: string;
+  patronymic: string;
+  phoneNumber: string;
   role: Role;
 }
 
@@ -27,8 +25,6 @@ export interface UpdateUserRequest {
   lastName?: string;
   email?: string;
   role?: Role;
-  isActive?: boolean;
-  isBanned?: boolean;
 }
 
 export interface LoginRequest {
@@ -59,13 +55,11 @@ export interface PaginatedResponse<T> {
 export interface UserFilters {
   search?: string;
   role?: Role;
-  isActive?: boolean;
-  isBanned?: boolean;
 }
 
 export interface UserListParams extends UserFilters {
   page?: number;
   limit?: number;
-  sortBy?: 'createdAt' | 'firstName' | 'lastName' | 'email' | 'lastLoginAt';
+  sortBy?: 'firstName' | 'lastName' | 'email';
   sortOrder?: 'asc' | 'desc';
 }

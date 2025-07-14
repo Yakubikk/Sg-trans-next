@@ -26,10 +26,9 @@ export default function LoginPage() {
   };
 
   // Быстрый вход для демонстрации
-  const quickLogin = async (role: 'admin' | 'manager' | 'user') => {
+  const quickLogin = async (role: 'admin' | 'user') => {
     const credentials = {
       admin: { email: 'admin@example.com', password: 'password' },
-      manager: { email: 'manager@example.com', password: 'password' },
       user: { email: 'user@example.com', password: 'password' }
     };
 
@@ -65,13 +64,6 @@ export default function LoginPage() {
               className="w-full text-left px-3 py-2 text-sm bg-red-100 hover:bg-red-200 rounded border border-red-300 disabled:opacity-50"
             >
               👑 Админ (admin@example.com)
-            </button>
-            <button
-              onClick={() => quickLogin('manager')}
-              disabled={isLoading}
-              className="w-full text-left px-3 py-2 text-sm bg-green-100 hover:bg-green-200 rounded border border-green-300 disabled:opacity-50"
-            >
-              👨‍💼 Менеджер (manager@example.com)
             </button>
             <button
               onClick={() => quickLogin('user')}

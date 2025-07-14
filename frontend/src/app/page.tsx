@@ -79,9 +79,6 @@ export default function Home() {
                   • <strong>Admin</strong> - полный доступ
                 </li>
                 <li>
-                  • <strong>Manager</strong> - управление пользователями
-                </li>
-                <li>
                   • <strong>User</strong> - базовые функции
                 </li>
               </ul>

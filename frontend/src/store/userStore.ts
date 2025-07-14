@@ -31,9 +31,6 @@ interface UserState {
   createUser: (userData: CreateUserRequest) => Promise<User>;
   updateUser: (id: string, userData: UpdateUserRequest) => Promise<User>;
   deleteUser: (id: string) => Promise<void>;
-  banUser: (id: string) => Promise<User>;
-  unbanUser: (id: string) => Promise<User>;
-  toggleUserStatus: (id: string) => Promise<User>;
 
   // Действия для фильтров
   setFilters: (filters: Partial<UserListParams>) => void;
@@ -183,48 +180,6 @@ export const useUserStore = create<UserState>()(
             users: state.users.filter(user => user.id !== id),
             totalUsers: state.totalUsers - 1
           }));
-        },
-
-        banUser: async (id: string) => {
-          const response = await userApi.banUser(id);
-          const updatedUser = response.data;
-          
-          // Обновляем пользователя в списке
-          set(state => ({
-            users: state.users.map(user => 
-              user.id === id ? updatedUser : user
-            )
-          }));
-
-          return updatedUser;
-        },
-
-        unbanUser: async (id: string) => {
-          const response = await userApi.unbanUser(id);
-          const updatedUser = response.data;
-          
-          // Обновляем пользователя в списке
-          set(state => ({
-            users: state.users.map(user => 
-              user.id === id ? updatedUser : user
-            )
-          }));
-
-          return updatedUser;
-        },
-
-        toggleUserStatus: async (id: string) => {
-          const response = await userApi.toggleUserStatus(id);
-          const updatedUser = response.data;
-          
-          // Обновляем пользователя в списке
-          set(state => ({
-            users: state.users.map(user => 
-              user.id === id ? updatedUser : user
-            )
-          }));
-
-          return updatedUser;
         },
 
         // Фильтры

@@ -17,64 +17,18 @@ const FAKE_USERS: User[] = [
     email: 'admin@example.com',
     firstName: 'Админ',
     lastName: 'Системы',
+    patronymic: '',
+    phoneNumber: '',
     role: Role.ADMIN,
-    isActive: true,
-    isBanned: false,
-    createdAt: '2024-01-01T00:00:00.000Z',
-    updatedAt: '2024-01-01T00:00:00.000Z',
-    lastLoginAt: '2024-12-26T10:30:00.000Z',
-    avatar: 'https://ui-avatars.com/api/?name=Admin+System&background=6366f1&color=fff'
-  },
-  {
-    id: '2',
-    email: 'manager@example.com',
-    firstName: 'Иван',
-    lastName: 'Менеджеров',
-    role: Role.MANAGER,
-    isActive: true,
-    isBanned: false,
-    createdAt: '2024-01-15T00:00:00.000Z',
-    updatedAt: '2024-01-15T00:00:00.000Z',
-    lastLoginAt: '2024-12-25T14:20:00.000Z',
-    avatar: 'https://ui-avatars.com/api/?name=Ivan+Manager&background=10b981&color=fff'
   },
   {
     id: '3',
     email: 'user@example.com',
     firstName: 'Петр',
     lastName: 'Пользователев',
+    patronymic: '',
+    phoneNumber: '',
     role: Role.USER,
-    isActive: true,
-    isBanned: false,
-    createdAt: '2024-02-01T00:00:00.000Z',
-    updatedAt: '2024-02-01T00:00:00.000Z',
-    lastLoginAt: '2024-12-24T09:15:00.000Z',
-    avatar: 'https://ui-avatars.com/api/?name=Petr+User&background=f59e0b&color=fff'
-  },
-  {
-    id: '4',
-    email: 'inactive@example.com',
-    firstName: 'Анна',
-    lastName: 'Неактивная',
-    role: Role.USER,
-    isActive: false,
-    isBanned: false,
-    createdAt: '2024-02-15T00:00:00.000Z',
-    updatedAt: '2024-02-15T00:00:00.000Z',
-    avatar: 'https://ui-avatars.com/api/?name=Anna+Inactive&background=6b7280&color=fff'
-  },
-  {
-    id: '5',
-    email: 'banned@example.com',
-    firstName: 'Сергей',
-    lastName: 'Заблокированный',
-    role: Role.USER,
-    isActive: false,
-    isBanned: true,
-    createdAt: '2024-03-01T00:00:00.000Z',
-    updatedAt: '2024-03-01T00:00:00.000Z',
-    lastLoginAt: '2024-03-15T16:45:00.000Z',
-    avatar: 'https://ui-avatars.com/api/?name=Sergey+Banned&background=ef4444&color=fff'
   }
 ];
 
@@ -93,18 +47,11 @@ class UserApiService {
   async login(credentials: LoginRequest): Promise<ApiResponse<LoginResponse>> {
     await delay(800);
 
-    const user = this.users.find(u => u.email === credentials.email && !u.isBanned);
+    const user = this.users.find(u => u.email === credentials.email);
     
     if (!user) {
       throw new Error('Неверный email или пароль');
     }
-
-    if (!user.isActive) {
-      throw new Error('Аккаунт деактивирован');
-    }
-
-    // Обновляем время последнего входа
-    user.lastLoginAt = new Date().toISOString();
     
     const mockToken = `fake_token_${user.id}_${Date.now()}`;
     const mockRefreshToken = `fake_refresh_${user.id}_${Date.now()}`;
@@ -167,14 +114,6 @@ class UserApiService {
 
     if (params.role) {
       filteredUsers = filteredUsers.filter(user => user.role === params.role);
-    }
-
-    if (params.isActive !== undefined) {
-      filteredUsers = filteredUsers.filter(user => user.isActive === params.isActive);
-    }
-
-    if (params.isBanned !== undefined) {
-      filteredUsers = filteredUsers.filter(user => user.isBanned === params.isBanned);
     }
 
     // Сортировка
@@ -241,12 +180,9 @@ class UserApiService {
       email: userData.email,
       firstName: userData.firstName,
       lastName: userData.lastName,
+      patronymic: userData.patronymic,
+      phoneNumber: userData.phoneNumber,
       role: userData.role,
-      isActive: true,
-      isBanned: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.firstName + '+' + userData.lastName)}&background=6366f1&color=fff`
     };
 
     this.users.push(newUser);
@@ -278,13 +214,7 @@ class UserApiService {
     const updatedUser: User = {
       ...this.users[userIndex],
       ...userData,
-      updatedAt: new Date().toISOString()
     };
-
-    // Обновляем аватар если изменилось имя
-    if (userData.firstName || userData.lastName) {
-      updatedUser.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(updatedUser.firstName + '+' + updatedUser.lastName)}&background=6366f1&color=fff`;
-    }
 
     this.users[userIndex] = updatedUser;
 
@@ -321,29 +251,6 @@ class UserApiService {
       data: undefined,
       message: 'Пользователь успешно удален'
     };
-  }
-
-  async banUser(id: string): Promise<ApiResponse<User>> {
-    await delay(400);
-
-    return this.updateUser(id, { isBanned: true, isActive: false });
-  }
-
-  async unbanUser(id: string): Promise<ApiResponse<User>> {
-    await delay(400);
-
-    return this.updateUser(id, { isBanned: false, isActive: true });
-  }
-
-  async toggleUserStatus(id: string): Promise<ApiResponse<User>> {
-    await delay(400);
-
-    const user = this.users.find(u => u.id === id);
-    if (!user) {
-      throw new Error('Пользователь не найден');
-    }
-
-    return this.updateUser(id, { isActive: !user.isActive });
   }
 }
 

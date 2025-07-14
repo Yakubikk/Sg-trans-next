@@ -6,7 +6,7 @@ export default function UsersPage() {
   return (
     <ProtectedComponent
       requiredPermissions={[Permission.VIEW_USERS]}
-      requiredRoles={[Role.ADMIN, Role.MANAGER]}
+      requiredRoles={[Role.ADMIN]}
     >
       <div className="min-h-screen bg-gray-50">
         <UserManagement />

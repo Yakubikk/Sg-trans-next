@@ -42,7 +42,7 @@ function AdminDashboard() {
                     <h3 className="text-sm font-medium text-yellow-800">Защищённая область</h3>
                     <div className="mt-2 text-sm text-yellow-700">
                       <p>
-                        {'Эта страница доступна только пользователям с ролью Администратор или Менеджер и разрешением "view_dashboard"'}
+                        {'Эта страница доступна только пользователям с ролью Администратор и разрешением "view_dashboard"'}
                       </p>
                     </div>
                   </div>
@@ -58,5 +58,5 @@ function AdminDashboard() {
 
 export default withRoleProtection(AdminDashboard, {
   requiredPermissions: [Permission.VIEW_DASHBOARD],
-  requiredRoles: [Role.ADMIN, Role.MANAGER]
+  requiredRoles: [Role.ADMIN]
 });

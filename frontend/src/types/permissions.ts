@@ -1,6 +1,5 @@
 export const Role = {
   ADMIN: "Admin",
-  MANAGER: "Manager",
   USER: "User",
 } as const;
 
@@ -11,7 +10,6 @@ export const Permission = {
   VIEW_USERS: "view_users",
   CREATE_USER: "create_user",
   EDIT_USER: "edit_user",
-  BAN_USER: "ban_user",
   DELETE_USER: "delete_user",
 
   // Данные
@@ -36,21 +34,9 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     Permission.CREATE_USER,
     Permission.EDIT_USER,
     Permission.DELETE_USER,
-    Permission.BAN_USER,
     Permission.VIEW_DASHBOARD,
     Permission.VIEW_ANALYTICS,
     Permission.MANAGE_SYSTEM,
-  ],
-
-  [Role.MANAGER]: [
-    // Менеджер может управлять пользователями
-    Permission.VIEW_USERS,
-    Permission.CREATE_USER,
-    Permission.EDIT_USER,
-    Permission.BAN_USER,
-    Permission.DELETE_USER,
-    Permission.VIEW_DASHBOARD,
-    Permission.VIEW_ANALYTICS,
   ],
 
   [Role.USER]: [
