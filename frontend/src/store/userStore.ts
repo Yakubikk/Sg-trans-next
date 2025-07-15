@@ -96,7 +96,16 @@ export const useUserStore = create<UserState>()(
 
         getCurrentUser: async () => {
           const { token } = get();
-          if (!token) return;
+          
+          // Если нет токена в состоянии, проверяем localStorage
+          if (!token) {
+            // Даем время для восстановления persist данных
+            await new Promise(resolve => setTimeout(resolve, 50));
+            const updatedState = get();
+            if (!updatedState.token) {
+              throw new Error('Токен не найден');
+            }
+          }
 
           set({ isLoading: true });
           try {

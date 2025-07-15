@@ -40,8 +40,42 @@ const generateId = () => Math.random().toString(36).substr(2, 9);
 
 class UserApiService {
   private users: User[] = [...FAKE_USERS];
-  private currentUser: User | null = null;
-  private token: string | null = null;
+
+  // Получаем токен из localStorage (где его сохраняет Zustand persist)
+  private getToken(): string | null {
+    if (typeof window === 'undefined') return null;
+    
+    try {
+      const persistedState = localStorage.getItem('user-store');
+      console.log('getToken: persistedState from localStorage:', persistedState);
+      
+      if (persistedState) {
+        const parsed = JSON.parse(persistedState);
+        const token = parsed.state?.token || null;
+        console.log('getToken: extracted token:', token);
+        return token;
+      }
+    } catch (error) {
+      console.error('Ошибка при получении токена из localStorage:', error);
+    }
+    return null;
+  }
+
+  // Получаем текущего пользователя из localStorage
+  private getCurrentUserFromStorage(): User | null {
+    if (typeof window === 'undefined') return null;
+    
+    try {
+      const persistedState = localStorage.getItem('user-store');
+      if (persistedState) {
+        const parsed = JSON.parse(persistedState);
+        return parsed.state?.currentUser || null;
+      }
+    } catch (error) {
+      console.error('Ошибка при получении пользователя из localStorage:', error);
+    }
+    return null;
+  }
 
   // Аутентификация
   async login(credentials: LoginRequest): Promise<ApiResponse<LoginResponse>> {
@@ -55,9 +89,6 @@ class UserApiService {
     
     const mockToken = `fake_token_${user.id}_${Date.now()}`;
     const mockRefreshToken = `fake_refresh_${user.id}_${Date.now()}`;
-
-    this.currentUser = user;
-    this.token = mockToken;
 
     return {
       success: true,
@@ -73,9 +104,6 @@ class UserApiService {
   async logout(): Promise<ApiResponse<void>> {
     await delay(200);
     
-    this.currentUser = null;
-    this.token = null;
-
     return {
       success: true,
       data: undefined,
@@ -86,13 +114,33 @@ class UserApiService {
   async getCurrentUser(): Promise<ApiResponse<User>> {
     await delay(300);
 
-    if (!this.currentUser || !this.token) {
-      throw new Error('Пользователь не авторизован');
+    const token = this.getToken();
+    console.log('getCurrentUser: token from localStorage:', token);
+    
+    if (!token) {
+      console.log('getCurrentUser: Токен не найден в localStorage');
+      throw new Error('Токен не найден');
     }
 
+    // Симулируем проверку токена - извлекаем ID пользователя
+    const tokenParts = token.split('_');
+    if (tokenParts.length < 3 || tokenParts[0] !== 'fake' || tokenParts[1] !== 'token') {
+      console.log('getCurrentUser: Недействительный токен:', token);
+      throw new Error('Недействительный токен');
+    }
+
+    const userId = tokenParts[2];
+    const currentUser = this.users.find(u => u.id === userId);
+
+    if (!currentUser) {
+      console.log('getCurrentUser: Пользователь не найден для ID:', userId);
+      throw new Error('Пользователь не найден');
+    }
+
+    console.log('getCurrentUser: Пользователь найден:', currentUser);
     return {
       success: true,
-      data: this.currentUser
+      data: currentUser
     };
   }
 
@@ -218,11 +266,6 @@ class UserApiService {
 
     this.users[userIndex] = updatedUser;
 
-    // Если обновляем текущего пользователя
-    if (this.currentUser?.id === id) {
-      this.currentUser = updatedUser;
-    }
-
     return {
       success: true,
       data: updatedUser,
@@ -240,7 +283,8 @@ class UserApiService {
     }
 
     // Нельзя удалить самого себя
-    if (this.currentUser?.id === id) {
+    const currentUser = this.getCurrentUserFromStorage();
+    if (currentUser?.id === id) {
       throw new Error('Нельзя удалить самого себя');
     }
 

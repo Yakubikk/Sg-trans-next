@@ -1,4 +1,4 @@
-import { ProtectedComponent } from "@/components/ProtectedComponent";
+import { ProtectedPageComponent } from "@/components/ProtectedPage";
 import { Permission, Role } from "@/types/permissions";
 
 // HOC для защиты страниц
@@ -12,9 +12,9 @@ export function withRoleProtection<T extends object>(
 ) {
   return function ProtectedPage(props: T) {
     return (
-      <ProtectedComponent {...config}>
+      <ProtectedPageComponent {...config}>
         <Component {...props} />
-      </ProtectedComponent>
+      </ProtectedPageComponent>
     );
   };
 }
