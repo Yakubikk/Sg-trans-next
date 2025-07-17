@@ -1,9 +1,6 @@
 namespace Core.Depots;
 
-public class Depot
+public class Depot:Location
 {
-    public Guid Id { get; set; }
-    public string Name { get; set; }
-    public string Location { get; set; }
-    public string Code { get; set; }
+    
 }
