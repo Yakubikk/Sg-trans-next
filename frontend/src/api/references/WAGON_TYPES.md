@@ -78,7 +78,7 @@
 
 ### Использование:
 ```tsx
-import { WagonCard } from '@/components/WagonCard';
+import { WagonCard } from '@/components';
 import { Wagon } from '@/api/references';
 
 <WagonCard wagon={wagonData} className="mb-4" />

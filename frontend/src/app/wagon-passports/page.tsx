@@ -1,5 +1,4 @@
-import LogoutButton from "@/components/LogoutButton";
-import { BackButton } from "@/components/BackButton";
+import { LogoutButton, BackButton } from "@/components";
 
 export default function WagonPassports() {
   return (

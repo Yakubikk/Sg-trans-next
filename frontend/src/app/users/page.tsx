@@ -1,5 +1,4 @@
-import { ProtectedPageComponent } from '@/components/ProtectedPage';
-import UserManagement from '@/components/UserManagement';
+import { ProtectedPageComponent, UserManagement } from '@/components';
 import { Permission, Role } from '@/types/permissions';
 
 export default function UsersPage() {

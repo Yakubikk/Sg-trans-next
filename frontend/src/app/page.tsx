@@ -1,7 +1,5 @@
-import HomeClient from '@/components/HomeClient';
+import { HomeClient, LogoutButton, ProtectedComponent } from '@/components';
 import Link from "next/link";
-import LogoutButton from "@/components/LogoutButton";
-import { ProtectedComponent } from "@/components/ProtectedComponent";
 
 export default function Home() {
   return (
