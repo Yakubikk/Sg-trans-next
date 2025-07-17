@@ -4,6 +4,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { referencesApi, Wagon, RepairType } from '@/api/references';
 import { useApiCall } from '@/hooks/useApiCall';
+import WagonCard from './WagonCard';
 
 interface ReferencesButtonsProps {
   className?: string;
@@ -132,15 +133,9 @@ export default function ReferencesButtons({ className = '' }: ReferencesButtonsP
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Вагоны ({wagons.length})
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {wagons.map((wagon) => (
-              <div key={wagon.id} className="border border-gray-200 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900">Вагон №{wagon.number}</h4>
-                <p className="text-sm text-gray-600">Тип: {wagon.type}</p>
-                <p className="text-sm text-gray-600">Грузоподъемность: {wagon.capacity}т</p>
-                <p className="text-sm text-gray-600">Статус: {wagon.status}</p>
-                <p className="text-sm text-gray-600">Последнее ТО: {new Date(wagon.lastMaintenanceDate).toLocaleDateString()}</p>
-              </div>
+              <WagonCard key={wagon.id} wagon={wagon} />
             ))}
           </div>
         </div>
