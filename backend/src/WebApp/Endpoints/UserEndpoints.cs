@@ -67,26 +67,18 @@ public static class UsersEndpoints
 
     private static async Task<IResult> RefreshToken(
         RefreshTokenUseCase useCase,
+        [FromBody] string refreshToken,
         HttpContext context)
     {
-        // Получаем refresh token из cookie
-        if (!context.Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
+        var userId = context.User.FindFirstValue("userId");
+        Guid parsedUserId;
+        if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out parsedUserId))
             return Results.Unauthorized();
-
-        var request = new RefreshTokenRequest(refreshToken);
+        
+        var request = new RefreshTokenRequest(parsedUserId, refreshToken);
         var response = await useCase.ExecuteAsync(request);
 
-        // Обновляем cookie с refresh token
-        var cookieOptions = new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddDays(7)
-        };
-        context.Response.Cookies.Append("refreshToken", response.RefreshToken, cookieOptions);
-
-        return Results.Ok(new { accessToken = response.AccessToken });
+        return Results.Ok(response);
     }
     
     // private static async Task<IResult> GetAllUsers(
