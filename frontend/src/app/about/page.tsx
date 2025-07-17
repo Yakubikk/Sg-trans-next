@@ -1,4 +1,4 @@
-import AboutClient from '@/components/AboutClient';
+import { AboutClient } from '@/components';
 
 export default function About() {
   return (

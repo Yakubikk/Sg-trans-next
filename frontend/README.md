@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Это проект [Next.js](https://nextjs.org), созданный с помощью [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+## Начало работы
 
-First, run the development server:
+Сначала запустите сервер разработки:
 
 ```bash
 npm run dev
-# or
+# или
 yarn dev
-# or
+# или
 pnpm dev
-# or
+# или
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Откройте [http://localhost:3000](http://localhost:3000) в браузере, чтобы увидеть результат.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Вы можете начать редактировать страницу, изменив файл `app/page.tsx`. Страница автоматически обновляется при редактировании файла.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Этот проект использует [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) для автоматической оптимизации и загрузки [Geist](https://vercel.com/font) - нового семейства шрифтов от Vercel.
 
-## Learn More
+## Продакшн деплой с PM2
 
-To learn more about Next.js, take a look at the following resources:
+Этот проект включает в себя комплексную конфигурацию PM2 для продакшн деплоя на разных платформах.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Быстрый старт
+```bash
+# Установка зависимостей и сборка
+npm ci
+npm run build
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Запуск с PM2 (работает на Windows, Linux, macOS)
+npm run pm2:start
 
-## Deploy on Vercel
+# Просмотр статуса
+npm run pm2:status
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Просмотр логов
+npm run pm2:logs
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Остановка приложения
+npm run pm2:stop
+```
+
+### Доступные команды PM2
+- `npm run pm2:start` - Запуск приложения
+- `npm run pm2:stop` - Остановка приложения
+- `npm run pm2:restart` - Перезапуск приложения
+- `npm run pm2:reload` - Graceful перезагрузка (без простоя)
+- `npm run pm2:delete` - Удаление из PM2
+- `npm run pm2:status` - Показать статус процессов
+- `npm run pm2:logs` - Показать логи приложения
+- `npm run pm2:monitor` - Открыть интерфейс мониторинга
+
+### Платформо-специфичные скрипты
+- **Windows**: PowerShell скрипт (`scripts/pm2.ps1`) и Batch файл (`scripts/pm2.bat`)
+- **Linux/macOS**: Shell скрипт (`scripts/pm2.sh`)
+- **Кросс-платформенный**: Node.js runner (`scripts/pm2-runner.js`)
+
+### Документация
+- [Руководство по деплою на Windows Server](./WINDOWS_DEPLOYMENT.md) - Комплексная настройка Windows Server
+- [Примеры использования PM2](./PM2_USAGE_EXAMPLES.md) - Подробные примеры для всех платформ
+
+### Возможности API
+Этот проект включает модульную структуру API с:
+- Универсальной обработкой ошибок с Axios интерцепторами
+- Toast уведомлениями для обратной связи с пользователем
+- TypeScript интерфейсами, соответствующими C# моделям бэкенда
+- Организованными модулями API в директории `src/api/`
+
+## Узнать больше
+
+Чтобы узнать больше о Next.js, изучите следующие ресурсы:
+
+- [Документация Next.js](https://nextjs.org/docs) - узнайте о возможностях и API Next.js.
+- [Изучение Next.js](https://nextjs.org/learn) - интерактивный учебник по Next.js.
+
+Посетите [GitHub репозиторий Next.js](https://github.com/vercel/next.js) - ваши отзывы и вклад в разработку приветствуются!
+
+## Деплой на Vercel
+
+Самый простой способ развернуть ваше Next.js приложение - использовать [платформу Vercel](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) от создателей Next.js.
+
+Ознакомьтесь с [документацией по деплою Next.js](https://nextjs.org/docs/app/building-your-application/deploying) для получения более подробной информации.

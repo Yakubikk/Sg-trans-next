@@ -39,3 +39,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# PM2 logs
+logs/*.log
+.pm2/
+ecosystem.config.local.js
+
+# PM2 runtime files
+pids/
+*.pid
+
+# C# Models (backend reference)
+c#-models/
+*.seed
+*.pid.lock

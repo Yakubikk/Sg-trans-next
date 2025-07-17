@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { userApi } from '@/api/userApi';
 import { User, LoginRequest, CreateUserRequest, UpdateUserRequest, UserListParams } from '@/types/user';
+import { userApi } from '@/api';
 
 interface UserState {
   // Текущий пользователь

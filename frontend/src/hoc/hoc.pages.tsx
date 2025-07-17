@@ -1,4 +1,4 @@
-import { ProtectedPageComponent } from "@/components/ProtectedPage";
+import { ProtectedPageComponent } from "@/components";
 import { Permission, Role } from "@/types/permissions";
 
 // HOC для защиты страниц

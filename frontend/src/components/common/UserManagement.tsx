@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useUserStore } from "@/store/userStore";
 import { Role } from "@/types/permissions";
 import { User } from "@/types/user";
+import { cn } from "@/lib/utils";
 
 // Компонент карточки пользователя
 function UserCard({
@@ -39,7 +40,7 @@ function UserCard({
             </h3>
             <p className="text-sm text-gray-600">{user.email}</p>
             <div className="flex items-center space-x-2 mt-2">
-              <span className={`px-2 py-1 text-xs font-medium rounded-full ${getRoleColor(user.role)}`}>
+              <span className={cn("px-2 py-1 text-xs font-medium rounded-full", getRoleColor(user.role))}>
                 {user.role === Role.ADMIN ? "Админ" : "Пользователь"}
               </span>
             </div>
@@ -216,11 +217,12 @@ export default function UserManagement() {
                   <button
                     key={page}
                     onClick={() => handlePageChange(page)}
-                    className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    className={cn(
+                      "px-3 py-2 rounded-md text-sm font-medium",
                       page === currentPage
                         ? "bg-indigo-600 text-white"
                         : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
-                    }`}
+                    )}
                   >
                     {page}
                   </button>
