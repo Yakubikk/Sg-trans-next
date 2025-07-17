@@ -1,3 +1,3 @@
 namespace UseCases.Users.RefreshToken;
 
-public record RefreshTokenRequest(string RefreshToken);
+public record RefreshTokenRequest(Guid Id, string RefreshToken);

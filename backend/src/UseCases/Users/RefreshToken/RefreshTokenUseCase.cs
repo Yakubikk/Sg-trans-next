@@ -18,12 +18,10 @@ public class RefreshTokenUseCase
     public async Task<RefreshTokenResponse> ExecuteAsync(RefreshTokenRequest request)
     {
         // Найти пользователя по refresh token
-        var users = await _userRepository.GetAllUsersAsync();
-        var user = users.FirstOrDefault(u => u.RefreshToken == request.RefreshToken) 
-            ?? throw new Exception("Invalid refresh token");
+        var user = await _userRepository.GetUserByIdAsync(request.Id);
 
         // Проверить срок действия токена
-        if (user.RefreshTokenExpiry <= DateTime.UtcNow)
+        if (user.RefreshTokenExpiry <= DateTime.UtcNow || user.RefreshToken != request.RefreshToken)
             throw new Exception("Refresh token expired");
 
         // Сгенерировать новые токены
