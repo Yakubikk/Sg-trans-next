@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { referencesApi, Wagon, RepairType } from '@/api/referencesApi';
+import { referencesApi, Wagon, RepairType } from '@/api/references';
 import { useApiCall } from '@/hooks/useApiCall';
 
 interface ReferencesButtonsProps {
