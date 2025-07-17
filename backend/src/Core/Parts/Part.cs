@@ -12,6 +12,7 @@ public class Part
     public Status Status { get; set; }
     public string Notes { get; set; }
     public double Weight { get; set; }
+    public string Code { get; set; }
    
     
     

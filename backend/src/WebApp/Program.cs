@@ -3,6 +3,7 @@ using Infrastructure;
 using Infrastructure.Authentication;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.OpenApi.Models;
+using WebApp.Endpoints.Repairs;
 using WebApp.Extensions;
 using Persistence;
 using Persistence.Mappings;
@@ -65,25 +66,43 @@ services.AddAutoMapper(typeof(DataBaseMappings));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-app.MapOpenApi();
 app.UseSwagger();
-app.UseSwaggerUI(); 
+app.UseSwaggerUI();
 
-// app.UseHttpsRedirection();
-
-app.UseCookiePolicy(new CookiePolicyOptions
-{
-    MinimumSameSitePolicy = SameSiteMode.Strict,
-    HttpOnly = HttpOnlyPolicy.Always,
-    Secure = CookieSecurePolicy.Always
-});
-
+app.UseHttpsRedirection();
 app.UseAuthentication();
-
 app.UseAuthorization();
 
+// Map endpoints
 app.AddMappedEndpoints();
+app.MapGasContractEndpoints();
+app.MapStationEndpoints();
+app.MapRepairTypeEndpoints();
+app.MapRepairEndpoints();
+app.MapRailwayEndpoints();
+app.MapCountryEndpoints();
+app.MapWagonEndpoints();
+app.MapDepotEndpoints();
+app.MapEmployeeEndpoints();
+app.MapDefectEndpoints();
+app.MapFaultEndpoints();
+app.MapEuroCostEndpoints();
+app.MapModelVCEndpoints();
+app.MapVcTypeEndpoints();
+app.MapStampEndpoints();
+app.MapReferenceStationEndpoints();
+app.MapAbsorberDeviceEndpoints();
+app.MapAbsorberDevice1Endpoints();
+app.MapAbsorberDeviceAccountingEndpoints();
+app.MapAirDistributorEndpoints();
+app.MapBrakeEndpoints();
+app.MapCargoEndpoints();
+app.MapClientEndpoints();
+app.MapContractEndpoints();
+app.MapCostEndpoints();
+app.MapModernizationEndpoints();
+app.MapPartEndpoints();
+app.MapReasonEndpoints();
 
 using (var scope = app.Services.CreateScope())
 {
