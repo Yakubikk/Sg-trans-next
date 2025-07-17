@@ -1,6 +1,7 @@
 'use client';
 
 import { Wagon, getWagonStatus, getWagonDisplayName } from '@/api/references';
+import { cn } from '@/lib/utils';
 
 interface WagonCardProps {
   wagon: Wagon;
@@ -9,16 +10,17 @@ interface WagonCardProps {
 
 export default function WagonCard({ wagon, className = '' }: WagonCardProps) {
   return (
-    <div className={`border border-gray-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow ${className}`}>
+    <div className={cn("border border-gray-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow", className)}>
       {/* Заголовок */}
       <div className="flex justify-between items-start mb-3">
         <h4 className="font-semibold text-lg text-gray-900">{getWagonDisplayName(wagon)}</h4>
         <div className="flex gap-2">
-          <span className={`px-2 py-1 text-xs rounded-full ${
+          <span className={cn(
+            "px-2 py-1 text-xs rounded-full",
             wagon.isActive 
-              ? 'bg-green-100 text-green-800' 
-              : 'bg-red-100 text-red-800'
-          }`}>
+              ? "bg-green-100 text-green-800" 
+              : "bg-red-100 text-red-800"
+          )}>
             {getWagonStatus(wagon)}
           </span>
           {wagon.isLeased && (

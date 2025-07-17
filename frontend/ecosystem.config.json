@@ -1,0 +1,37 @@
+{
+  "apps": [
+    {
+      "name": "sg-trans-frontend",
+      "script": "npm",
+      "args": "start",
+      "cwd": "/home/yakubikk/SG/Sg-trans-next/frontend",
+      "instances": "max",
+      "exec_mode": "cluster",
+      "env": {
+        "NODE_ENV": "production",
+        "PORT": "3000"
+      },
+      "env_development": {
+        "NODE_ENV": "development",
+        "PORT": "3000"
+      },
+      "env_staging": {
+        "NODE_ENV": "production",
+        "PORT": "3001"
+      },
+      "log_date_format": "YYYY-MM-DD HH:mm:ss Z",
+      "error_file": "/var/log/pm2/sg-trans-frontend-error.log",
+      "out_file": "/var/log/pm2/sg-trans-frontend-out.log",
+      "log_file": "/var/log/pm2/sg-trans-frontend-combined.log",
+      "time": true,
+      "autorestart": true,
+      "watch": false,
+      "max_memory_restart": "1G",
+      "node_args": "--max_old_space_size=4096",
+      "merge_logs": true,
+      "kill_timeout": 5000,
+      "wait_ready": true,
+      "listen_timeout": 10000
+    }
+  ]
+}

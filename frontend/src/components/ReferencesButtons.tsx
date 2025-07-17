@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { referencesApi, Wagon, RepairType } from '@/api/references';
 import { useApiCall } from '@/hooks/useApiCall';
 import WagonCard from './WagonCard';
+import { cn } from '@/lib/utils';
 
 interface ReferencesButtonsProps {
   className?: string;
@@ -57,7 +58,7 @@ export default function ReferencesButtons({ className = '' }: ReferencesButtonsP
   };
 
   return (
-    <div className={`space-y-6 ${className}`}>
+    <div className={cn("space-y-6", className)}>
       {/* Кнопки управления */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <button
