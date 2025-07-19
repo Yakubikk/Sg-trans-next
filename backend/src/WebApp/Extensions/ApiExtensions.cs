@@ -1,12 +1,13 @@
 using System.Text;
-using Core.Abstractions.Services;
-using Core.Users;
-using Infrastructure.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
-using UseCases.Services;
+using WebApp.Abstractions.Services;
+using WebApp.Data.Enums;
 using WebApp.Endpoints;
+using WebApp.Endpoints.References;
+using WebApp.Services;
+using WebApp.Services.Authentication;
 
 namespace WebApp.Extensions;
 
@@ -15,6 +16,37 @@ public static class ApiExtensions
     public static void AddMappedEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapUsersEndpoints();
+        
+        //references endpoints
+        app.MapGasContractEndpoints();
+        app.MapStationEndpoints();
+        app.MapRepairTypeEndpoints();
+        app.MapRepairEndpoints();
+        app.MapRailwayEndpoints();
+        app.MapCountryEndpoints();
+        app.MapWagonEndpoints();
+        app.MapDepotEndpoints();
+        app.MapEmployeeEndpoints();
+        app.MapDefectEndpoints();
+        app.MapFaultEndpoints();
+        app.MapEuroCostEndpoints();
+        app.MapModelVCEndpoints();
+        app.MapVcTypeEndpoints();
+        app.MapStampEndpoints();
+        app.MapReferenceStationEndpoints();
+        app.MapAbsorberDeviceEndpoints();
+        app.MapAbsorberDevice1Endpoints();
+        app.MapAbsorberDeviceAccountingEndpoints();
+        app.MapAirDistributorEndpoints();
+        app.MapBrakeEndpoints();
+        app.MapCargoEndpoints();
+        app.MapClientEndpoints();
+        app.MapContractEndpoints();
+        app.MapCostEndpoints();
+        app.MapModernizationEndpoints();
+        app.MapPartEndpoints();
+        app.MapReasonEndpoints();
+
     }
 
     public static void AddApiAuthentication(
@@ -44,30 +76,10 @@ public static class ApiExtensions
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(jwtOptions!.SecretKey))
                 };
-                //
-                // options.Events = new JwtBearerEvents
-                // {
-                //     OnMessageReceived = context =>
-                //     {
-                //         context.Token = context.Request.Cookies["secretCookie"];
-                //
-                //         return Task.CompletedTask;
-                //     }
-                // };
             });
 
         services.AddScoped<IPermissionService, PermissionService>();
         services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
-
-        // services.AddAuthorization(options =>
-        // {
-        //     options.AddPolicy("AdminPolicy", policy =>
-        //     {
-        //         policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
-        //
-        //         policy.Requirements.Add(new PermissionRequirement([Permission.CreateCourse]));
-        //     });
-        // });
     }
 
     public static IEndpointConventionBuilder RequirePermissions<TBuilder>(

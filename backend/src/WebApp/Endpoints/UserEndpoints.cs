@@ -1,15 +1,15 @@
 using System.Security.Claims;
-using Core.Users;
 using Microsoft.AspNetCore.Mvc;
-using UseCases.Users.Delete;
-using UseCases.Users.GetCurrent;
-using UseCases.Users.GetPermissions;
-using UseCases.Users.Login;
-using UseCases.Users.RefreshToken;
-using UseCases.Users.Register;
-using UseCases.Users.Update;
-using UseCases.Users.UpdateRoles;
+using WebApp.Data.Enums;
 using WebApp.Extensions;
+using WebApp.Features.Users.Delete;
+using WebApp.Features.Users.GetCurrent;
+using WebApp.Features.Users.GetPermissions;
+using WebApp.Features.Users.Login;
+using WebApp.Features.Users.RefreshToken;
+using WebApp.Features.Users.Register;
+using WebApp.Features.Users.Update;
+using WebApp.Features.Users.UpdateRoles;
 
 namespace WebApp.Endpoints;
 
@@ -107,7 +107,7 @@ public static class UsersEndpoints
     {
         var request = new GetUserPermissionsRequest(userId);
         var permissions = await useCase.ExecuteAsync(request);
-        return Results.Ok(permissions);
+        return Results.Ok(permissions.ToList());
     }
 
     private static async Task<IResult> UpdateUser(
