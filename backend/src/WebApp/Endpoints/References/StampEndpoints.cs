@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApp.Data.Entities.References;
+using WebApp.Data.Enums;
+using WebApp.Extensions;
 using WebApp.Features.References;
 
 namespace WebApp.Endpoints.References;
@@ -9,22 +11,26 @@ public static class StampEndpoints
     public static void MapStampEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/stamps")
+            .RequireAuthorization()
             .WithTags("справочник_клеймо");
 
         group.MapGet("/", async ([FromServices] StampService service) =>
-            Results.Ok(await service.GetAllStampsAsync()));
+            Results.Ok(await service.GetAllStampsAsync()))
+            .RequirePermissions(Permission.Read);
 
         group.MapGet("/{id}", async ([FromServices] StampService service, [FromRoute] Guid id) =>
         {
             var stamp = await service.GetStampByIdAsync(id);
             return stamp is null ? Results.NotFound() : Results.Ok(stamp);
-        });
+        })
+        .RequirePermissions(Permission.Read);
 
         group.MapPost("/", async ([FromServices] StampService service, [FromBody] Stamp stamp) =>
         {
             var created = await service.CreateStampAsync(stamp);
             return Results.Created($"/api/stamps/{created.Id}", created);
-        });
+        })
+        .RequirePermissions(Permission.Create);
 
         group.MapPut("/{id}", async ([FromServices] StampService service, [FromRoute] Guid id, [FromBody] Stamp stamp) =>
         {
@@ -33,12 +39,14 @@ public static class StampEndpoints
             
             await service.UpdateStampAsync(stamp);
             return Results.NoContent();
-        });
+        })
+        .RequirePermissions(Permission.Update);
 
         group.MapDelete("/{id}", async ([FromServices] StampService service, [FromRoute] Guid id) =>
         {
             await service.DeleteStampAsync(id);
             return Results.NoContent();
-        });
+        })
+        .RequirePermissions(Permission.Delete);
     }
 }

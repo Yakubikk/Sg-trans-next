@@ -26,7 +26,6 @@ services.AddCors(options =>
               .AllowCredentials();
     });
 });
-
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -100,3 +99,4 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+

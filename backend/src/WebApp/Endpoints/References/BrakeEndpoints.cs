@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApp.Data.Entities.References;
+using WebApp.Data.Enums;
+using WebApp.Extensions;
 using WebApp.Features.References;
 
 namespace WebApp.Endpoints.References;
@@ -9,22 +11,26 @@ public static class BrakeEndpoints
     public static void MapBrakeEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/brakes")
+            .RequireAuthorization()
             .WithTags("справочник_тормоз");
 
         group.MapGet("/", async ([FromServices] BrakeService service) =>
-            Results.Ok(await service.GetAllBrakesAsync()));
+            Results.Ok(await service.GetAllBrakesAsync()))
+            .RequirePermissions(Permission.Read);
 
         group.MapGet("/{id}", async ([FromServices] BrakeService service, [FromRoute] Guid id) =>
         {
             var brake = await service.GetBrakeByIdAsync(id);
             return brake is null ? Results.NotFound() : Results.Ok(brake);
-        });
+        })
+        .RequirePermissions(Permission.Read);
 
         group.MapPost("/", async ([FromServices] BrakeService service, [FromBody] Brake brake) =>
         {
             var created = await service.CreateBrakeAsync(brake);
             return Results.Created($"/api/brakes/{created.Id}", created);
-        });
+        })
+        .RequirePermissions(Permission.Create);
 
         group.MapPut("/{id}", async ([FromServices] BrakeService service, [FromRoute] Guid id, [FromBody] Brake brake) =>
         {
@@ -33,12 +39,14 @@ public static class BrakeEndpoints
             
             await service.UpdateBrakeAsync(brake);
             return Results.NoContent();
-        });
+        })
+        .RequirePermissions(Permission.Update);
 
         group.MapDelete("/{id}", async ([FromServices] BrakeService service, [FromRoute] Guid id) =>
         {
             await service.DeleteBrakeAsync(id);
             return Results.NoContent();
-        });
+        })
+        .RequirePermissions(Permission.Delete);
     }
 }

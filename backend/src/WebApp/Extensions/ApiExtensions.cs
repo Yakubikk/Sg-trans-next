@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using WebApp.Abstractions.Services;
 using WebApp.Data.Enums;
 using WebApp.Endpoints;
+using WebApp.Endpoints.RailwayCisterns;
 using WebApp.Endpoints.References;
 using WebApp.Services;
 using WebApp.Services.Authentication;
@@ -47,6 +48,9 @@ public static class ApiExtensions
         app.MapPartEndpoints();
         app.MapReasonEndpoints();
 
+        // railway cisterns endpoints
+        app.MapManufacturerEndpoints();
+        app.MapRailwayCisternEndpoints();
     }
 
     public static void AddApiAuthentication(

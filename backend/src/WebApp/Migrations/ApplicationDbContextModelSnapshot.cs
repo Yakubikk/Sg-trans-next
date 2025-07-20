@@ -22,6 +22,483 @@ namespace Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.Bolster", b =>
+                {
+                    b.Property<Guid>("PartId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly?>("ExtendedUntil")
+                        .HasColumnType("date");
+
+                    b.Property<int?>("ServiceLifeYears")
+                        .HasColumnType("integer");
+
+                    b.HasKey("PartId");
+
+                    b.ToTable("Bolsters");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.Coupler", b =>
+                {
+                    b.Property<Guid>("PartId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("PartId");
+
+                    b.ToTable("Couplers");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.Depot", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatorId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Depots");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.Location", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatorId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Locations");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.Manufacturer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatorId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Manufacturers");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.Part", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatorId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CurrentLocation")
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("DepotId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("ManufactureYear")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<int>("PartType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SerialNumber")
+                        .HasColumnType("text");
+
+                    b.Property<string>("StampNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DepotId");
+
+                    b.ToTable("Parts");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.PartInstallation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("FromLocationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("InstalledAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("InstalledBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("PartId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("RemovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RemovedBy")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ToLocationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("WagonId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FromLocationId");
+
+                    b.HasIndex("PartId");
+
+                    b.HasIndex("ToLocationId");
+
+                    b.HasIndex("WagonId");
+
+                    b.ToTable("PartInstallations");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.RailwayCistern", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("AxleCount")
+                        .HasColumnType("integer");
+
+                    b.Property<DateOnly>("BuildDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("CommissioningDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatorId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal?>("FillingVolume")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal?>("InitialTareWeight")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("Length")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("LoadCapacity")
+                        .HasColumnType("numeric");
+
+                    b.Property<Guid>("ManufacturerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ModelId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("RegistrarId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly>("RegistrationDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("RegistrationNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SerialNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("TareWeight")
+                        .HasColumnType("numeric");
+
+                    b.Property<Guid>("TypeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ManufacturerId");
+
+                    b.HasIndex("ModelId");
+
+                    b.HasIndex("RegistrarId");
+
+                    b.HasIndex("TypeId");
+
+                    b.ToTable("RailwayCisterns");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.Registrar", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Registrars");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.Repair", b =>
+                {
+                    b.Property<Guid>("RepairId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DepotId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly?>("NextRepairDate")
+                        .HasColumnType("date");
+
+                    b.Property<Guid>("PartId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly>("RepairDate")
+                        .HasColumnType("date");
+
+                    b.Property<Guid>("RepairTypeId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("RepairId");
+
+                    b.HasIndex("DepotId");
+
+                    b.HasIndex("PartId");
+
+                    b.HasIndex("RepairTypeId");
+
+                    b.ToTable("Repairs");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.RepairType", b =>
+                {
+                    b.Property<Guid>("RepairTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("RepairTypeId");
+
+                    b.ToTable("RepairTypes");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.ShockAbsorber", b =>
+                {
+                    b.Property<Guid>("PartId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ManufacturerCode")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Model")
+                        .HasColumnType("text");
+
+                    b.Property<DateOnly?>("NextRepairDate")
+                        .HasColumnType("date");
+
+                    b.Property<int?>("ServiceLifeYears")
+                        .HasColumnType("integer");
+
+                    b.HasKey("PartId");
+
+                    b.ToTable("ShockAbsorbers");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.SideFrame", b =>
+                {
+                    b.Property<Guid>("PartId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly?>("ExtendedUntil")
+                        .HasColumnType("date");
+
+                    b.Property<int?>("ServiceLifeYears")
+                        .HasColumnType("integer");
+
+                    b.HasKey("PartId");
+
+                    b.ToTable("SideFrames");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.Vessel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RailwayCisternId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly?>("VesselBuildDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("VesselSerialNumber")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RailwayCisternId")
+                        .IsUnique();
+
+                    b.ToTable("Vessels");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.WagonModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WagonModels");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.WagonType", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WagonTypes");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.WheelPair", b =>
+                {
+                    b.Property<Guid>("PartId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal?>("ThicknessLeft")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal?>("ThicknessRight")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("WheelType")
+                        .HasColumnType("text");
+
+                    b.HasKey("PartId");
+
+                    b.ToTable("WheelPairs");
+                });
+
             modelBuilder.Entity("WebApp.Data.Entities.References.AbsorberDevice", b =>
                 {
                     b.Property<Guid>("Id")
@@ -391,7 +868,7 @@ namespace Persistence.Migrations
                     b.ToTable("спрнеисправности");
                 });
 
-            modelBuilder.Entity("WebApp.Data.Entities.References.Depot", b =>
+            modelBuilder.Entity("WebApp.Data.Entities.References.DepotReference", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -580,7 +1057,7 @@ namespace Persistence.Migrations
                     b.ToTable("спрмодернизация");
                 });
 
-            modelBuilder.Entity("WebApp.Data.Entities.References.Part", b =>
+            modelBuilder.Entity("WebApp.Data.Entities.References.PartReference", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -673,7 +1150,7 @@ namespace Persistence.Migrations
                     b.ToTable("спрстанции");
                 });
 
-            modelBuilder.Entity("WebApp.Data.Entities.References.Repair", b =>
+            modelBuilder.Entity("WebApp.Data.Entities.References.RepairReference", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -698,7 +1175,7 @@ namespace Persistence.Migrations
                     b.ToTable("спрремонты");
                 });
 
-            modelBuilder.Entity("WebApp.Data.Entities.References.RepairType", b =>
+            modelBuilder.Entity("WebApp.Data.Entities.References.RepairTypeReference", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1213,6 +1690,168 @@ namespace Persistence.Migrations
                     b.ToTable("UserRole");
                 });
 
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.Bolster", b =>
+                {
+                    b.HasOne("WebApp.Data.Entities.RailwayCisterns.Part", "Part")
+                        .WithOne("Bolster")
+                        .HasForeignKey("WebApp.Data.Entities.RailwayCisterns.Bolster", "PartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Part");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.Coupler", b =>
+                {
+                    b.HasOne("WebApp.Data.Entities.RailwayCisterns.Part", "Part")
+                        .WithOne("Coupler")
+                        .HasForeignKey("WebApp.Data.Entities.RailwayCisterns.Coupler", "PartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Part");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.Part", b =>
+                {
+                    b.HasOne("WebApp.Data.Entities.RailwayCisterns.Depot", "Depot")
+                        .WithMany("Parts")
+                        .HasForeignKey("DepotId");
+
+                    b.Navigation("Depot");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.PartInstallation", b =>
+                {
+                    b.HasOne("WebApp.Data.Entities.RailwayCisterns.Location", "FromLocation")
+                        .WithMany("FromInstallations")
+                        .HasForeignKey("FromLocationId");
+
+                    b.HasOne("WebApp.Data.Entities.RailwayCisterns.Part", "Part")
+                        .WithMany("PartInstallations")
+                        .HasForeignKey("PartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApp.Data.Entities.RailwayCisterns.Location", "ToLocation")
+                        .WithMany("ToInstallations")
+                        .HasForeignKey("ToLocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApp.Data.Entities.RailwayCisterns.RailwayCistern", "Wagon")
+                        .WithMany("PartInstallations")
+                        .HasForeignKey("WagonId");
+
+                    b.Navigation("FromLocation");
+
+                    b.Navigation("Part");
+
+                    b.Navigation("ToLocation");
+
+                    b.Navigation("Wagon");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.RailwayCistern", b =>
+                {
+                    b.HasOne("WebApp.Data.Entities.RailwayCisterns.Manufacturer", "Manufacturer")
+                        .WithMany("RailwayCisterns")
+                        .HasForeignKey("ManufacturerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApp.Data.Entities.RailwayCisterns.WagonModel", "Model")
+                        .WithMany("RailwayCisterns")
+                        .HasForeignKey("ModelId");
+
+                    b.HasOne("WebApp.Data.Entities.RailwayCisterns.Registrar", "Registrar")
+                        .WithMany("RailwayCisterns")
+                        .HasForeignKey("RegistrarId");
+
+                    b.HasOne("WebApp.Data.Entities.RailwayCisterns.WagonType", "Type")
+                        .WithMany("RailwayCisterns")
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Manufacturer");
+
+                    b.Navigation("Model");
+
+                    b.Navigation("Registrar");
+
+                    b.Navigation("Type");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.Repair", b =>
+                {
+                    b.HasOne("WebApp.Data.Entities.RailwayCisterns.Depot", "Depot")
+                        .WithMany("Repairs")
+                        .HasForeignKey("DepotId");
+
+                    b.HasOne("WebApp.Data.Entities.RailwayCisterns.Part", "Part")
+                        .WithMany("Repairs")
+                        .HasForeignKey("PartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApp.Data.Entities.RailwayCisterns.RepairType", "RepairType")
+                        .WithMany("Repairs")
+                        .HasForeignKey("RepairTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Depot");
+
+                    b.Navigation("Part");
+
+                    b.Navigation("RepairType");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.ShockAbsorber", b =>
+                {
+                    b.HasOne("WebApp.Data.Entities.RailwayCisterns.Part", "Part")
+                        .WithOne("ShockAbsorber")
+                        .HasForeignKey("WebApp.Data.Entities.RailwayCisterns.ShockAbsorber", "PartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Part");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.SideFrame", b =>
+                {
+                    b.HasOne("WebApp.Data.Entities.RailwayCisterns.Part", "Part")
+                        .WithOne("SideFrame")
+                        .HasForeignKey("WebApp.Data.Entities.RailwayCisterns.SideFrame", "PartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Part");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.Vessel", b =>
+                {
+                    b.HasOne("WebApp.Data.Entities.RailwayCisterns.RailwayCistern", "RailwayCistern")
+                        .WithOne("Vessel")
+                        .HasForeignKey("WebApp.Data.Entities.RailwayCisterns.Vessel", "RailwayCisternId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RailwayCistern");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.WheelPair", b =>
+                {
+                    b.HasOne("WebApp.Data.Entities.RailwayCisterns.Part", "Part")
+                        .WithOne("WheelPair")
+                        .HasForeignKey("WebApp.Data.Entities.RailwayCisterns.WheelPair", "PartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Part");
+                });
+
             modelBuilder.Entity("WebApp.Data.Entities.References.Defect", b =>
                 {
                     b.HasOne("WebApp.Data.Entities.References.Reason", "Reason")
@@ -1250,6 +1889,69 @@ namespace Persistence.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.Depot", b =>
+                {
+                    b.Navigation("Parts");
+
+                    b.Navigation("Repairs");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.Location", b =>
+                {
+                    b.Navigation("FromInstallations");
+
+                    b.Navigation("ToInstallations");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.Manufacturer", b =>
+                {
+                    b.Navigation("RailwayCisterns");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.Part", b =>
+                {
+                    b.Navigation("Bolster");
+
+                    b.Navigation("Coupler");
+
+                    b.Navigation("PartInstallations");
+
+                    b.Navigation("Repairs");
+
+                    b.Navigation("ShockAbsorber");
+
+                    b.Navigation("SideFrame");
+
+                    b.Navigation("WheelPair");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.RailwayCistern", b =>
+                {
+                    b.Navigation("PartInstallations");
+
+                    b.Navigation("Vessel");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.Registrar", b =>
+                {
+                    b.Navigation("RailwayCisterns");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.RepairType", b =>
+                {
+                    b.Navigation("Repairs");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.WagonModel", b =>
+                {
+                    b.Navigation("RailwayCisterns");
+                });
+
+            modelBuilder.Entity("WebApp.Data.Entities.RailwayCisterns.WagonType", b =>
+                {
+                    b.Navigation("RailwayCisterns");
                 });
 
             modelBuilder.Entity("WebApp.Data.Entities.References.Reason", b =>

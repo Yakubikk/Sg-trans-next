@@ -5,30 +5,30 @@ namespace WebApp.Features.References;
 
 public class RepairTypeService
 {
-    private readonly BaseRepository<RepairType> _repairTypeRepository;
+    private readonly BaseRepository<RepairTypeReference> _repairTypeRepository;
 
-    public RepairTypeService(BaseRepository<RepairType> repairTypeRepository)
+    public RepairTypeService(BaseRepository<RepairTypeReference> repairTypeRepository)
     {
         _repairTypeRepository = repairTypeRepository;
     }
 
-    public async Task<IEnumerable<RepairType>> GetAllRepairTypesAsync()
+    public async Task<IEnumerable<RepairTypeReference>> GetAllRepairTypesAsync()
     {
         return await _repairTypeRepository.GetAllAsync();
     }
 
-    public async Task<RepairType?> GetRepairTypeByIdAsync(Guid id)
+    public async Task<RepairTypeReference?> GetRepairTypeByIdAsync(Guid id)
     {
         return await _repairTypeRepository.GetByIdAsync(id);
     }
 
-    public async Task<RepairType> CreateRepairTypeAsync(RepairType repairType)
+    public async Task<RepairTypeReference> CreateRepairTypeAsync(RepairTypeReference repairType)
     {
         repairType.Id = Guid.NewGuid();
         return await _repairTypeRepository.CreateAsync(repairType);
     }
 
-    public async Task UpdateRepairTypeAsync(RepairType repairType)
+    public async Task UpdateRepairTypeAsync(RepairTypeReference repairType)
     {
         await _repairTypeRepository.UpdateAsync(repairType);
     }

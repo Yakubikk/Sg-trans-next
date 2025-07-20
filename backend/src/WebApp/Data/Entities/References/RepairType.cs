@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace WebApp.Data.Entities.References;
 
 [Table("справочник_видыремонта")]
-public class RepairType
+public class RepairTypeReference
 {
     [Key]
     public Guid Id { get; set; }

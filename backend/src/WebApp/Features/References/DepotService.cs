@@ -5,30 +5,30 @@ namespace WebApp.Features.References;
 
 public class DepotService
 {
-    private readonly BaseRepository<Depot> _depotRepository;
+    private readonly BaseRepository<DepotReference> _depotRepository;
 
-    public DepotService(BaseRepository<Depot> depotRepository)
+    public DepotService(BaseRepository<DepotReference> depotRepository)
     {
         _depotRepository = depotRepository;
     }
 
-    public async Task<IEnumerable<Depot>> GetAllDepotsAsync()
+    public async Task<IEnumerable<DepotReference>> GetAllDepotsAsync()
     {
         return await _depotRepository.GetAllAsync();
     }
 
-    public async Task<Depot?> GetDepotByIdAsync(Guid id)
+    public async Task<DepotReference?> GetDepotByIdAsync(Guid id)
     {
         return await _depotRepository.GetByIdAsync(id);
     }
 
-    public async Task<Depot> CreateDepotAsync(Depot depot)
+    public async Task<DepotReference> CreateDepotAsync(DepotReference depot)
     {
         depot.Id = Guid.NewGuid();
         return await _depotRepository.CreateAsync(depot);
     }
 
-    public async Task UpdateDepotAsync(Depot depot)
+    public async Task UpdateDepotAsync(DepotReference depot)
     {
         await _depotRepository.UpdateAsync(depot);
     }
