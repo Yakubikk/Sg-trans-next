@@ -1,5 +1,6 @@
 using WebApp.Data.Entities.Users;
 using WebApp.Data.Repositories;
+using WebApp.Features.Users.GetCurrent;
 
 namespace WebApp.Features.Users.UpdateRoles;
 
@@ -12,7 +13,7 @@ public class UpdateUserRolesUseCase
         _userRepository = userRepository;
     }
 
-    public async Task<User> ExecuteAsync(UpdateUserRolesRequest request)
+    public async Task<GetCurrentUserResponse> ExecuteAsync(UpdateUserRolesRequest request)
     {
         var user = await _userRepository.GetUserByIdAsync(request.UserId);
         user.Roles = new List<RoleEntity>();
@@ -21,6 +22,21 @@ public class UpdateUserRolesUseCase
             user.Roles.Add(await _userRepository.GetRoleByIdAsync((int)role));
         }
 
-        return await _userRepository.UpdateUserAsync(user);
+        user = await _userRepository.UpdateUserAsync(user);
+        
+        var response = new GetCurrentUserResponse(
+            user.Id,
+            user.Email,
+            user.FirstName,
+            user.LastName,
+            user.Patronymic,
+            user.PhoneNumber,
+            user.RefreshToken,
+            user.RefreshTokenExpiry,
+            user.Roles.Select(r => new RolesForCurrentUser(
+                r.Id,
+                r.Name
+            )).ToArray());
+        return response;
     }
 }

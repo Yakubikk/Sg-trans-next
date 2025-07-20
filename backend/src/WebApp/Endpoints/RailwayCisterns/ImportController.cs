@@ -14,7 +14,7 @@ namespace WebApp.Endpoints.RailwayCisterns;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class ImportController(ApplicationDbContext context)
+public class ImportController(ApplicationDbContext context) :ControllerBase
 {
    [HttpPost("WagonTypes")]
     public async Task<IResult> ImportWagonTypes(IFormFile? file)
@@ -119,14 +119,14 @@ public class ImportController(ApplicationDbContext context)
 
     // POST: api/Import/Manufacturers
     [HttpPost("Manufacturers")]
-    public async Task<IResult> ImportManufacturers(HttpContext _context, IFormFile? file)
+    public async Task<IResult> ImportManufacturers(IFormFile? file)
     {
         if (file == null || file.Length == 0)
         {
             return Results.BadRequest("Файл не загружен");
         }
-        
-        var userId = _context.User.FindFirstValue("userId");
+
+        var userId = HttpContext.User.FindFirstValue("userId");
         if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var parsedUserId))
             return Results.Unauthorized();
 
@@ -229,14 +229,14 @@ public class ImportController(ApplicationDbContext context)
 
     // POST: api/Import/RailwayCisterns
     [HttpPost("RailwayCisterns")]
-    public async Task<IResult> ImportRailwayCisterns(HttpContext _context, IFormFile? file)
+    public async Task<IResult> ImportRailwayCisterns(IFormFile? file)
     {
         if (file == null || file.Length == 0)
         {
             return Results.BadRequest("Файл не загружен");
         }
-        
-        var userId = _context.User.FindFirstValue("userId");
+
+        var userId = HttpContext.User.FindFirstValue("userId");
         if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var parsedUserId))
             return Results.Unauthorized();
 
@@ -417,14 +417,14 @@ public class ImportController(ApplicationDbContext context)
 
     // POST: api/Import/Depots
     [HttpPost("Depots")]
-    public async Task<IResult> ImportDepots(HttpContext _context, IFormFile? file)
+    public async Task<IResult> ImportDepots(IFormFile? file)
     {
         if (file == null || file.Length == 0)
         {
             return Results.BadRequest("Файл не загружен");
         }
-        
-        var userId = _context.User.FindFirstValue("userId");
+
+        var userId = HttpContext.User.FindFirstValue("userId");
         if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var parsedUserId))
             return Results.Unauthorized();
 
@@ -476,14 +476,14 @@ public class ImportController(ApplicationDbContext context)
 
     // POST: api/Import/Locations
     [HttpPost("Locations")]
-    public async Task<IResult> ImportLocations(HttpContext _context, IFormFile? file)
+    public async Task<IResult> ImportLocations(IFormFile? file)
     {
         if (file == null || file.Length == 0)
         {
             return Results.BadRequest("Файл не загружен");
         }
-        
-        var userId = _context.User.FindFirstValue("userId");
+
+        var userId = HttpContext.User.FindFirstValue("userId");
         if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var parsedUserId))
             return Results.Unauthorized();
 
@@ -535,14 +535,14 @@ public class ImportController(ApplicationDbContext context)
 
     // POST: api/Import/Parts
     [HttpPost("Parts")]
-    public async Task<IResult> ImportParts(HttpContext _context, IFormFile? file)
+    public async Task<IResult> ImportParts(IFormFile? file)
     {
         if (file == null || file.Length == 0)
         {
             return Results.BadRequest("Файл не загружен");
         }
-        
-        var userId = _context.User.FindFirstValue("userId");
+
+        var userId = HttpContext.User.FindFirstValue("userId");
         if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var parsedUserId))
             return Results.Unauthorized();
 

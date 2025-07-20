@@ -90,7 +90,6 @@ public class UserRepository
     public async Task<User> UpdateUserAsync(User user)
     {
         var userEntity = await _context.Users
-            .AsNoTracking()
             .Include(u => u.Roles).FirstOrDefaultAsync(u => u.Id == user.Id);
         if (userEntity == null)
             throw new Exception("User not found");
@@ -103,7 +102,15 @@ public class UserRepository
         userEntity.PasswordHash = user.PasswordHash;
         userEntity.RefreshToken = user.RefreshToken;
         userEntity.RefreshTokenExpiry = user.RefreshTokenExpiry;
-        userEntity.Roles = user.Roles;
+        userEntity.Roles.Clear();
+        foreach (var role in user.Roles)
+        {
+            var existingRole = await _context.Roles.FindAsync(role.Id);
+            if (existingRole != null)
+            {
+                userEntity.Roles.Add(existingRole);
+            }
+        }
 
         await _context.SaveChangesAsync();
         return userEntity;
