@@ -30,6 +30,13 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Data\Entities\RailwayCisterns\Parts\" />
+      <Folder Include="Features\RailwayCisterns\Manufacturers\" />
+      <Folder Include="Features\RailwayCisterns\RailwayCisterns\" />
+      <Folder Include="Features\RailwayCisterns\Registrars\" />
+      <Folder Include="Features\RailwayCisterns\Vessels\" />
+      <Folder Include="Features\RailwayCisterns\WagonModels\" />
+      <Folder Include="Features\RailwayCisterns\WagonTypes\" />
       <Folder Include="Middlewares\" />
     </ItemGroup>
 

@@ -1,3 +1,5 @@
+using WebApp.DTO.Common;
+
 namespace WebApp.DTO;
 
 public class CountryInfo
@@ -82,10 +84,4 @@ public class ManufacturerResponse
 public class ManufacturerDetailResponse : ManufacturerResponse
 {
     public ICollection<RailwayCisternSummaryResponse>? Wagons { get; set; }
-}
-
-public class RailwayCisternSummaryResponse
-{
-    public Guid Id { get; set; }
-    public string Number { get; set; } = string.Empty;
 }

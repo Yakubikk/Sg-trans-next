@@ -2,6 +2,7 @@ using Microsoft.OpenApi.Models;
 using WebApp.Extensions;
 using WebApp.Abstractions.Auth;
 using WebApp.Data;
+using WebApp.Endpoints.RailwayCisterns;
 using WebApp.Services;
 using WebApp.Services.Authentication;
 
@@ -60,6 +61,9 @@ builder.Services.AddSwaggerGen(c =>
 services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
 services.Configure<AuthorizationOptions>(configuration.GetSection(nameof(AuthorizationOptions)));
 
+services.AddHttpContextAccessor();
+services.AddScoped<ICurrentUserService, CurrentUserService>();
+
 services
     .AddPersistence(configuration)
     .AddApplication()
@@ -74,7 +78,6 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
@@ -101,4 +104,3 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
-
