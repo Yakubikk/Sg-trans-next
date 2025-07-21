@@ -1,29 +1,35 @@
 'use client';
 
-import { useUserStore } from '@/store/userStore';
+import { usePermissions, useLogout } from '@/hooks';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function LogoutButton() {
-  const { logout, currentUser, isAuthenticated } = useUserStore();
+  const { user, isAuthenticated } = usePermissions();
+  const logoutMutation = useLogout();
   const router = useRouter();
+
+  useEffect(() => {
+    console.log('LogoutButton mounted', { isAuthenticated, user });
+  }, [isAuthenticated, user]);
 
   const handleLogout = async () => {
     try {
-      await logout();
+      await logoutMutation.mutateAsync();
       router.push('/');
     } catch (error) {
       console.error('Ошибка при выходе:', error);
     }
   };
 
-  if (!isAuthenticated || !currentUser) {
+  if (!isAuthenticated || !user) {
     return null;
   }
 
   return (
     <div className="flex items-center space-x-4">
       <span className="text-sm text-gray-600">
-        Добро пожаловать, <strong>{currentUser.firstName} {currentUser.lastName}</strong>
+        Добро пожаловать, <strong>{user.firstName} {user.lastName}</strong>
       </span>
       <button
         onClick={handleLogout}

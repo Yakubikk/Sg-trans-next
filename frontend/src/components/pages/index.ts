@@ -7,6 +7,7 @@ export { default as AbsorberDevicesPageClient } from "./AbsorberDevicesPageClien
 export { default as AirDistributorsPageClient } from "./AirDistributorsPageClient";
 export { default as BrakesPageClient } from "./BrakesPageClient";
 export { default as CargosPageClient } from "./CargosPageClient";
+export { default as WagonPassportSearch } from "./WagonPassportSearch";
 
 // Типы для страниц
 export type * from './AboutClient';

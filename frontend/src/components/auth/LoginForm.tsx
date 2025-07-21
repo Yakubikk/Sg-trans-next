@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUserStore } from '@/store/userStore';
+import { useLogin } from '@/hooks';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -10,14 +10,14 @@ export default function LoginForm() {
   const [error, setError] = useState('');
   const router = useRouter();
   
-  const { login, isLoading } = useUserStore();
+  const loginMutation = useLogin();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     try {
-      await login({ email, password });
+      await loginMutation.mutateAsync({ email, password });
       // После успешного входа перенаправляем на главную
       router.push('/');
     } catch (err) {
@@ -28,12 +28,12 @@ export default function LoginForm() {
   // Быстрый вход для демонстрации
   const quickLogin = async (role: 'admin' | 'user') => {
     const credentials = {
-      admin: { email: 'admin@example.com', password: 'password' },
-      user: { email: 'user@example.com', password: 'password' }
+      admin: { email: 'admin@wagon.com', password: 'Admin123!' },
+      user: { email: 'user@wagon.com', password: 'User123!' }
     };
 
     try {
-      await login(credentials[role]);
+      await loginMutation.mutateAsync(credentials[role]);
       router.push('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Произошла ошибка при входе');
@@ -86,10 +86,10 @@ export default function LoginForm() {
         <div>
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={loginMutation.isPending}
             className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
           >
-            {isLoading ? 'Вход...' : 'Войти'}
+            {loginMutation.isPending ? 'Вход...' : 'Войти'}
           </button>
         </div>
       </form>
@@ -108,7 +108,7 @@ export default function LoginForm() {
         <div className="mt-6 grid grid-cols-2 gap-3">
           <button
             onClick={() => quickLogin('admin')}
-            disabled={isLoading}
+            disabled={loginMutation.isPending}
             className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
           >
             Администратор
@@ -116,7 +116,7 @@ export default function LoginForm() {
 
           <button
             onClick={() => quickLogin('user')}
-            disabled={isLoading}
+            disabled={loginMutation.isPending}
             className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
           >
             Пользователь

@@ -45,13 +45,34 @@ export function usePermissions() {
   }, [currentUser, isLoading, getCurrentUser, isInitialized, isAuthenticated]);
 
   const hasPermission = (permission: Permission): boolean => {
-    if (!currentUser || !isAuthenticated) return false;
-    return ROLE_PERMISSIONS[currentUser.role]?.includes(permission) || false;
+    if (!currentUser || !isAuthenticated || !currentUser.roles.length) return false;
+    
+    console.log('usePermissions: Checking permission', {
+      permission,
+      userRoles: currentUser.roles,
+      isAuthenticated
+    });
+    
+    return currentUser.roles.some(roleObj => {
+      const permissions = ROLE_PERMISSIONS[roleObj.name];
+      console.log('usePermissions: Role permissions', { roleName: roleObj.name, permissions });
+      return permissions?.includes(permission);
+    }) || false;
   };
 
   const hasRole = (role: Role): boolean => {
     if (!currentUser || !isAuthenticated) return false;
-    return currentUser.role === role;
+    
+    console.log('usePermissions: Checking role', {
+      role,
+      userRoles: currentUser.roles,
+      isAuthenticated
+    });
+    
+    return currentUser.roles.some(roleObj => {
+      console.log('usePermissions: Comparing roles', { roleName: roleObj.name, targetRole: role });
+      return roleObj.name === role;
+    });
   };
 
   const hasAnyPermission = (permissions: Permission[]): boolean => {

@@ -1,4 +1,11 @@
-import { LogoutButton, BackButton } from "@/components";
+import { Metadata } from 'next';
+import { LogoutButton, BackButton, WagonPassportSearch } from "@/components";
+
+export const metadata: Metadata = {
+  title: 'Паспортные данные вагонов | SG-Trans',
+  description: 'Поиск и просмотр паспортных данных железнодорожных цистерн. Система управления транспортом SG-Trans.',
+  keywords: ['вагоны', 'цистерны', 'паспортные данные', 'железнодорожный транспорт'],
+};
 
 export default function WagonPassports() {
   return (
@@ -11,15 +18,10 @@ export default function WagonPassports() {
         
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Паспортные данные вагонов</h1>
-          <p className="text-lg text-gray-600">Управление паспортными данными вагонов</p>
+          <p className="text-lg text-gray-600">Поиск и просмотр паспортных данных железнодорожных цистерн</p>
         </div>
 
-        <div className="bg-white p-8 rounded-lg shadow-md text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Раздел в разработке</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Здесь будут размещены паспортные данные вагонов системы управления транспортом.
-          </p>
-        </div>
+        <WagonPassportSearch />
       </div>
     </div>
   );

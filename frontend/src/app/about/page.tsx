@@ -76,7 +76,7 @@ export default function About() {
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">Технологии:</h3>
                 <ul className="space-y-1 text-sm text-gray-600">
-                  <li>• Next.js 14 (React Framework)</li>
+                  <li>• Next.js 15 (React Framework)</li>
                   <li>• TypeScript для типизации</li>
                   <li>• Tailwind CSS для стилизации</li>
                   <li>• Zustand для управления состоянием</li>

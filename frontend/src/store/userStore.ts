@@ -1,12 +1,13 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { User, LoginRequest, CreateUserRequest, UpdateUserRequest, UserListParams } from '@/types/user';
-import { userApi } from '@/api';
+import { userApi } from '@/api/users/userApi';
 
 interface UserState {
   // Текущий пользователь
   currentUser: User | null;
   token: string | null;
+  refreshToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
 
@@ -17,32 +18,38 @@ interface UserState {
   totalPages: number;
   isLoadingUsers: boolean;
 
-  // Фильтры и поиск
-  filters: UserListParams;
+  // Фильтры
+  filters: Partial<UserListParams>;
 
-  // Действия для аутентификации
+  // Базовые методы для управления состоянием
+  setUser: (user: User) => void;
+  setToken: (token: string, refreshToken?: string) => void;
+  clearUser: () => void;
+
+  // Методы аутентификации
   login: (credentials: LoginRequest) => Promise<void>;
   logout: () => Promise<void>;
   getCurrentUser: () => Promise<void>;
 
-  // Действия для управления пользователями
+  // Методы управления пользователями
   fetchUsers: (params?: UserListParams) => Promise<void>;
-  getUserById: (id: string) => Promise<User>;
   createUser: (userData: CreateUserRequest) => Promise<User>;
   updateUser: (id: string, userData: UpdateUserRequest) => Promise<User>;
   deleteUser: (id: string) => Promise<void>;
 
-  // Действия для фильтров
+  // Методы пагинации и фильтрации
+  setCurrentPage: (page: number) => void;
   setFilters: (filters: Partial<UserListParams>) => void;
   clearFilters: () => void;
 
-  // Утилиты
+  // Сброс состояния
   reset: () => void;
 }
 
 const initialState = {
   currentUser: null,
   token: null,
+  refreshToken: null,
   isAuthenticated: false,
   isLoading: false,
   users: [],
@@ -59,19 +66,40 @@ export const useUserStore = create<UserState>()(
       (set, get) => ({
         ...initialState,
 
+        // Базовые методы для управления состоянием
+        setUser: (user: User) => set({ currentUser: user }),
+        setToken: (token: string, refreshToken?: string) => set({ 
+          token, 
+          isAuthenticated: true,
+          ...(refreshToken && { refreshToken }) 
+        }),
+        clearUser: () => set({ 
+          currentUser: null, 
+          token: null, 
+          refreshToken: null, 
+          isAuthenticated: false 
+        }),
+
         // Аутентификация
         login: async (credentials: LoginRequest) => {
           set({ isLoading: true });
           try {
             const response = await userApi.login(credentials);
-            const { user, token } = response.data;
             
+            // Сохраняем токены и устанавливаем authenticated в true
             set({
-              currentUser: user,
-              token,
-              isAuthenticated: true,
-              isLoading: false
+              token: response.data.accessToken,
+              refreshToken: response.data.refreshToken,
+              isAuthenticated: true
             });
+            
+            // Небольшая задержка для сохранения в localStorage
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Получаем данные пользователя после сохранения токенов
+            await get().getCurrentUser();
+            
+            set({ isLoading: false });
           } catch (error) {
             set({ isLoading: false });
             throw error;
@@ -79,50 +107,34 @@ export const useUserStore = create<UserState>()(
         },
 
         logout: async () => {
-          set({ isLoading: true });
           try {
+            // Вызываем logout из API для очистки localStorage
             await userApi.logout();
-            set({
-              ...initialState
-            });
           } catch (error) {
-            // Даже если запрос не удался, очищаем локальное состояние
+            console.error('Logout error:', error);
+          } finally {
+            // Очищаем состояние пользователя
             set({
-              ...initialState
+              currentUser: null,
+              token: null,
+              refreshToken: null,
+              isAuthenticated: false
             });
-            throw error;
           }
         },
 
         getCurrentUser: async () => {
           const { token } = get();
-          
-          // Если нет токена в состоянии, проверяем localStorage
-          if (!token) {
-            // Даем время для восстановления persist данных
-            await new Promise(resolve => setTimeout(resolve, 50));
-            const updatedState = get();
-            if (!updatedState.token) {
-              throw new Error('Токен не найден');
-            }
-          }
+          console.log('getCurrentUser called with token:', token ? 'exists' : 'missing');
+          if (!token) return;
 
-          set({ isLoading: true });
           try {
             const response = await userApi.getCurrentUser();
-            set({
-              currentUser: response.data,
-              isAuthenticated: true,
-              isLoading: false
-            });
+            console.log('getCurrentUser success:', response.data);
+            set({ currentUser: response.data, isAuthenticated: true });
           } catch (error) {
-            set({
-              currentUser: null,
-              token: null,
-              isAuthenticated: false,
-              isLoading: false
-            });
-            throw error;
+            console.error('Get current user error:', error);
+            get().clearUser();
           }
         },
 
@@ -130,17 +142,21 @@ export const useUserStore = create<UserState>()(
         fetchUsers: async (params?: UserListParams) => {
           set({ isLoadingUsers: true });
           try {
-            const mergedParams = { ...get().filters, ...params };
-            const response = await userApi.getUsers(mergedParams);
-            const { data, total, page, totalPages } = response.data;
-            
+            const { filters, currentPage } = get();
+            const searchParams = {
+              ...filters,
+              ...params,
+              page: params?.page || currentPage,
+              limit: params?.limit || 10
+            };
+
+            const response = await userApi.getUsers(searchParams);
             set({
-              users: data,
-              totalUsers: total,
-              currentPage: page,
-              totalPages,
-              isLoadingUsers: false,
-              filters: mergedParams
+              users: response.data.data,
+              totalUsers: response.data.total,
+              totalPages: response.data.totalPages,
+              currentPage: response.data.page,
+              isLoadingUsers: false
             });
           } catch (error) {
             set({ isLoadingUsers: false });
@@ -148,76 +164,69 @@ export const useUserStore = create<UserState>()(
           }
         },
 
-        getUserById: async (id: string) => {
-          const response = await userApi.getUserById(id);
-          return response.data;
-        },
-
         createUser: async (userData: CreateUserRequest) => {
           const response = await userApi.createUser(userData);
-          const newUser = response.data;
-          
           // Обновляем список пользователей
-          set(state => ({
-            users: [newUser, ...state.users],
-            totalUsers: state.totalUsers + 1
-          }));
-
-          return newUser;
+          get().fetchUsers();
+          return response.data;
         },
 
         updateUser: async (id: string, userData: UpdateUserRequest) => {
           const response = await userApi.updateUser(id, userData);
-          const updatedUser = response.data;
-          
+          const user = response.data;
           // Обновляем пользователя в списке
-          set(state => ({
-            users: state.users.map(user => 
-              user.id === id ? updatedUser : user
-            ),
-            currentUser: state.currentUser?.id === id ? updatedUser : state.currentUser
-          }));
-
-          return updatedUser;
+          const { users } = get();
+          const updatedUsers = users.map(u => u.id === id ? user : u);
+          set({ users: updatedUsers });
+          
+          // Если обновляем текущего пользователя
+          const { currentUser } = get();
+          if (currentUser?.id === id) {
+            set({ currentUser: user });
+          }
+          
+          return user;
         },
 
         deleteUser: async (id: string) => {
           await userApi.deleteUser(id);
-          
           // Удаляем пользователя из списка
-          set(state => ({
-            users: state.users.filter(user => user.id !== id),
-            totalUsers: state.totalUsers - 1
-          }));
+          const { users } = get();
+          const filteredUsers = users.filter(u => u.id !== id);
+          set({ users: filteredUsers });
         },
 
-        // Фильтры
-        setFilters: (newFilters: Partial<UserListParams>) => {
-          set(state => ({
-            filters: { ...state.filters, ...newFilters }
-          }));
+        // Пагинация и фильтрация
+        setCurrentPage: (page: number) => {
+          set({ currentPage: page });
+          get().fetchUsers({ page });
+        },
+
+        setFilters: (filters: Partial<UserListParams>) => {
+          set({ 
+            filters: { ...get().filters, ...filters },
+            currentPage: 1 
+          });
+          get().fetchUsers({ ...filters, page: 1 });
         },
 
         clearFilters: () => {
-          set({ filters: {} });
+          set({ filters: {}, currentPage: 1 });
+          get().fetchUsers({ page: 1 });
         },
 
         // Сброс состояния
-        reset: () => {
-          set(initialState);
-        }
+        reset: () => set(initialState)
       }),
       {
-        name: 'user-store',
+        name: 'user-storage',
         partialize: (state) => ({
           currentUser: state.currentUser,
           token: state.token,
-          isAuthenticated: state.isAuthenticated
-        })
+          refreshToken: state.refreshToken,
+          isAuthenticated: state.isAuthenticated,
+        }),
       }
-    ),
-    {
-      name: 'user-store'
-    }
+    )
   )
 );

@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useUserStore } from "@/store/userStore";
-import { Role } from "@/types/permissions";
-import { User } from "@/types/user";
+import { useState } from "react";
+import { useUsers, useDeleteUser } from "@/hooks";
+import { Role, RoleObject } from "@/types/permissions";
+import { User, UserListParams } from "@/types/user";
 import { cn } from "@/lib/utils";
 
 // Компонент карточки пользователя
@@ -16,8 +16,9 @@ function UserCard({
   onEdit: (user: User) => void;
   onDelete: (userId: string) => void;
 }) {
-  const getRoleColor = (role: Role) => {
-    switch (role) {
+  const getRoleColor = (roleObj: RoleObject | undefined) => {
+    const roleName = roleObj?.name || Role.USER;
+    switch (roleName) {
       case Role.ADMIN:
         return "bg-red-100 text-red-800";
       case Role.USER:
@@ -40,8 +41,8 @@ function UserCard({
             </h3>
             <p className="text-sm text-gray-600">{user.email}</p>
             <div className="flex items-center space-x-2 mt-2">
-              <span className={cn("px-2 py-1 text-xs font-medium rounded-full", getRoleColor(user.role))}>
-                {user.role === Role.ADMIN ? "Админ" : "Пользователь"}
+              <span className={cn("px-2 py-1 text-xs font-medium rounded-full", getRoleColor(user.roles[0]))}>
+                {user.roles[0]?.name === Role.ADMIN ? "Админ" : "Пользователь"}
               </span>
             </div>
           </div>
@@ -85,35 +86,35 @@ function UserCard({
 
 // Основной компонент управления пользователями
 export default function UserManagement() {
-  const { users, totalUsers, currentPage, totalPages, isLoadingUsers, filters, fetchUsers, deleteUser, setFilters } =
-    useUserStore();
-
   const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState<UserListParams>({ page: 1, limit: 10 });
+  
+  // React Query хуки
+  const { data: usersData, isLoading: isLoadingUsers } = useUsers(filters);
+  const deleteUserMutation = useDeleteUser();
 
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+  const users = usersData?.data.data || [];
+  const totalUsers = usersData?.data.total || 0;
+  const currentPage = usersData?.data.page || 1;
+  const totalPages = usersData?.data.totalPages || 0;
 
   const handleSearch = (search: string) => {
     setSearchTerm(search);
-    setFilters({ ...filters, search, page: 1 });
-    fetchUsers({ ...filters, search, page: 1 });
+    setFilters(prev => ({ ...prev, search, page: 1 }));
   };
 
-  const handleRoleFilter = (role: Role | undefined) => {
-    setFilters({ ...filters, role, page: 1 });
-    fetchUsers({ ...filters, role, page: 1 });
+  const handleRoleFilter = (roles: Role[]) => {
+    setFilters(prev => ({ ...prev, roles, page: 1 }));
   };
 
   const handlePageChange = (page: number) => {
-    setFilters({ ...filters, page });
-    fetchUsers({ ...filters, page });
+    setFilters(prev => ({ ...prev, page }));
   };
 
   const handleDelete = async (userId: string) => {
     if (window.confirm("Вы уверены, что хотите удалить этого пользователя?")) {
       try {
-        await deleteUser(userId);
+        await deleteUserMutation.mutateAsync(userId);
       } catch (error) {
         console.error("Ошибка при удалении:", error);
       }
@@ -144,8 +145,11 @@ export default function UserManagement() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Роль</label>
             <select
-              value={filters.role || ""}
-              onChange={(e) => handleRoleFilter((e.target.value as Role) || undefined)}
+              value={filters.roles?.[0] || ""}
+              onChange={(e) => {
+                const value = e.target.value;
+                handleRoleFilter(value ? [value as Role] : []);
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="">Все роли</option>

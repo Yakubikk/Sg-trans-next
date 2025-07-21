@@ -1,4 +1,4 @@
-import { Role } from './permissions';
+import { Role, RoleObject } from './permissions';
 
 export interface User {
   id: string;
@@ -7,7 +7,7 @@ export interface User {
   lastName: string;
   patronymic: string;
   phoneNumber: string;
-  role: Role;
+  roles: RoleObject[];
 }
 
 export interface CreateUserRequest {
@@ -17,14 +17,14 @@ export interface CreateUserRequest {
   lastName: string;
   patronymic: string;
   phoneNumber: string;
-  role: Role;
+  roles: RoleObject[];
 }
 
 export interface UpdateUserRequest {
   firstName?: string;
   lastName?: string;
   email?: string;
-  role?: Role;
+  roles?: RoleObject[];
 }
 
 export interface LoginRequest {
@@ -33,8 +33,7 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  user: User;
-  token: string;
+  accessToken: string;
   refreshToken: string;
 }
 
@@ -54,7 +53,7 @@ export interface PaginatedResponse<T> {
 
 export interface UserFilters {
   search?: string;
-  role?: Role;
+  roles?: Role[];
 }
 
 export interface UserListParams extends UserFilters {

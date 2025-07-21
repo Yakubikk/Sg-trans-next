@@ -5,6 +5,12 @@ export const Role = {
 
 export type Role = (typeof Role)[keyof typeof Role];
 
+// Интерфейс для роли как объекта (как приходит с сервера)
+export interface RoleObject {
+  id: number;
+  name: Role;
+}
+
 export const Permission = {
   // Пользователи
   VIEW_USERS: "view_users",

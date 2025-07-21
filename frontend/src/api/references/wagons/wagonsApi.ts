@@ -14,7 +14,7 @@ export const wagonsApi = {
 
   // Получение конкретного вагона по ID
   getWagonById: (id: string): Promise<ApiResponse<Wagon>> => 
-    makeRequest<Wagon>(wagonsApiInstance, 'get', `/wagons/${id}`),
+    makeRequest<Wagon>(wagonsApiInstance, 'get', `/railway-cisterns/${id}`),
 
   // Создание нового вагона
   createWagon: (wagon: Omit<Wagon, 'id'>): Promise<ApiResponse<Wagon>> => 
