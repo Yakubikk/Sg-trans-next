@@ -1,22 +1,89 @@
 import { createApiInstance, DEFAULT_API_CONFIG } from '../../core/apiInstance';
-import { makeRequest } from '../../core/requestHandler';
-import { ApiResponse } from '@/types/user';
-import { RailwayCistern, RailwayCisternDetail } from './types';
+import type { RailwayCistern, RailwayCisternDetail } from './types';
 
 // Создаем экземпляр axios для железнодорожных цистерн
 const railwayCisternsApiInstance = createApiInstance(DEFAULT_API_CONFIG);
 
+export interface CreateRailwayCisternRequest {
+  number: string;
+  manufacturerId: string;
+  buildDate: string;
+  tareWeight: number;
+  loadCapacity: number;
+  length: number;
+  axleCount: number;
+  volume: number;
+  fillingVolume?: number;
+  initialTareWeight?: number;
+  typeId: string;
+  modelId?: string;
+  commissioningDate?: string;
+  serialNumber: string;
+  registrationNumber: string;
+  registrationDate: string;
+  registrarId?: string;
+  notes?: string;
+  vesselSerialNumber?: string;
+  vesselBuildDate?: string;
+}
+
+export interface UpdateRailwayCisternRequest {
+  number: string;
+  manufacturerId: string;
+  buildDate: string;
+  tareWeight: number;
+  loadCapacity: number;
+  length: number;
+  axleCount: number;
+  volume: number;
+  fillingVolume?: number;
+  initialTareWeight?: number;
+  typeId: string;
+  modelId?: string;
+  commissioningDate?: string;
+  serialNumber: string;
+  registrationNumber: string;
+  registrationDate: string;
+  registrarId?: string;
+  notes?: string;
+  vesselSerialNumber?: string;
+  vesselBuildDate?: string;
+}
+
 // API функции для железнодорожных цистерн
 export const railwayCisternsApi = {
-  // Получение списка всех цистерн
-  getRailwayCisterns: (): Promise<ApiResponse<RailwayCistern[]>> => 
-    makeRequest<RailwayCistern[]>(railwayCisternsApiInstance, 'get', '/railway-cisterns'),
+  // Получить все цистерны
+  async getRailwayCisterns(): Promise<RailwayCistern[]> {
+    const response = await railwayCisternsApiInstance.get('/railway-cisterns');
+    return response.data;
+  },
 
-  // Получение конкретной цистерны по ID
-  getRailwayCisternById: (id: string): Promise<ApiResponse<RailwayCisternDetail>> => 
-    makeRequest<RailwayCisternDetail>(railwayCisternsApiInstance, 'get', `/railway-cisterns/${id}`),
+  // Получить цистерну по ID
+  async getRailwayCisternById(id: string): Promise<RailwayCisternDetail> {
+    const response = await railwayCisternsApiInstance.get(`/railway-cisterns/${id}`);
+    return response.data;
+  },
 
-  // Получение цистерны по номеру
-  getRailwayCisternByNumber: (number: string): Promise<ApiResponse<RailwayCisternDetail>> => 
-    makeRequest<RailwayCisternDetail>(railwayCisternsApiInstance, 'get', `/railway-cisterns/by-number/${number}`),
+  // Получить цистерну по номеру
+  async getRailwayCisternByNumber(number: string): Promise<RailwayCisternDetail> {
+    const response = await railwayCisternsApiInstance.get(`/railway-cisterns/by-number/${encodeURIComponent(number)}`);
+    return response.data;
+  },
+
+  // Создать новую цистерну
+  async createRailwayCistern(data: CreateRailwayCisternRequest): Promise<RailwayCistern> {
+    const response = await railwayCisternsApiInstance.post('/railway-cisterns', data);
+    return response.data;
+  },
+
+  // Обновить цистерну
+  async updateRailwayCistern(id: string, data: UpdateRailwayCisternRequest): Promise<RailwayCistern> {
+    const response = await railwayCisternsApiInstance.put(`/railway-cisterns/${id}`, data);
+    return response.data;
+  },
+
+  // Удалить цистерну
+  async deleteRailwayCistern(id: string): Promise<void> {
+    await railwayCisternsApiInstance.delete(`/railway-cisterns/${id}`);
+  },
 };

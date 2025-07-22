@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -69,7 +70,12 @@ export const wagonsColumns: ColumnDef<Wagon>[] = [
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => <div className="font-medium">{row.getValue("number")}</div>,
+    cell: ({ row }) => (
+      <div className="font-medium flex items-center gap-2">
+        {row.getValue("number")}
+        <span className="text-xs text-gray-400">(клик для перехода к паспорту)</span>
+      </div>
+    ),
     filterFn: (row, id, value) => {
       if (!value) return true;
       const numberValue = row.getValue(id) as number;
@@ -180,10 +186,16 @@ export const wagonsColumns: ColumnDef<Wagon>[] = [
 ];
 
 export function WagonsTable({ data, onView, onEdit, onDelete }: WagonsTableProps) {
+  const router = useRouter();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+
+  const handleRowClick = (wagon: Wagon) => {
+    // Переходим на страницу паспортов с номером вагона в URL параметрах
+    router.push(`/wagon-passports?search=${encodeURIComponent(wagon.number)}`);
+  };
 
   const table = useReactTable({
     data,
@@ -271,9 +283,24 @@ export function WagonsTable({ data, onView, onEdit, onDelete }: WagonsTableProps
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow 
+                  key={row.id} 
+                  data-state={row.getIsSelected() && "selected"}
+                  className="cursor-pointer hover:bg-gray-50"
+                  onClick={() => handleRowClick(row.original)}
+                >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                    <TableCell 
+                      key={cell.id}
+                      onClick={(e) => {
+                        // Предотвращаем навигацию при клике на чекбокс или кнопки действий
+                        if (cell.column.id === 'select' || cell.column.id === 'actions') {
+                          e.stopPropagation();
+                        }
+                      }}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
                   ))}
                 </TableRow>
               ))

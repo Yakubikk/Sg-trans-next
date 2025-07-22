@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 import { LogoutButton, BackButton, WagonPassportSearch } from "@/components";
 
 export const metadata: Metadata = {
@@ -6,6 +7,15 @@ export const metadata: Metadata = {
   description: 'Поиск и просмотр паспортных данных железнодорожных цистерн. Система управления транспортом SG-Trans.',
   keywords: ['вагоны', 'цистерны', 'паспортные данные', 'железнодорожный транспорт'],
 };
+
+function SearchFallback() {
+  return (
+    <div className="animate-pulse">
+      <div className="h-32 bg-gray-200 rounded mb-4"></div>
+      <div className="h-64 bg-gray-200 rounded"></div>
+    </div>
+  );
+}
 
 export default function WagonPassports() {
   return (
@@ -21,7 +31,9 @@ export default function WagonPassports() {
           <p className="text-lg text-gray-600">Поиск и просмотр паспортных данных железнодорожных цистерн</p>
         </div>
 
-        <WagonPassportSearch />
+        <Suspense fallback={<SearchFallback />}>
+          <WagonPassportSearch />
+        </Suspense>
       </div>
     </div>
   );

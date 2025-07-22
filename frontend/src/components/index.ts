@@ -13,5 +13,8 @@ export * from './data';
 // Компоненты карточек
 export * from './cards';
 
+// Диалоги
+export * from './dialogs';
+
 // UI компоненты
 export * from './ui';

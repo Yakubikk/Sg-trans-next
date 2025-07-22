@@ -271,6 +271,37 @@ public static class RailwayCisternEndpoints
 
             return Results.Ok(MapToResponse(updatedCistern));
         }).RequirePermissions(Permission.Update);
+
+        group.MapDelete("/{id:guid}", async ([FromServices] ApplicationDbContext context, [FromRoute] Guid id) =>
+        {
+            var railwayCistern = await context.RailwayCisterns
+                .Include(r => r.Vessel)
+                .Include(r => r.PartInstallations)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (railwayCistern == null)
+            {
+                return Results.NotFound();
+            }
+
+            // Удаляем связанные сущности
+            if (railwayCistern.Vessel != null)
+            {
+                context.Vessels.Remove(railwayCistern.Vessel);
+            }
+
+            if (railwayCistern.PartInstallations.Any())
+            {
+                context.PartInstallations.RemoveRange(railwayCistern.PartInstallations);
+            }
+
+            // Удаляем саму цистерну
+            context.RailwayCisterns.Remove(railwayCistern);
+            
+            await context.SaveChangesAsync();
+
+            return Results.NoContent();
+        }).RequirePermissions(Permission.Delete);
     }
 
     private static RailwayCisternResponse MapToResponse(RailwayCistern railwayCistern)

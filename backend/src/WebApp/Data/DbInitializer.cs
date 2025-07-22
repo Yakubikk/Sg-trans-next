@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using WebApp.Abstractions.Auth;
+using WebApp.Data.Entities.RailwayCisterns;
 using WebApp.Data.Entities.References;
 using WebApp.Data.Entities.Users;
-using WebApp.Data.Entities.RailwayCisterns;
 using WebApp.Data.Enums;
 
 namespace WebApp.Data;
@@ -31,8 +31,8 @@ public static class DbInitializer
             {
                 Id = Guid.NewGuid(),
                 FirstName = "Admin",
-                LastName = "User",
-                Patronymic = "Adminovich",
+                LastName = "Adminovich",
+                Patronymic = "User",
                 PhoneNumber = "+1234567890",
                 Email = "admin@wagon.com",
                 PasswordHash = adminPasswordHash,
@@ -57,8 +57,8 @@ public static class DbInitializer
             {
                 Id = Guid.NewGuid(),
                 FirstName = "User",
-                LastName = "User",
-                Patronymic = "Polsovatelev",
+                LastName = "Polsovatelev",
+                Patronymic = "User",
                 PhoneNumber = "+1234567890",
                 Email = "user@wagon.com",
                 PasswordHash = userPasswordHash,
@@ -73,14 +73,11 @@ public static class DbInitializer
         if (!context.RolePermissions.Any())
         {
             context.RolePermissions.AddRange(
-                new[]
-                {
-                    new RolePermission { RoleId = 2, PermissionId = 1 },
-                    new RolePermission { RoleId = 1, PermissionId = 1 },
-                    new RolePermission { RoleId = 1, PermissionId = 2 },
-                    new RolePermission { RoleId = 1, PermissionId = 3 },
-                    new RolePermission { RoleId = 1, PermissionId = 4 },
-                });
+                new RolePermission { RoleId = 2, PermissionId = 1 }, 
+                new RolePermission { RoleId = 1, PermissionId = 1 }, 
+                new RolePermission { RoleId = 1, PermissionId = 2 }, 
+                new RolePermission { RoleId = 1, PermissionId = 3 }, 
+                new RolePermission { RoleId = 1, PermissionId = 4 });
 
             await context.SaveChangesAsync();
         }

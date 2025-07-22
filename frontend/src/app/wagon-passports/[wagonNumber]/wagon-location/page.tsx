@@ -1,0 +1,51 @@
+import type { Metadata } from 'next';
+import { BackButton, LogoutButton } from '@/components';
+import UnderDevelopmentPage from '@/components/pages/UnderDevelopmentPage';
+
+interface WagonLocationPageProps {
+  params: Promise<{
+    wagonNumber: string;
+  }>;
+}
+
+export async function generateMetadata({ params }: WagonLocationPageProps): Promise<Metadata> {
+  const { wagonNumber } = await params;
+  const decodedNumber = decodeURIComponent(wagonNumber);
+  
+  return {
+    title: `Локализация вагона - Вагон ${decodedNumber} | SG Trans`,
+    description: `Информация о местоположении железнодорожной цистерны номер ${decodedNumber}`,
+  };
+}
+
+export default async function WagonLocationPage({ params }: WagonLocationPageProps) {
+  const { wagonNumber } = await params;
+  const decodedWagonNumber = decodeURIComponent(wagonNumber);
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-4">
+              <BackButton>← Назад</BackButton>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Локализация вагона - Вагон {decodedWagonNumber}
+              </h1>
+            </div>
+            <LogoutButton />
+          </div>
+        </div>
+      </div>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <UnderDevelopmentPage
+          title="Локализация вагона"
+          description="В данном разделе будет отображаться информация о текущем местоположении вагона и история его перемещений."
+          wagonNumber={decodedWagonNumber}
+          iconColor="text-green-500"
+        />
+      </main>
+    </div>
+  );
+}
