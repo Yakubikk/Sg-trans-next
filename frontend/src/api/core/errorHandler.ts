@@ -38,6 +38,10 @@ export const handleAxiosError = (error: AxiosError): Error => {
     // Ошибка сети
     if (error.code === 'ECONNABORTED') {
       errorMessage = 'Превышено время ожидания ответа от сервера.';
+    } else if (error.message.includes('CORS') || error.message.includes('cross-origin')) {
+      errorMessage = 'Ошибка CORS. Проверьте настройки сервера или URL API.';
+    } else if (error.message.includes('Network Error')) {
+      errorMessage = 'Ошибка сети. Проверьте подключение к серверу или URL API.';
     } else {
       errorMessage = 'Ошибка сети. Проверьте подключение к серверу.';
     }

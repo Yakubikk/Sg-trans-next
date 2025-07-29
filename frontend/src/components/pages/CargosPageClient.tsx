@@ -1,7 +1,7 @@
 "use client";
 
 import { CargosTable } from "@/components/data";
-import { useCargos, useDeleteCargo } from "@/hooks/useCargos";
+import { useCargos, useDeleteCargo } from "@/hooks";
 import { Cargo } from "@/api/references/cargos/types";
 
 export default function CargosPageClient() {

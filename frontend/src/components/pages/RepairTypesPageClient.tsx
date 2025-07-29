@@ -1,10 +1,10 @@
 'use client';
 
 import { RepairTypesTable } from "@/components/data";
-import { useRepairTypes, useDeleteRepairType } from "@/hooks/useRepairTypes";
+import { useRepairTypes, useDeleteRepairType } from "@/hooks";
 import type { RepairType } from "@/api/references/repair-types";
 
-export function RepairTypesPageClient() {
+export default function RepairTypesPageClient() {
   const { data: repairTypes = [], isLoading: loading, error } = useRepairTypes();
   const deleteRepairType = useDeleteRepairType();
 
@@ -59,6 +59,7 @@ export function RepairTypesPageClient() {
   return (
     <RepairTypesTable 
       data={repairTypes}
+      isLoading={loading}
       onView={handleView}
       onEdit={handleEdit}
       onDelete={handleDelete}

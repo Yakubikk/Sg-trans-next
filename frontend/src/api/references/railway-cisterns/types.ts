@@ -2,76 +2,130 @@
 export interface RailwayCistern {
   id: string;
   number: string;
-  manufacturerId?: string;
-  manufacturerName?: string;
-  manufacturerCountry?: string;
-  buildDate?: string;
-  tareWeight?: number;
-  loadCapacity?: number;
-  length?: number;
-  axleCount?: number;
-  volume?: number;
-  fillingVolume?: number;
-  initialTareWeight?: number;
-  typeId?: string;
-  typeName?: string;
-  modelId?: string;
-  modelName?: string;
-  commissioningDate?: string;
-  serialNumber?: string;
-  registrationNumber?: string;
-  registrationDate?: string;
-  registrarId?: string;
-  registrarName?: string;
-  notes?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  creatorId?: string;
-  vessel?: VesselResponse;
+  manufacturerName: string;
+  buildDate: string;
+  typeName: string;
+  modelName: string;
+  ownerName: string;
+  registrationNumber: string;
+  registrationDate: string;
+  affiliationValue: string;
 }
 
-export interface RailwayCisternDetail extends RailwayCistern {
-  partInstallations?: PartInstallationResponse[];
-}
-
-export interface VesselResponse {
+// Детальные типы для полного паспорта цистерны
+export interface Manufacturer {
   id: string;
-  vesselSerialNumber?: string;
-  vesselBuildDate?: string;
+  name: string;
+  country: string;
+  shortName: string;
+  code: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface PartInstallationResponse {
-  installationId: string;
-  partId: string;
-  partName: string;
-  partType: PartType;
-  installedAt?: string;
-  installedBy?: string;
-  removedAt?: string;
-  removedBy?: string;
-  locationFrom?: string;
-  locationTo: string;
-  notes?: string;
+export interface WagonType {
+  id: string;
+  name: string;
+  type: string;
 }
 
-export enum PartType {
-  WheelPair = 'WheelPair',
-  Brake = 'Brake',
-  Coupler = 'Coupler',
-  Buffer = 'Buffer',
-  SpringSet = 'SpringSet',
-  Other = 'Other'
+export interface WagonModel {
+  id: string;
+  name: string;
+}
+
+export interface Registrar {
+  id: string;
+  name: string;
+}
+
+export interface Owner {
+  id: string;
+  name: string;
+  unp: string;
+  shortName: string;
+  address: string;
+  treatRepairs: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Affiliation {
+  id: string;
+  value: string;
+}
+
+export interface RailwayCisternDetailed {
+  id: string;
+  number: string;
+  manufacturer: Manufacturer;
+  buildDate: string;
+  tareWeight: number;
+  loadCapacity: number;
+  length: number;
+  axleCount: number;
+  volume: number;
+  fillingVolume: number;
+  initialTareWeight: number;
+  type: WagonType;
+  model: WagonModel;
+  commissioningDate: string;
+  serialNumber: string;
+  registrationNumber: string;
+  registrationDate: string;
+  registrar: Registrar;
+  notes: string;
+  owner: Owner;
+  techConditions: string;
+  pripiska: string;
+  reRegistrationDate: string;
+  pressure: number;
+  testPressure: number;
+  rent: string;
+  affiliation: Affiliation;
+  serviceLifeYears: number;
+  periodMajorRepair: string;
+  periodPeriodicTest: string;
+  periodIntermediateTest: string;
+  periodDepotRepair: string;
+  dangerClass: number;
+  substance: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RailwayCisternDetailedResponse {
+  railwayCisterns: RailwayCisternDetailed[];
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+}
+
+// Создание и обновление цистерн
+export interface CreateRailwayCisternRequest {
+  number: string;
+  manufacturerName: string;
+  buildDate: string;
+  typeName: string;
+  modelName: string;
+  ownerName: string;
+  registrationNumber: string;
+  registrationDate: string;
+  affiliationValue: string;
+}
+
+export type UpdateRailwayCisternRequest = Partial<CreateRailwayCisternRequest>;
+
+export interface RailwayCisternQueryParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 // Утилитарные функции
 export const getRailwayCisternDisplayName = (cistern: RailwayCistern): string => {
   return `Цистерна №${cistern.number}${cistern.typeName ? ` (${cistern.typeName})` : ''}`;
-};
-
-export const formatWeight = (weight?: number): string => {
-  return weight ? `${weight} т` : 'Не указан';
-};
-
-export const formatVolume = (volume?: number): string => {
-  return volume ? `${volume} м³` : 'Не указан';
 };

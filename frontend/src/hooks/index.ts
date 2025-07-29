@@ -1,9 +1,11 @@
+// Общие хуки
+export * from './common';
+
+// Аутентификация
+export * from './auth';
+
+// Справочники
+export * from './references';
+
+// Остальные хуки (временно, пока не перенесены)
 export { usePermissions } from './usePermissions';
-export * from './useUsers';
-export * from './useWagons';
-export * from './useRepairTypes';
-export * from './useAbsorberDevices';
-export * from './useAirDistributors';
-export * from './useBrakes';
-export * from './useCargos';
-export * from './useRailwayCisterns';

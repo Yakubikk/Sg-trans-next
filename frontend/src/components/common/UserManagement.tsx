@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useUsers, useDeleteUser } from "@/hooks";
+import { useUsers, useDeleteUser } from "@/hooks/auth/useUsers";
 import { Role, RoleObject } from "@/types/permissions";
 import { User, UserListParams } from "@/types/user";
 import { cn } from "@/lib/utils";

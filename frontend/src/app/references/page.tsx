@@ -3,16 +3,17 @@ import { ReferenceCard } from "@/components/cards";
 import { 
   Train, 
   Settings, 
-  Zap, 
-  Wind, 
-  CircleStop, 
-  Package 
+  // Zap, 
+  // Wind, 
+  // CircleStop, 
+  // Package,
+  Building2
 } from "lucide-react";
 
 export default function References() {
   const references = [
     {
-      href: "/references/wagons",
+      href: "/references/cisterns",
       title: "Вагоны",
       subtitle: "Справочник вагонов",
       description: "Просмотр и управление данными о вагонах, их характеристиках и статусах.",
@@ -27,42 +28,50 @@ export default function References() {
       icon: Settings,
       bgColor: "bg-green-500"
     },
+    // {
+    //   href: "/references/absorber-devices",
+    //   title: "Поглощающие аппараты",
+    //   subtitle: "Справочник поглощающих аппаратов",
+    //   description: "Управление данными о поглощающих аппаратах и их учете.",
+    //   icon: Zap,
+    //   bgColor: "bg-purple-500"
+    // },
+    // {
+    //   href: "/references/air-distributors",
+    //   title: "Воздухораспределители",
+    //   subtitle: "Справочник воздухораспределителей",
+    //   description: "Управление данными о воздухораспределителях и их характеристиках.",
+    //   icon: Wind,
+    //   bgColor: "bg-cyan-500"
+    // },
+    // {
+    //   href: "/references/brakes",
+    //   title: "Тормоза",
+    //   subtitle: "Справочник тормозных систем",
+    //   description: "Управление данными о тормозных системах и их характеристиках.",
+    //   icon: CircleStop,
+    //   bgColor: "bg-red-500"
+    // },
+    // {
+    //   href: "/references/cargos",
+    //   title: "Грузы",
+    //   subtitle: "Справочник грузов",
+    //   description: "Управление данными о грузах, их названиях и ценах.",
+    //   icon: Package,
+    //   bgColor: "bg-orange-500"
+    // },
     {
-      href: "/references/absorber-devices",
-      title: "Поглощающие аппараты",
-      subtitle: "Справочник поглощающих аппаратов",
-      description: "Управление данными о поглощающих аппаратах и их учете.",
-      icon: Zap,
-      bgColor: "bg-purple-500"
-    },
-    {
-      href: "/references/air-distributors",
-      title: "Воздухораспределители",
-      subtitle: "Справочник воздухораспределителей",
-      description: "Управление данными о воздухораспределителях и их характеристиках.",
-      icon: Wind,
-      bgColor: "bg-cyan-500"
-    },
-    {
-      href: "/references/brakes",
-      title: "Тормоза",
-      subtitle: "Справочник тормозных систем",
-      description: "Управление данными о тормозных системах и их характеристиках.",
-      icon: CircleStop,
-      bgColor: "bg-red-500"
-    },
-    {
-      href: "/references/cargos",
-      title: "Грузы",
-      subtitle: "Справочник грузов",
-      description: "Управление данными о грузах, их названиях и ценах.",
-      icon: Package,
-      bgColor: "bg-orange-500"
+      href: "/references/owners",
+      title: "Владельцы",
+      subtitle: "Справочник владельцев",
+      description: "Управление данными о владельцах вагонов и их контактной информацией.",
+      icon: Building2,
+      bgColor: "bg-indigo-500"
     }
   ];
   return (
     <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="py-6">
           <div className="flex items-center justify-between">
             <div>

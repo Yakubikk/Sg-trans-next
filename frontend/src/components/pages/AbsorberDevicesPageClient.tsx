@@ -1,7 +1,7 @@
 "use client";
 
 import { AbsorberDevicesTable } from "@/components/data";
-import { useAbsorberDevices, useDeleteAbsorberDevice } from "@/hooks/useAbsorberDevices";
+import { useAbsorberDevices, useDeleteAbsorberDevice } from "@/hooks";
 import { AbsorberDevice } from "@/api/references/absorber-devices/types";
 
 export default function AbsorberDevicesPageClient() {

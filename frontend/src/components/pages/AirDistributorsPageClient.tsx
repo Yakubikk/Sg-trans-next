@@ -1,7 +1,7 @@
 "use client";
 
 import { AirDistributorsTable } from "@/components/data";
-import { useAirDistributors, useDeleteAirDistributor } from "@/hooks/useAirDistributors";
+import { useAirDistributors, useDeleteAirDistributor } from "@/hooks";
 import { AirDistributor } from "@/api/references/air-distributors/types";
 
 export default function AirDistributorsPageClient() {

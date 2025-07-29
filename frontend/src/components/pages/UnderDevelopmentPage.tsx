@@ -38,7 +38,7 @@ export default function UnderDevelopmentPage({
     <div className="space-y-6">
       {/* Хлебные крошки */}
       <nav className="flex items-center space-x-2 text-sm text-gray-600">
-        <Link href="/wagon-passports" className="hover:text-blue-600">
+        <Link href="/cistern-passports" className="hover:text-blue-600">
           Паспорта вагонов
         </Link>
         <span>/</span>
@@ -92,7 +92,7 @@ export default function UnderDevelopmentPage({
       <Card>
         <CardContent className="p-6">
           <div className="flex justify-between items-center">
-            <Link href="/wagon-passports">
+            <Link href="/cistern-passports">
               <Button variant="outline" size="lg" className="flex items-center gap-2">
                 <ArrowLeft className="w-4 h-4" />
                 Назад к поиску
@@ -100,25 +100,25 @@ export default function UnderDevelopmentPage({
             </Link>
             
             <div className="flex gap-3">
-              <Link href={`/wagon-passports/${encodeURIComponent(wagonNumber)}/complectation-list`}>
+              <Link href={`/cistern-passports/${encodeURIComponent(wagonNumber)}/complectation-list`}>
                 <Button variant="outline" size="sm" className="bg-blue-500 text-white hover:bg-blue-700 hover:text-white flex items-center gap-1">
                   <ClipboardList className="w-4 h-4" />
                   Лист комплектации
                 </Button>
               </Link>
-              <Link href={`/wagon-passports/${encodeURIComponent(wagonNumber)}/repair-history`}>
+              <Link href={`/cistern-passports/${encodeURIComponent(wagonNumber)}/repair-history`}>
                 <Button variant="outline" size="sm" className="bg-orange-500 text-white hover:bg-orange-600 hover:text-white flex items-center gap-1">
                   <Wrench className="w-4 h-4" />
                   Ремонты
                 </Button>
               </Link>
-              <Link href={`/wagon-passports/${encodeURIComponent(wagonNumber)}/wagon-location`}>
+              <Link href={`/cistern-passports/${encodeURIComponent(wagonNumber)}/cistern-location`}>
                 <Button variant="outline" size="sm" className="bg-green-600 text-white hover:bg-green-700 hover:text-white flex items-center gap-1">
                   <MapPin className="w-4 h-4" />
                   Локализация
                 </Button>
               </Link>
-              <Link href={`/wagon-passports/${encodeURIComponent(wagonNumber)}/wagon-change-log`}>
+              <Link href={`/cistern-passports/${encodeURIComponent(wagonNumber)}/cistern-change-log`}>
                 <Button variant="outline" size="sm" className="bg-red-600 text-white hover:bg-red-700 hover:text-white flex items-center gap-1">
                   <FileText className="w-4 h-4" />
                   Журнал изменений

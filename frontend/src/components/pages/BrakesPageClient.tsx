@@ -1,7 +1,7 @@
 "use client";
 
 import { BrakesTable } from "@/components/data";
-import { useBrakes, useDeleteBrake } from "@/hooks/useBrakes";
+import { useBrakes, useDeleteBrake } from "@/hooks";
 import { Brake } from "@/api/references/brakes/types";
 
 export default function BrakesPageClient() {

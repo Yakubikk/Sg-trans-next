@@ -3,15 +3,9 @@ export { repairTypesApi } from './repairTypesApi';
 
 // Экспорт типов и утилит для типов ремонта
 export type { 
-  RepairType, 
-  RepairCategory, 
-  RepairPriority 
+  RepairType,
 } from './types';
 
 export { 
-  RepairCategoryLabels, 
-  RepairPriorityLabels, 
   getRepairTypeDisplayName, 
-  getRepairTypeDuration,
-  getRepairTypePriorityColor
 } from './types';

@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { handleAxiosError } from './errorHandler';
 
 export interface ApiInstanceConfig {
-  baseURL: string;
+  baseURL?: string;
   timeout?: number;
   headers?: Record<string, string>;
 }
@@ -89,7 +89,7 @@ export const createApiInstance = (config: ApiInstanceConfig): AxiosInstance => {
               
               if (refreshToken) {
                 // Создаем новый запрос для обновления токена
-                const refreshResponse = await axios.post(`${config.baseURL}/users/refresh-token`, { refreshToken });
+                const refreshResponse = await axios.post(`${process.env.NEXT_PUBLIC_AUTH_BASE_URL}/users/refresh-token`, { refreshToken });
                 
                 if (refreshResponse.data.success) {
                   const newAccessToken = refreshResponse.data.data.accessToken;
@@ -133,16 +133,16 @@ export const createApiInstance = (config: ApiInstanceConfig): AxiosInstance => {
 
 // Конфигурация по умолчанию для основного API
 export const DEFAULT_API_CONFIG: ApiInstanceConfig = {
-  baseURL: 'http://localhost:5169/api',
-  timeout: 10000,
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  timeout: Number(process.env.NEXT_PUBLIC_API_TIMEOUT) || 10000,
   headers: {
     'Content-Type': 'application/json',
   },
 };
 
 export const AUTH_API_CONFIG: ApiInstanceConfig = {
-  baseURL: 'http://localhost:5169',
-  timeout: 10000,
+  baseURL: process.env.NEXT_PUBLIC_AUTH_BASE_URL,
+  timeout: Number(process.env.NEXT_PUBLIC_API_TIMEOUT) || 10000,
   headers: {
     'Content-Type': 'application/json',
   },
