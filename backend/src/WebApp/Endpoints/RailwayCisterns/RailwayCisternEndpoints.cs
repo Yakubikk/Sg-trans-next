@@ -135,6 +135,213 @@ public static class RailwayCisternEndpoints
         .Produces<List<RailwayCisternDetailDTO>>(StatusCodes.Status200OK)
         .RequirePermissions(Permission.Read);
 
+        // Get detailed list with pagination
+        group.MapGet("/detailed/paged", async (
+            [FromServices] ApplicationDbContext context,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10) =>
+        {
+            var query = context.Set<RailwayCistern>()
+                .Include(rc => rc.Manufacturer)
+                .Include(rc => rc.Type)
+                .Include(rc => rc.Model)
+                .Include(rc => rc.Owner)
+                .Include(rc => rc.Registrar)
+                .Include(rc => rc.Affiliation)
+                .Include(rc => rc.MilageCisterns)
+                .AsQueryable();
+
+            var totalCount = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            var cisterns = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(rc => new RailwayCisternDetailDTO
+                {
+                    Id = rc.Id,
+                    Number = rc.Number,
+                    Manufacturer = new ManufacturerDTO 
+                    { 
+                        Id = rc.Manufacturer.Id, 
+                        Name = rc.Manufacturer.Name,
+                        Country = rc.Manufacturer.Country,
+                        ShortName = rc.Manufacturer.ShortName,
+                        Code = rc.Manufacturer.Code
+                    },
+                    BuildDate = rc.BuildDate,
+                    TareWeight = rc.TareWeight,
+                    LoadCapacity = rc.LoadCapacity,
+                    Length = rc.Length,
+                    AxleCount = rc.AxleCount,
+                    Volume = rc.Volume,
+                    FillingVolume = rc.FillingVolume,
+                    InitialTareWeight = rc.InitialTareWeight,
+                    Type = new WagonTypeDTO 
+                    { 
+                        Id = rc.Type.Id, 
+                        Name = rc.Type.Name,
+                        Type = rc.Type.Type
+                    },
+                    Model = rc.Model != null ? new WagonModelDTO 
+                    { 
+                        Id = rc.Model.Id, 
+                        Name = rc.Model.Name 
+                    } : null,
+                    CommissioningDate = rc.CommissioningDate,
+                    SerialNumber = rc.SerialNumber,
+                    RegistrationNumber = rc.RegistrationNumber,
+                    RegistrationDate = rc.RegistrationDate,
+                    Registrar = rc.Registrar != null ? new RegistrarDTO 
+                    { 
+                        Id = rc.Registrar.Id, 
+                        Name = rc.Registrar.Name 
+                    } : null,
+                    Notes = rc.Notes,
+                    Owner = rc.Owner != null ? new OwnerDTO 
+                    { 
+                        Id = rc.Owner.Id, 
+                        Name = rc.Owner.Name,
+                        UNP = rc.Owner.UNP,
+                        ShortName = rc.Owner.ShortName,
+                        Address = rc.Owner.Address,
+                        TreatRepairs = rc.Owner.TreatRepairs
+                    } : null,
+                    TechConditions = rc.TechConditions,
+                    Pripiska = rc.Pripiska,
+                    ReRegistrationDate = rc.ReRegistrationDate,
+                    Pressure = rc.Pressure,
+                    TestPressure = rc.TestPressure,
+                    Rent = rc.Rent,
+                    Affiliation = new AffiliationDTO 
+                    { 
+                        Id = rc.Affiliation.Id, 
+                        Value = rc.Affiliation.Value 
+                    },
+                    ServiceLifeYears = rc.ServiceLifeYears,
+                    PeriodMajorRepair = rc.PeriodMajorRepair,
+                    PeriodPeriodicTest = rc.PeriodPeriodicTest,
+                    PeriodIntermediateTest = rc.PeriodIntermediateTest,
+                    PeriodDepotRepair = rc.PeriodDepotRepair,
+                    DangerClass = rc.DangerClass,
+                    Substance = rc.Substance,
+                    CreatedAt = rc.CreatedAt,
+                    UpdatedAt = rc.UpdatedAt
+                })
+                .ToListAsync();
+
+            var response = new
+            {
+                Items = cisterns,
+                TotalCount = totalCount,
+                TotalPages = totalPages,
+                CurrentPage = page,
+                PageSize = pageSize
+            };
+
+            return Results.Ok(response);
+        })
+        .WithName("GetPagedDetailedRailwayCisterns")
+        .Produces<object>(StatusCodes.Status200OK)
+        .RequirePermissions(Permission.Read);
+
+        // Search detailed list by number
+        group.MapGet("/detailed/search", async (
+            [FromServices] ApplicationDbContext context,
+            [FromQuery] string number) =>
+        {
+            if (string.IsNullOrWhiteSpace(number))
+                return Results.BadRequest("Search number is required");
+
+            var cisterns = await context.Set<RailwayCistern>()
+                .Include(rc => rc.Manufacturer)
+                .Include(rc => rc.Type)
+                .Include(rc => rc.Model)
+                .Include(rc => rc.Owner)
+                .Include(rc => rc.Registrar)
+                .Include(rc => rc.Affiliation)
+                .Include(rc => rc.MilageCisterns)
+                .Where(rc => rc.Number.Contains(number))
+                .Select(rc => new RailwayCisternDetailDTO
+                {
+                    Id = rc.Id,
+                    Number = rc.Number,
+                    Manufacturer = new ManufacturerDTO 
+                    { 
+                        Id = rc.Manufacturer.Id, 
+                        Name = rc.Manufacturer.Name,
+                        Country = rc.Manufacturer.Country,
+                        ShortName = rc.Manufacturer.ShortName,
+                        Code = rc.Manufacturer.Code
+                    },
+                    BuildDate = rc.BuildDate,
+                    TareWeight = rc.TareWeight,
+                    LoadCapacity = rc.LoadCapacity,
+                    Length = rc.Length,
+                    AxleCount = rc.AxleCount,
+                    Volume = rc.Volume,
+                    FillingVolume = rc.FillingVolume,
+                    InitialTareWeight = rc.InitialTareWeight,
+                    Type = new WagonTypeDTO 
+                    { 
+                        Id = rc.Type.Id, 
+                        Name = rc.Type.Name,
+                        Type = rc.Type.Type
+                    },
+                    Model = rc.Model != null ? new WagonModelDTO 
+                    { 
+                        Id = rc.Model.Id, 
+                        Name = rc.Model.Name 
+                    } : null,
+                    CommissioningDate = rc.CommissioningDate,
+                    SerialNumber = rc.SerialNumber,
+                    RegistrationNumber = rc.RegistrationNumber,
+                    RegistrationDate = rc.RegistrationDate,
+                    Registrar = rc.Registrar != null ? new RegistrarDTO 
+                    { 
+                        Id = rc.Registrar.Id, 
+                        Name = rc.Registrar.Name 
+                    } : null,
+                    Notes = rc.Notes,
+                    Owner = rc.Owner != null ? new OwnerDTO 
+                    { 
+                        Id = rc.Owner.Id, 
+                        Name = rc.Owner.Name,
+                        UNP = rc.Owner.UNP,
+                        ShortName = rc.Owner.ShortName,
+                        Address = rc.Owner.Address,
+                        TreatRepairs = rc.Owner.TreatRepairs
+                    } : null,
+                    TechConditions = rc.TechConditions,
+                    Pripiska = rc.Pripiska,
+                    ReRegistrationDate = rc.ReRegistrationDate,
+                    Pressure = rc.Pressure,
+                    TestPressure = rc.TestPressure,
+                    Rent = rc.Rent,
+                    Affiliation = new AffiliationDTO 
+                    { 
+                        Id = rc.Affiliation.Id, 
+                        Value = rc.Affiliation.Value 
+                    },
+                    ServiceLifeYears = rc.ServiceLifeYears,
+                    PeriodMajorRepair = rc.PeriodMajorRepair,
+                    PeriodPeriodicTest = rc.PeriodPeriodicTest,
+                    PeriodIntermediateTest = rc.PeriodIntermediateTest,
+                    PeriodDepotRepair = rc.PeriodDepotRepair,
+                    DangerClass = rc.DangerClass,
+                    Substance = rc.Substance,
+                    CreatedAt = rc.CreatedAt,
+                    UpdatedAt = rc.UpdatedAt
+                })
+                .ToListAsync();
+
+            return Results.Ok(cisterns);
+        })
+        .WithName("SearchDetailedRailwayCisterns")
+        .Produces<List<RailwayCisternDetailDTO>>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status400BadRequest)
+        .RequirePermissions(Permission.Read);
+
         // Get by ID with detailed info
         group.MapGet("/{id}", async ([FromServices] ApplicationDbContext context, [FromRoute] Guid id) =>
         {
