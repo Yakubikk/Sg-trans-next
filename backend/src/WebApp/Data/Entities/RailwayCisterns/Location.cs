@@ -16,14 +16,14 @@ public enum LocationType
 
 public class Location 
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
-    public string Name { get; set; } = string.Empty;
+    public Guid Id { get; set; }
+    public string Name { get; set; } = null!;
     public LocationType Type { get; set; }
     public string? Description { get; set; }
     
     public ICollection<PartInstallation> FromInstallations { get; set; } = new List<PartInstallation>();
     public ICollection<PartInstallation> ToInstallations { get; set; } = new List<PartInstallation>();
     
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public string CreatorId { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public string CreatorId { get; set; } = null!;
 }

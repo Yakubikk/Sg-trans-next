@@ -10,8 +10,8 @@ public class MilageCistern
     public DateOnly RepairDate { get; set; }
     public int InputModeCode { get; set; }
     public DateOnly InputDate { get; set; }
-    public string CisternNumber { get; set; }
+    public string CisternNumber { get; set; } = null!;
 
-    public RailwayCistern Cistern { get; set; }
-    public RepairType RepairType { get; set; }
+    public RailwayCistern Cistern { get; set; } = null!;
+    public RepairType RepairType { get; set; } = null!;
 }
