@@ -1,12 +1,11 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Data;
 using WebApp.Data.Entities.RailwayCisterns;
 using WebApp.Data.Enums;
-using WebApp.DTO;
-using WebApp.DTO.Common;
+using WebApp.DTO.RailwayCisterns;
 using WebApp.Extensions;
-using WebApp.Services;
 
 namespace WebApp.Endpoints.RailwayCisterns;
 
@@ -20,101 +19,112 @@ public static class ManufacturerEndpoints
 
         group.MapGet("/", async ([FromServices] ApplicationDbContext context) =>
         {
-            var manufacturers = await context.Manufacturers
-                .AsNoTracking()
+            var manufacturers = await context.Set<Manufacturer>()
+                .Select(m => new ManufacturerDTO
+                {
+                    Id = m.Id,
+                    Name = m.Name,
+                    Country = m.Country,
+                    ShortName = m.ShortName,
+                    Code = m.Code,
+                    CreatedAt = m.CreatedAt,
+                    UpdatedAt = m.UpdatedAt
+                })
                 .ToListAsync();
-                
-            return Results.Ok(manufacturers.Select(MapToResponse));
-        }).RequirePermissions(Permission.Read);
+            return Results.Ok(manufacturers);
+        })
+        .WithName("GetManufacturers")
+        .Produces<List<ManufacturerDTO>>(StatusCodes.Status200OK)
+        .RequirePermissions(Permission.Read);
 
-        group.MapGet("/{id:guid}", async ([FromServices] ApplicationDbContext context, [FromRoute] Guid id) =>
+        group.MapGet("/{id}", async ([FromServices] ApplicationDbContext context, [FromRoute] Guid id) =>
         {
-            var manufacturer = await context.Manufacturers
-                .Include(m => m.RailwayCisterns)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var manufacturer = await context.Set<Manufacturer>()
+                .Where(m => m.Id == id)
+                .Select(m => new ManufacturerDTO
+                {
+                    Id = m.Id,
+                    Name = m.Name,
+                    Country = m.Country,
+                    ShortName = m.ShortName,
+                    Code = m.Code,
+                    CreatedAt = m.CreatedAt,
+                    UpdatedAt = m.UpdatedAt
+                })
+                .FirstOrDefaultAsync();
+            return manufacturer is null ? Results.NotFound() : Results.Ok(manufacturer);
+        })
+        .WithName("GetManufacturerById")
+        .Produces<ManufacturerDTO>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound)
+        .RequirePermissions(Permission.Read);
 
-            if (manufacturer == null)
-                return Results.NotFound();
-
-            return Results.Ok(MapToDetailResponse(manufacturer));
-        }).RequirePermissions(Permission.Read);
-
-        group.MapPost("/", async ([FromServices] ApplicationDbContext context,
-            [FromServices] ICurrentUserService currentUserService,
-            [FromBody] ManufacturerRequest request) =>
+        group.MapPost("/", async ([FromServices] ApplicationDbContext context, [FromBody] CreateManufacturerDTO dto, HttpContext httpContext) =>
         {
             var manufacturer = new Manufacturer
             {
-                Name = request.Name,
-                Country = request.Country,
-                CreatorId = currentUserService.GetCurrentUserId()
+                Name = dto.Name,
+                Country = dto.Country,
+                ShortName = dto.ShortName,
+                Code = dto.Code,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow,
+                CreatorId = httpContext.User.FindFirstValue("userId")
             };
 
-            context.Manufacturers.Add(manufacturer);
+            context.Add(manufacturer);
             await context.SaveChangesAsync();
 
-            return Results.Created($"/api/manufacturers/{manufacturer.Id}", 
-                MapToResponse(manufacturer));
-        }).RequirePermissions(Permission.Create);
+            return Results.Created($"/api/manufacturers/{manufacturer.Id}", new ManufacturerDTO
+            {
+                Id = manufacturer.Id,
+                Name = manufacturer.Name,
+                Country = manufacturer.Country,
+                ShortName = manufacturer.ShortName,
+                Code = manufacturer.Code,
+                CreatedAt = manufacturer.CreatedAt,
+                UpdatedAt = manufacturer.UpdatedAt
+            });
+        })
+        .WithName("CreateManufacturer")
+        .Produces<ManufacturerDTO>(StatusCodes.Status201Created)
+        .ProducesValidationProblem()
+        .RequirePermissions(Permission.Create);
 
-        group.MapPut("/{id:guid}", async ([FromServices] ApplicationDbContext context,
-            [FromServices] ICurrentUserService currentUserService,
-            [FromRoute] Guid id, [FromBody] ManufacturerRequest request) =>
+        group.MapPut("/{id}", async ([FromServices] ApplicationDbContext context, [FromRoute] Guid id, [FromBody] UpdateManufacturerDTO dto) =>
         {
-            var manufacturer = await context.Manufacturers.FindAsync(id);
-
+            var manufacturer = await context.Set<Manufacturer>().FindAsync(id);
             if (manufacturer == null)
                 return Results.NotFound();
 
-            // Проверяем уникальность имени
-            if (await context.Manufacturers.AnyAsync(m => m.Id != id && m.Name == request.Name))
-                return Results.BadRequest($"Manufacturer with name '{request.Name}' already exists");
+            manufacturer.Name = dto.Name;
+            manufacturer.Country = dto.Country;
+            manufacturer.ShortName = dto.ShortName;
+            manufacturer.Code = dto.Code;
+            manufacturer.UpdatedAt = DateTimeOffset.UtcNow;
 
-            manufacturer.Name = request.Name;
-            manufacturer.Country = request.Country;
             await context.SaveChangesAsync();
+            return Results.NoContent();
+        })
+        .WithName("UpdateManufacturer")
+        .Produces(StatusCodes.Status204NoContent)
+        .Produces(StatusCodes.Status404NotFound)
+        .ProducesValidationProblem()
+        .RequirePermissions(Permission.Update);
 
-            return Results.Ok(MapToResponse(manufacturer));
-        }).RequirePermissions(Permission.Update);
-    }
-    
-    private static ManufacturerResponse MapToResponse(Manufacturer manufacturer)
-    {
-        if (manufacturer == null) return null!;
-        
-        return new ManufacturerResponse
+        group.MapDelete("/{id}", async ([FromServices] ApplicationDbContext context, [FromRoute] Guid id) =>
         {
-            Id = manufacturer.Id,
-            Name = manufacturer.Name,
-            Country = manufacturer.GetCountryInfo(),
-            CreatedAt = manufacturer.CreatedAt,
-            UpdatedAt = manufacturer.UpdatedAt,
-            CreatorId = manufacturer.CreatorId
-        };
-    }
-    
-    private static ManufacturerDetailResponse MapToDetailResponse(Manufacturer manufacturer)
-    {
-        if (manufacturer == null) return null!;
-        
-        var response = new ManufacturerDetailResponse
-        {
-            Id = manufacturer.Id,
-            Name = manufacturer.Name,
-            Country = manufacturer.GetCountryInfo(),
-            CreatedAt = manufacturer.CreatedAt,
-            UpdatedAt = manufacturer.UpdatedAt,
-            CreatorId = manufacturer.CreatorId,
-            Wagons = manufacturer.RailwayCisterns?
-                .Select(w => new RailwayCisternSummaryResponse
-                {
-                    Id = w.Id,
-                    Number = w.Number
-                })
-                .ToList()
-        };
-        
-        return response;
+            var manufacturer = await context.Set<Manufacturer>().FindAsync(id);
+            if (manufacturer == null)
+                return Results.NotFound();
+
+            context.Remove(manufacturer);
+            await context.SaveChangesAsync();
+            return Results.NoContent();
+        })
+        .WithName("DeleteManufacturer")
+        .Produces(StatusCodes.Status204NoContent)
+        .Produces(StatusCodes.Status404NotFound)
+        .RequirePermissions(Permission.Delete);
     }
 }

@@ -18,15 +18,15 @@ public static class ApiExtensions
     {
         app.MapUsersEndpoints();
         
-        //references endpoints
+        // Reference endpoints (справочники)
         app.MapGasContractEndpoints();
         app.MapStationEndpoints();
-        app.MapRepairTypeEndpoints();
+        //app.MapRepairTypeEndpoints();
         app.MapRepairEndpoints();
         app.MapRailwayEndpoints();
         app.MapCountryEndpoints();
         app.MapWagonEndpoints();
-        app.MapDepotEndpoints();
+        //app.MapDepotEndpoints();
         app.MapEmployeeEndpoints();
         app.MapDefectEndpoints();
         app.MapFaultEndpoints();
@@ -48,13 +48,18 @@ public static class ApiExtensions
         app.MapPartEndpoints();
         app.MapReasonEndpoints();
 
-        // railway cisterns endpoints
-        app.MapManufacturerEndpoints();
+        // Railway cisterns endpoints
         app.MapRailwayCisternEndpoints();
-        app.MapWagonTypeEndpoints();
+        app.MapRepairTypeEndpoints();
+        app.MapManufacturerEndpoints();
         app.MapWagonModelEndpoints();
+        app.MapWagonTypeEndpoints();
         app.MapRegistrarEndpoints();
-        app.MapVesselEndpoints();
+        app.MapOwnerEndpoints();
+        app.MapAffiliationEndpoints();
+        app.MapMilageCisternEndpoints();
+        app.MapLocationEndpoints();
+        app.MapDepotEndpoints();
     }
 
     public static void AddApiAuthentication(

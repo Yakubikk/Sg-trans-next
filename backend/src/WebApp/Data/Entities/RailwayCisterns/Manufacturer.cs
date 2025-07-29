@@ -4,17 +4,14 @@ namespace WebApp.Data.Entities.RailwayCisterns;
 
 public class Manufacturer
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
-    public string Name { get; set; } = string.Empty;
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    public string Country { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
+    public string CreatorId { get; set; }
+    public string ShortName { get; set; }
+    public int Code { get; set; }
 
-    public string Country { get; set; } = "Республика Беларусь";
-
-    public CountryInfo GetCountryInfo() => CountryInfo.FromString(Country);
-    
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-
-    public string CreatorId { get; set; } = string.Empty;
-
-    public ICollection<RailwayCistern> RailwayCisterns { get; set; } = new List<RailwayCistern>();
+    public ICollection<RailwayCistern> RailwayCisterns { get; set; }
 }
