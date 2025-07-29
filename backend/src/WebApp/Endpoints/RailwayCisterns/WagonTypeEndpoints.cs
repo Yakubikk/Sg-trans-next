@@ -3,8 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using WebApp.Data;
 using WebApp.Data.Entities.RailwayCisterns;
 using WebApp.Data.Enums;
-using WebApp.DTO;
-using WebApp.DTO.Common;
+using WebApp.DTO.RailwayCisterns;
 using WebApp.Extensions;
 
 namespace WebApp.Endpoints.RailwayCisterns;
@@ -15,96 +14,96 @@ public static class WagonTypeEndpoints
     {
         var group = app.MapGroup("/api/wagon-types")
             .RequireAuthorization()
-            .WithTags("wagon_types");
+            .WithTags("wagon-types");
 
         group.MapGet("/", async ([FromServices] ApplicationDbContext context) =>
         {
-            var types = await context.WagonTypes
-                .AsNoTracking()
-                .ToListAsync();
-            
-            return Results.Ok(types.Select(MapToResponse));
-        }).RequirePermissions(Permission.Read);
-
-        group.MapGet("/{id:guid}", async ([FromServices] ApplicationDbContext context, [FromRoute] Guid id) =>
-        {
-            var type = await context.WagonTypes
-                .Include(t => t.RailwayCisterns)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(t => t.Id == id);
-
-            if (type == null)
-                return Results.NotFound();
-
-            return Results.Ok(MapToDetailResponse(type));
-        }).RequirePermissions(Permission.Read);
-
-        group.MapPost("/", async ([FromServices] ApplicationDbContext context, 
-            [FromBody] WagonTypeRequest request) =>
-        {
-            // Проверяем уникальность имени
-            var existingType = await context.WagonTypes
-                .FirstOrDefaultAsync(t => t.Name == request.Name);
-                
-            if (existingType != null)
-                return Results.BadRequest($"WagonType with name '{request.Name}' already exists");
-
-            var type = new WagonType
-            {
-                Name = request.Name
-            };
-
-            context.WagonTypes.Add(type);
-            await context.SaveChangesAsync();
-
-            return Results.Created($"/api/wagon-types/{type.Id}", MapToResponse(type));
-        }).RequirePermissions(Permission.Create);
-
-        group.MapPut("/{id:guid}", async ([FromServices] ApplicationDbContext context,
-            [FromRoute] Guid id, [FromBody] WagonTypeRequest request) =>
-        {
-            var type = await context.WagonTypes.FindAsync(id);
-
-            if (type == null)
-                return Results.NotFound();
-
-            // Проверяем уникальность имени
-            if (await context.WagonTypes.AnyAsync(t => t.Id != id && t.Name == request.Name))
-                return Results.BadRequest($"WagonType with name '{request.Name}' already exists");
-
-            type.Name = request.Name;
-            await context.SaveChangesAsync();
-
-            return Results.Ok(MapToResponse(type));
-        }).RequirePermissions(Permission.Update);
-    }
-
-    private static WagonTypeResponse MapToResponse(WagonType type)
-    {
-        if (type == null) return null!;
-        
-        return new WagonTypeResponse
-        {
-            Id = type.Id,
-            Name = type.Name
-        };
-    }
-
-    private static WagonTypeDetailResponse MapToDetailResponse(WagonType type)
-    {
-        if (type == null) return null!;
-        
-        return new WagonTypeDetailResponse
-        {
-            Id = type.Id,
-            Name = type.Name,
-            RailwayCisterns = type.RailwayCisterns?
-                .Select(w => new RailwayCisternSummaryResponse
+            var types = await context.Set<WagonType>()
+                .Select(w => new WagonTypeDTO
                 {
                     Id = w.Id,
-                    Number = w.Number
+                    Name = w.Name,
+                    Type = w.Type
                 })
-                .ToList()
-        };
+                .ToListAsync();
+            return Results.Ok(types);
+        })
+        .WithName("GetWagonTypes")
+        .Produces<List<WagonTypeDTO>>(StatusCodes.Status200OK)
+        .RequirePermissions(Permission.Read);
+
+        group.MapGet("/{id}", async ([FromServices] ApplicationDbContext context, [FromRoute] Guid id) =>
+        {
+            var type = await context.Set<WagonType>()
+                .Where(w => w.Id == id)
+                .Select(w => new WagonTypeDTO
+                {
+                    Id = w.Id,
+                    Name = w.Name,
+                    Type = w.Type
+                })
+                .FirstOrDefaultAsync();
+            return type is null ? Results.NotFound() : Results.Ok(type);
+        })
+        .WithName("GetWagonTypeById")
+        .Produces<WagonTypeDTO>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound)
+        .RequirePermissions(Permission.Read);
+
+        group.MapPost("/", async ([FromServices] ApplicationDbContext context, [FromBody] CreateWagonTypeDTO dto) =>
+        {
+            var wagonType = new WagonType
+            {
+                Name = dto.Name,
+                Type = dto.Type
+            };
+
+            context.Add(wagonType);
+            await context.SaveChangesAsync();
+
+            return Results.Created($"/api/wagon-types/{wagonType.Id}", new WagonTypeDTO
+            {
+                Id = wagonType.Id,
+                Name = wagonType.Name,
+                Type = wagonType.Type
+            });
+        })
+        .WithName("CreateWagonType")
+        .Produces<WagonTypeDTO>(StatusCodes.Status201Created)
+        .ProducesValidationProblem()
+        .RequirePermissions(Permission.Create);
+
+        group.MapPut("/{id}", async ([FromServices] ApplicationDbContext context, [FromRoute] Guid id, [FromBody] UpdateWagonTypeDTO dto) =>
+        {
+            var wagonType = await context.Set<WagonType>().FindAsync(id);
+            if (wagonType == null)
+                return Results.NotFound();
+
+            wagonType.Name = dto.Name;
+            wagonType.Type = dto.Type;
+
+            await context.SaveChangesAsync();
+            return Results.NoContent();
+        })
+        .WithName("UpdateWagonType")
+        .Produces(StatusCodes.Status204NoContent)
+        .Produces(StatusCodes.Status404NotFound)
+        .ProducesValidationProblem()
+        .RequirePermissions(Permission.Update);
+
+        group.MapDelete("/{id}", async ([FromServices] ApplicationDbContext context, [FromRoute] Guid id) =>
+        {
+            var wagonType = await context.Set<WagonType>().FindAsync(id);
+            if (wagonType == null)
+                return Results.NotFound();
+
+            context.Remove(wagonType);
+            await context.SaveChangesAsync();
+            return Results.NoContent();
+        })
+        .WithName("DeleteWagonType")
+        .Produces(StatusCodes.Status204NoContent)
+        .Produces(StatusCodes.Status404NotFound)
+        .RequirePermissions(Permission.Delete);
     }
 }

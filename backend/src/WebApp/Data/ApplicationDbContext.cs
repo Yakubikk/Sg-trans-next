@@ -42,9 +42,12 @@ public class ApplicationDbContext(
     public DbSet<Station> Stations { get; set; }
     public DbSet<VCType> VCTypes { get; set; }
     public DbSet<Wagon> Wagons { get; set; }
-    
+
     //RailwayCisternsModels
+    public DbSet<Affiliation> Affiliations { get; set; }
     public DbSet<Manufacturer> Manufacturers { get; set; }
+    public DbSet<MilageCistern> MilageCisterns { get; set; }
+    public DbSet<Owner> Owners { get; set; }
     public DbSet<RailwayCistern> RailwayCisterns { get; set; }
     public DbSet<WagonType> WagonTypes { get; set; }
     public DbSet<WagonModel> WagonModels { get; set; }
@@ -62,40 +65,189 @@ public class ApplicationDbContext(
     public DbSet<RepairType> RepairTypes { get; set; }
     public DbSet<Repair> Repairs { get; set; }
 
-    
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Manufacturer - RailwayCistern связь
-        modelBuilder.Entity<Manufacturer>()
-            .HasMany(m => m.RailwayCisterns)
-            .WithOne(w => w.Manufacturer)
-            .HasForeignKey(w => w.ManufacturerId)
-            .OnDelete(DeleteBehavior.Cascade);
-            
-        // WagonType - RailwayCistern связь
-        modelBuilder.Entity<WagonType>()
-            .HasMany(t => t.RailwayCisterns)
-            .WithOne(r => r.Type)
-            .HasForeignKey(r => r.TypeId);
-            
-        // WagonModel - RailwayCistern связь
-        modelBuilder.Entity<WagonModel>()
-            .HasMany(m => m.RailwayCisterns)
-            .WithOne(r => r.Model)
-            .HasForeignKey(r => r.ModelId);
-            
-        // Registrar - RailwayCistern связь
-        modelBuilder.Entity<Registrar>()
-            .HasMany(r => r.RailwayCisterns)
-            .WithOne(c => c.Registrar)
-            .HasForeignKey(c => c.RegistrarId);
+        // Affiliations
+        modelBuilder.Entity<Affiliation>(entity =>
+        {
+            entity.ToTable("Affiliations");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("Id").IsRequired();
+            entity.Property(e => e.Value).HasColumnName("Value").IsRequired().HasColumnType("text");
+        });
 
-        // RailwayCistern - Vessel связь один-к-одному
-        modelBuilder.Entity<RailwayCistern>()
-            .HasOne(r => r.Vessel)
-            .WithOne(v => v.RailwayCistern)
-            .HasForeignKey<Vessel>(v => v.RailwayCisternId);
+        // Manufacturers
+        modelBuilder.Entity<Manufacturer>(entity =>
+        {
+            entity.ToTable("Manufacturers");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("Id").IsRequired();
+            entity.Property(e => e.Name).HasColumnName("Name").IsRequired().HasColumnType("text");
+            entity.Property(e => e.Country).HasColumnName("Country").IsRequired().HasColumnType("text");
+            entity.Property(e => e.CreatedAt).HasColumnName("CreatedAt").IsRequired()
+                .HasColumnType("timestamp with time zone");
+            entity.Property(e => e.UpdatedAt).HasColumnName("UpdatedAt").IsRequired()
+                .HasColumnType("timestamp with time zone");
+            entity.Property(e => e.CreatorId).HasColumnName("CreatorId").IsRequired().HasColumnType("text");
+            entity.Property(e => e.ShortName).HasColumnName("ShortName").HasColumnType("text");
+            entity.Property(e => e.Code).HasColumnName("Code").IsRequired().HasDefaultValue(0);
+        });
+
+        // MilageCisterns
+        modelBuilder.Entity<MilageCistern>(entity =>
+        {
+            entity.ToTable("MilageCisterns");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("Id").IsRequired();
+            entity.Property(e => e.CisternId).HasColumnName("CisternId").IsRequired();
+            entity.Property(e => e.Milage).HasColumnName("Milage").IsRequired();
+            entity.Property(e => e.MilageNorm).HasColumnName("MilageNorm").IsRequired();
+            entity.Property(e => e.RepairTypeId).HasColumnName("RepairTypeId").IsRequired();
+            entity.Property(e => e.RepairDate).HasColumnName("RepairDate").IsRequired().HasColumnType("date");
+            entity.Property(e => e.InputModeCode).HasColumnName("InputModeCode").IsRequired();
+            entity.Property(e => e.InputDate).HasColumnName("InputDate").IsRequired().HasColumnType("date");
+            entity.Property(e => e.CisternNumber).HasColumnName("CisternNumber").IsRequired().HasColumnType("text");
+
+            entity.HasOne(d => d.Cistern)
+                .WithMany(p => p.MilageCisterns)
+                .HasForeignKey(d => d.CisternId)
+                .HasConstraintName("FK_CisternId_RailwayCisterns_id")
+                .OnDelete(DeleteBehavior.NoAction); // ON DELETE NO ACTION
+
+            entity.HasOne(d => d.RepairType)
+                .WithMany(p => p.MilageCisterns)
+                .HasForeignKey(d => d.RepairTypeId)
+                .HasConstraintName("FK_RepairTypeId_RepairTypes_id")
+                .OnDelete(DeleteBehavior.NoAction); // ON DELETE NO ACTION
+        });
+
+        // Owners
+        modelBuilder.Entity<Owner>(entity =>
+        {
+            entity.ToTable("Owners");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("Id").IsRequired();
+            entity.Property(e => e.Name).HasColumnName("Name").IsRequired().HasColumnType("text");
+            entity.Property(e => e.UNP).HasColumnName("UNP").HasColumnType("text");
+            entity.Property(e => e.CreatedAt).HasColumnName("CreatedAt").HasColumnType("timestamp with time zone");
+            entity.Property(e => e.UpdatedAt).HasColumnName("UpdatedAt").HasColumnType("timestamp with time zone");
+            entity.Property(e => e.CreatorId).HasColumnName("CreatorId").HasColumnType("text");
+            entity.Property(e => e.ShortName).HasColumnName("ShortName").IsRequired().HasColumnType("text");
+            entity.Property(e => e.Address).HasColumnName("Address").HasColumnType("text");
+            entity.Property(e => e.TreatRepairs).HasColumnName("TreatRepairs").IsRequired();
+        });
+
+        // RailwayCisterns
+        modelBuilder.Entity<RailwayCistern>(entity =>
+        {
+            entity.ToTable("RailwayCisterns");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("Id").IsRequired();
+            entity.Property(e => e.Number).HasColumnName("Number").IsRequired().HasColumnType("text");
+            entity.Property(e => e.ManufacturerId).HasColumnName("ManufacturerId").IsRequired();
+            entity.Property(e => e.BuildDate).HasColumnName("BuildDate").IsRequired().HasColumnType("date");
+            entity.Property(e => e.TareWeight).HasColumnName("TareWeight").IsRequired().HasColumnType("numeric");
+            entity.Property(e => e.LoadCapacity).HasColumnName("LoadCapacity").IsRequired().HasColumnType("numeric");
+            entity.Property(e => e.Length).HasColumnName("Length").IsRequired();
+            entity.Property(e => e.AxleCount).HasColumnName("AxleCount").IsRequired();
+            entity.Property(e => e.Volume).HasColumnName("Volume").IsRequired().HasColumnType("numeric");
+            entity.Property(e => e.FillingVolume).HasColumnName("FillingVolume").HasColumnType("numeric");
+            entity.Property(e => e.InitialTareWeight).HasColumnName("InitialTareWeight").HasColumnType("numeric");
+            entity.Property(e => e.TypeId).HasColumnName("TypeId").IsRequired();
+            entity.Property(e => e.ModelId).HasColumnName("ModelId");
+            entity.Property(e => e.CommissioningDate).HasColumnName("CommissioningDate").HasColumnType("date");
+            entity.Property(e => e.SerialNumber).HasColumnName("SerialNumber").IsRequired().HasColumnType("text");
+            entity.Property(e => e.RegistrationNumber).HasColumnName("RegistrationNumber").IsRequired()
+                .HasColumnType("text");
+            entity.Property(e => e.RegistrationDate).HasColumnName("RegistrationDate").IsRequired()
+                .HasColumnType("date");
+            entity.Property(e => e.RegistrarId).HasColumnName("RegistrarId");
+            entity.Property(e => e.Notes).HasColumnName("Notes").HasColumnType("text");
+            entity.Property(e => e.CreatedAt).HasColumnName("CreatedAt").IsRequired()
+                .HasColumnType("timestamp with time zone");
+            entity.Property(e => e.UpdatedAt).HasColumnName("UpdatedAt").IsRequired()
+                .HasColumnType("timestamp with time zone");
+            entity.Property(e => e.CreatorId).HasColumnName("CreatorId").IsRequired().HasColumnType("text");
+            entity.Property(e => e.OwnerId).HasColumnName("Ownerid"); // Matches SQL column name
+            entity.Property(e => e.TechConditions).HasColumnName("TechСonditions")
+                .HasColumnType("text"); // Matches SQL column name
+            entity.Property(e => e.Pripiska).HasColumnName("Pripiska").HasColumnType("text");
+            entity.Property(e => e.ReRegistrationDate).HasColumnName("ReRegistrationDate").HasColumnType("date");
+            entity.Property(e => e.Pressure).HasColumnName("Pressure").IsRequired().HasColumnType("numeric");
+            entity.Property(e => e.TestPressure).HasColumnName("TestPressure").IsRequired().HasColumnType("numeric")
+                .HasDefaultValue(0);
+            entity.Property(e => e.Rent).HasColumnName("Rent").HasColumnType("text");
+            entity.Property(e => e.AffiliationId).HasColumnName("AffiliationId").IsRequired();
+            entity.Property(e => e.ServiceLifeYears).HasColumnName("ServiceLifeYears").IsRequired().HasDefaultValue(40);
+            entity.Property(e => e.PeriodMajorRepair).HasColumnName("PeriodMajorRepair").HasColumnType("date");
+            entity.Property(e => e.PeriodPeriodicTest).HasColumnName("PeriodPeriodicTest").HasColumnType("date");
+            entity.Property(e => e.PeriodIntermediateTest).HasColumnName("PeriodIntermediateTest")
+                .HasColumnType("date");
+            entity.Property(e => e.PeriodDepotRepair).HasColumnName("PeriodDepotRepair").HasColumnType("date");
+            entity.Property(e => e.DangerClass).HasColumnName("DangerClass").IsRequired().HasDefaultValue(0);
+            entity.Property(e => e.Substance).HasColumnName("Substance").IsRequired().HasColumnType("text")
+                .HasDefaultValue("СУГ");
+
+
+            entity.HasOne(d => d.Affiliation)
+                .WithMany(p => p.RailwayCisterns)
+                .HasForeignKey(d => d.AffiliationId)
+                .HasConstraintName("FK_RailwayCisterns_Affiliations_AffiliationId")
+                .OnDelete(DeleteBehavior.NoAction); // ON DELETE NO ACTION
+
+            entity.HasOne(d => d.Manufacturer)
+                .WithMany(p => p.RailwayCisterns)
+                .HasForeignKey(d => d.ManufacturerId)
+                .HasConstraintName("FK_RailwayCisterns_Manufacturers_ManufacturerId")
+                .OnDelete(DeleteBehavior.Cascade); // ON DELETE CASCADE
+
+            entity.HasOne(d => d.Owner)
+                .WithMany(p => p.RailwayCisterns)
+                .HasForeignKey(d => d.OwnerId) // Corrected to OwnerId
+                .HasConstraintName("FK_RailwayCisterns_Owners_Ownerid")
+                .OnDelete(DeleteBehavior.NoAction); // ON DELETE NO ACTION
+
+            entity.HasOne(d => d.Registrar)
+                .WithMany(p => p.RailwayCisterns)
+                .HasForeignKey(d => d.RegistrarId)
+                .HasConstraintName("FK_RailwayCisterns_Registrars_RegistrarId")
+                .OnDelete(DeleteBehavior.NoAction); // ON DELETE NO ACTION
+
+            entity.HasOne(d => d.Model)
+                .WithMany(p => p.RailwayCisterns)
+                .HasForeignKey(d => d.ModelId)
+                .HasConstraintName("FK_RailwayCisterns_WagonModels_ModelId")
+                .OnDelete(DeleteBehavior.NoAction); // ON DELETE NO ACTION
+
+            entity.HasOne(d => d.Type)
+                .WithMany(p => p.RailwayCisterns)
+                .HasForeignKey(d => d.TypeId)
+                .HasConstraintName("FK_RailwayCisterns_WagonTypes_TypeId")
+                .OnDelete(DeleteBehavior.Cascade); // ON DELETE CASCADE
+        });
+
+        // WagonTypes
+        modelBuilder.Entity<WagonType>(entity =>
+        {
+            entity.ToTable("WagonTypes");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("Id").IsRequired();
+            entity.Property(e => e.Name).HasColumnName("Name").IsRequired().HasColumnType("text");
+            entity.Property(e => e.Type).HasColumnName("Type").IsRequired().HasColumnType("text").HasDefaultValue("0"); // "0" as text default based on SQL
+        });
+
+        // RepairTypes
+        modelBuilder.Entity<RepairType>(entity =>
+        {
+            entity.ToTable("RepairTypes");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("Id").IsRequired();
+            entity.Property(e => e.Name).HasColumnName("Name").IsRequired().HasColumnType("text");
+            entity.Property(e => e.Code).HasColumnName("Code").IsRequired().HasColumnType("text");
+            entity.Property(e => e.Description).HasColumnName("Description").HasColumnType("text");
+            entity.Property(e => e.CreatedAt).HasColumnName("CreatedAt").IsRequired().HasColumnType("timestamp with time zone");
+        });
 
         // Part - PartInstallation связь
         modelBuilder.Entity<Part>()
@@ -106,16 +258,16 @@ public class ApplicationDbContext(
         // Part - специальные части (TPH схема наследования)
         modelBuilder.Entity<WheelPair>()
             .HasKey(w => w.PartId);
-            
+
         modelBuilder.Entity<SideFrame>()
             .HasKey(s => s.PartId);
-            
+
         modelBuilder.Entity<Bolster>()
             .HasKey(b => b.PartId);
-            
+
         modelBuilder.Entity<Coupler>()
             .HasKey(c => c.PartId);
-            
+
         modelBuilder.Entity<ShockAbsorber>()
             .HasKey(s => s.PartId);
 
@@ -159,11 +311,11 @@ public class ApplicationDbContext(
             .HasMany(d => d.Repairs)
             .WithOne(r => r.Depot)
             .HasForeignKey(r => r.DepotId);
-        
+
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
-        
+
         var builder = modelBuilder.Entity<RolePermission>();
-        
+
         builder.HasKey(r => new { r.RoleId, r.PermissionId });
     }
 }

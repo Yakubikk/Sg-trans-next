@@ -1,9 +1,9 @@
-namespace WebApp.Data.Entities.RailwayCisterns;
+﻿namespace WebApp.Data.Entities.RailwayCisterns;
 
-public class Registrar
+public class Affiliation
 {
     public Guid Id { get; set; }
-    public string Name { get; set; } = null!;
-    
+    public string Value { get; set; } = null!;
+
     public ICollection<RailwayCistern> RailwayCisterns { get; set; } = new List<RailwayCistern>();
 }

@@ -1,11 +1,11 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Data;
 using WebApp.Data.Entities.RailwayCisterns;
 using WebApp.Data.Enums;
-using WebApp.DTO;
+using WebApp.DTO.RailwayCisterns;
 using WebApp.Extensions;
-using WebApp.Services;
 
 namespace WebApp.Endpoints.RailwayCisterns;
 
@@ -15,364 +15,543 @@ public static class RailwayCisternEndpoints
     {
         var group = app.MapGroup("/api/railway-cisterns")
             .RequireAuthorization()
-            .WithTags("railway_cisterns");
+            .WithTags("railway-cisterns");
 
+        // Get basic list
         group.MapGet("/", async ([FromServices] ApplicationDbContext context) =>
         {
-            var railwayCisterns = await context.RailwayCisterns
-                .Include(r => r.Manufacturer)
-                .Include(r => r.Type)
-                .Include(r => r.Model)
-                .Include(r => r.Registrar)
-                .Include(r => r.Vessel)
+            var cisterns = await context.Set<RailwayCistern>()
+                .Include(rc => rc.Manufacturer)
+                .Include(rc => rc.Type)
+                .Include(rc => rc.Model)
+                .Include(rc => rc.Owner)
+                .Include(rc => rc.Affiliation)
+                .Select(rc => new RailwayCisternListDTO
+                {
+                    Id = rc.Id,
+                    Number = rc.Number,
+                    ManufacturerName = rc.Manufacturer.Name,
+                    BuildDate = rc.BuildDate,
+                    TypeName = rc.Type.Name,
+                    ModelName = rc.Model.Name,
+                    OwnerName = rc.Owner.Name,
+                    RegistrationNumber = rc.RegistrationNumber,
+                    RegistrationDate = rc.RegistrationDate,
+                    AffiliationValue = rc.Affiliation.Value
+                })
+                .ToListAsync();
+            return Results.Ok(cisterns);
+        })
+        .WithName("GetRailwayCisterns")
+        .Produces<List<RailwayCisternListDTO>>(StatusCodes.Status200OK)
+        .RequirePermissions(Permission.Read);
+
+        // Get detailed list
+        group.MapGet("/detailed", async ([FromServices] ApplicationDbContext context) =>
+        {
+            var cisterns = await context.Set<RailwayCistern>()
+                .Include(rc => rc.Manufacturer)
+                .Include(rc => rc.Type)
+                .Include(rc => rc.Model)
+                .Include(rc => rc.Owner)
+                .Include(rc => rc.Registrar)
+                .Include(rc => rc.Affiliation)
+                .Include(rc => rc.MilageCisterns)
+                .Select(rc => new RailwayCisternDetailDTO
+                {
+                    Id = rc.Id,
+                    Number = rc.Number,
+                    Manufacturer = new ManufacturerDTO 
+                    { 
+                        Id = rc.Manufacturer.Id, 
+                        Name = rc.Manufacturer.Name,
+                        Country = rc.Manufacturer.Country,
+                        ShortName = rc.Manufacturer.ShortName,
+                        Code = rc.Manufacturer.Code
+                    },
+                    BuildDate = rc.BuildDate,
+                    TareWeight = rc.TareWeight,
+                    LoadCapacity = rc.LoadCapacity,
+                    Length = rc.Length,
+                    AxleCount = rc.AxleCount,
+                    Volume = rc.Volume,
+                    FillingVolume = rc.FillingVolume,
+                    InitialTareWeight = rc.InitialTareWeight,
+                    Type = new WagonTypeDTO 
+                    { 
+                        Id = rc.Type.Id, 
+                        Name = rc.Type.Name,
+                        Type = rc.Type.Type
+                    },
+                    Model = rc.Model != null ? new WagonModelDTO 
+                    { 
+                        Id = rc.Model.Id, 
+                        Name = rc.Model.Name 
+                    } : null,
+                    CommissioningDate = rc.CommissioningDate,
+                    SerialNumber = rc.SerialNumber,
+                    RegistrationNumber = rc.RegistrationNumber,
+                    RegistrationDate = rc.RegistrationDate,
+                    Registrar = rc.Registrar != null ? new RegistrarDTO 
+                    { 
+                        Id = rc.Registrar.Id, 
+                        Name = rc.Registrar.Name 
+                    } : null,
+                    Notes = rc.Notes,
+                    Owner = rc.Owner != null ? new OwnerDTO 
+                    { 
+                        Id = rc.Owner.Id, 
+                        Name = rc.Owner.Name,
+                        UNP = rc.Owner.UNP,
+                        ShortName = rc.Owner.ShortName,
+                        Address = rc.Owner.Address,
+                        TreatRepairs = rc.Owner.TreatRepairs
+                    } : null,
+                    TechConditions = rc.TechConditions,
+                    Pripiska = rc.Pripiska,
+                    ReRegistrationDate = rc.ReRegistrationDate,
+                    Pressure = rc.Pressure,
+                    TestPressure = rc.TestPressure,
+                    Rent = rc.Rent,
+                    Affiliation = new AffiliationDTO 
+                    { 
+                        Id = rc.Affiliation.Id, 
+                        Value = rc.Affiliation.Value 
+                    },
+                    ServiceLifeYears = rc.ServiceLifeYears,
+                    PeriodMajorRepair = rc.PeriodMajorRepair,
+                    PeriodPeriodicTest = rc.PeriodPeriodicTest,
+                    PeriodIntermediateTest = rc.PeriodIntermediateTest,
+                    PeriodDepotRepair = rc.PeriodDepotRepair,
+                    DangerClass = rc.DangerClass,
+                    Substance = rc.Substance,
+                    CreatedAt = rc.CreatedAt,
+                    UpdatedAt = rc.UpdatedAt
+                })
+                .ToListAsync();
+            return Results.Ok(cisterns);
+        })
+        .WithName("GetDetailedRailwayCisterns")
+        .Produces<List<RailwayCisternDetailDTO>>(StatusCodes.Status200OK)
+        .RequirePermissions(Permission.Read);
+
+        // Get detailed list with pagination
+        group.MapGet("/detailed/paged", async (
+            [FromServices] ApplicationDbContext context,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10) =>
+        {
+            var query = context.Set<RailwayCistern>()
+                .Include(rc => rc.Manufacturer)
+                .Include(rc => rc.Type)
+                .Include(rc => rc.Model)
+                .Include(rc => rc.Owner)
+                .Include(rc => rc.Registrar)
+                .Include(rc => rc.Affiliation)
+                .Include(rc => rc.MilageCisterns)
+                .AsQueryable();
+
+            var totalCount = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            var cisterns = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(rc => new RailwayCisternDetailDTO
+                {
+                    Id = rc.Id,
+                    Number = rc.Number,
+                    Manufacturer = new ManufacturerDTO 
+                    { 
+                        Id = rc.Manufacturer.Id, 
+                        Name = rc.Manufacturer.Name,
+                        Country = rc.Manufacturer.Country,
+                        ShortName = rc.Manufacturer.ShortName,
+                        Code = rc.Manufacturer.Code
+                    },
+                    BuildDate = rc.BuildDate,
+                    TareWeight = rc.TareWeight,
+                    LoadCapacity = rc.LoadCapacity,
+                    Length = rc.Length,
+                    AxleCount = rc.AxleCount,
+                    Volume = rc.Volume,
+                    FillingVolume = rc.FillingVolume,
+                    InitialTareWeight = rc.InitialTareWeight,
+                    Type = new WagonTypeDTO 
+                    { 
+                        Id = rc.Type.Id, 
+                        Name = rc.Type.Name,
+                        Type = rc.Type.Type
+                    },
+                    Model = rc.Model != null ? new WagonModelDTO 
+                    { 
+                        Id = rc.Model.Id, 
+                        Name = rc.Model.Name 
+                    } : null,
+                    CommissioningDate = rc.CommissioningDate,
+                    SerialNumber = rc.SerialNumber,
+                    RegistrationNumber = rc.RegistrationNumber,
+                    RegistrationDate = rc.RegistrationDate,
+                    Registrar = rc.Registrar != null ? new RegistrarDTO 
+                    { 
+                        Id = rc.Registrar.Id, 
+                        Name = rc.Registrar.Name 
+                    } : null,
+                    Notes = rc.Notes,
+                    Owner = rc.Owner != null ? new OwnerDTO 
+                    { 
+                        Id = rc.Owner.Id, 
+                        Name = rc.Owner.Name,
+                        UNP = rc.Owner.UNP,
+                        ShortName = rc.Owner.ShortName,
+                        Address = rc.Owner.Address,
+                        TreatRepairs = rc.Owner.TreatRepairs
+                    } : null,
+                    TechConditions = rc.TechConditions,
+                    Pripiska = rc.Pripiska,
+                    ReRegistrationDate = rc.ReRegistrationDate,
+                    Pressure = rc.Pressure,
+                    TestPressure = rc.TestPressure,
+                    Rent = rc.Rent,
+                    Affiliation = new AffiliationDTO 
+                    { 
+                        Id = rc.Affiliation.Id, 
+                        Value = rc.Affiliation.Value 
+                    },
+                    ServiceLifeYears = rc.ServiceLifeYears,
+                    PeriodMajorRepair = rc.PeriodMajorRepair,
+                    PeriodPeriodicTest = rc.PeriodPeriodicTest,
+                    PeriodIntermediateTest = rc.PeriodIntermediateTest,
+                    PeriodDepotRepair = rc.PeriodDepotRepair,
+                    DangerClass = rc.DangerClass,
+                    Substance = rc.Substance,
+                    CreatedAt = rc.CreatedAt,
+                    UpdatedAt = rc.UpdatedAt
+                })
                 .ToListAsync();
 
-            return Results.Ok(railwayCisterns.Select(MapToResponse).ToList());
-        }).RequirePermissions(Permission.Read);
-
-        group.MapGet("/{id:guid}", async ([FromServices] ApplicationDbContext context, [FromRoute] Guid id) =>
-        {
-            var railwayCistern = await context.RailwayCisterns
-                .Include(r => r.Manufacturer)
-                .Include(r => r.Type)
-                .Include(r => r.Model)
-                .Include(r => r.Registrar)
-                .Include(r => r.Vessel)
-                .Include(r => r.PartInstallations)
-                .ThenInclude(pi => pi.Part)
-                .Include(r => r.PartInstallations)
-                .ThenInclude(pi => pi.FromLocation)
-                .Include(r => r.PartInstallations)
-                .ThenInclude(pi => pi.ToLocation)
-                .FirstOrDefaultAsync(r => r.Id == id);
-
-            if (railwayCistern == null)
+            var response = new
             {
-                return Results.NotFound();
-            }
-
-            return Results.Ok(MapToDetailResponse(railwayCistern));
-        }).RequirePermissions(Permission.Read);
-
-        group.MapGet("/by-number/{number}", async ([FromServices] ApplicationDbContext context, [FromRoute] string number) =>
-        {
-            var railwayCistern = await context.RailwayCisterns
-                .Include(r => r.Manufacturer)
-                .Include(r => r.Type)
-                .Include(r => r.Model)
-                .Include(r => r.Registrar)
-                .Include(r => r.Vessel)
-                .Include(r => r.PartInstallations)
-                .ThenInclude(pi => pi.Part)
-                .Include(r => r.PartInstallations)
-                .ThenInclude(pi => pi.FromLocation)
-                .Include(r => r.PartInstallations)
-                .ThenInclude(pi => pi.ToLocation)
-                .FirstOrDefaultAsync(r => r.Number == number);
-
-            if (railwayCistern == null)
-            {
-                return Results.NotFound();
-            }
-
-            return Results.Ok(MapToDetailResponse(railwayCistern));
-        }).RequirePermissions(Permission.Read);
-
-        group.MapPost("/", async ([FromServices] ApplicationDbContext context, 
-            [FromServices] ICurrentUserService currentUserService,
-            [FromBody] RailwayCisternRequest request) =>
-        {
-            var railwayCistern = new RailwayCistern
-            {
-                Number = request.Number,
-                ManufacturerId = request.ManufacturerId,
-                BuildDate = request.BuildDate,
-                TareWeight = request.TareWeight,
-                LoadCapacity = request.LoadCapacity,
-                Length = request.Length,
-                AxleCount = request.AxleCount,
-                Volume = request.Volume,
-                FillingVolume = request.FillingVolume,
-                InitialTareWeight = request.InitialTareWeight,
-                TypeId = request.TypeId,
-                ModelId = request.ModelId,
-                CommissioningDate = request.CommissioningDate,
-                SerialNumber = request.SerialNumber,
-                RegistrationNumber = request.RegistrationNumber,
-                RegistrationDate = request.RegistrationDate,
-                RegistrarId = request.RegistrarId,
-                Notes = request.Notes,
-                CreatorId = currentUserService.GetCurrentUserId()
+                Items = cisterns,
+                TotalCount = totalCount,
+                TotalPages = totalPages,
+                CurrentPage = page,
+                PageSize = pageSize
             };
 
-            // Если предоставлены данные о котле, создаем его
-            if (!string.IsNullOrEmpty(request.VesselSerialNumber) || request.VesselBuildDate.HasValue)
-            {
-                railwayCistern.Vessel = new Vessel
+            return Results.Ok(response);
+        })
+        .WithName("GetPagedDetailedRailwayCisterns")
+        .Produces<object>(StatusCodes.Status200OK)
+        .RequirePermissions(Permission.Read);
+
+        // Search detailed list by number
+        group.MapGet("/detailed/search", async (
+            [FromServices] ApplicationDbContext context,
+            [FromQuery] string number) =>
+        {
+            if (string.IsNullOrWhiteSpace(number))
+                return Results.BadRequest("Search number is required");
+
+            var cisterns = await context.Set<RailwayCistern>()
+                .Include(rc => rc.Manufacturer)
+                .Include(rc => rc.Type)
+                .Include(rc => rc.Model)
+                .Include(rc => rc.Owner)
+                .Include(rc => rc.Registrar)
+                .Include(rc => rc.Affiliation)
+                .Include(rc => rc.MilageCisterns)
+                .Where(rc => rc.Number.Contains(number))
+                .Select(rc => new RailwayCisternDetailDTO
                 {
-                    VesselSerialNumber = request.VesselSerialNumber,
-                    VesselBuildDate = request.VesselBuildDate
-                };
-            }
+                    Id = rc.Id,
+                    Number = rc.Number,
+                    Manufacturer = new ManufacturerDTO 
+                    { 
+                        Id = rc.Manufacturer.Id, 
+                        Name = rc.Manufacturer.Name,
+                        Country = rc.Manufacturer.Country,
+                        ShortName = rc.Manufacturer.ShortName,
+                        Code = rc.Manufacturer.Code
+                    },
+                    BuildDate = rc.BuildDate,
+                    TareWeight = rc.TareWeight,
+                    LoadCapacity = rc.LoadCapacity,
+                    Length = rc.Length,
+                    AxleCount = rc.AxleCount,
+                    Volume = rc.Volume,
+                    FillingVolume = rc.FillingVolume,
+                    InitialTareWeight = rc.InitialTareWeight,
+                    Type = new WagonTypeDTO 
+                    { 
+                        Id = rc.Type.Id, 
+                        Name = rc.Type.Name,
+                        Type = rc.Type.Type
+                    },
+                    Model = rc.Model != null ? new WagonModelDTO 
+                    { 
+                        Id = rc.Model.Id, 
+                        Name = rc.Model.Name 
+                    } : null,
+                    CommissioningDate = rc.CommissioningDate,
+                    SerialNumber = rc.SerialNumber,
+                    RegistrationNumber = rc.RegistrationNumber,
+                    RegistrationDate = rc.RegistrationDate,
+                    Registrar = rc.Registrar != null ? new RegistrarDTO 
+                    { 
+                        Id = rc.Registrar.Id, 
+                        Name = rc.Registrar.Name 
+                    } : null,
+                    Notes = rc.Notes,
+                    Owner = rc.Owner != null ? new OwnerDTO 
+                    { 
+                        Id = rc.Owner.Id, 
+                        Name = rc.Owner.Name,
+                        UNP = rc.Owner.UNP,
+                        ShortName = rc.Owner.ShortName,
+                        Address = rc.Owner.Address,
+                        TreatRepairs = rc.Owner.TreatRepairs
+                    } : null,
+                    TechConditions = rc.TechConditions,
+                    Pripiska = rc.Pripiska,
+                    ReRegistrationDate = rc.ReRegistrationDate,
+                    Pressure = rc.Pressure,
+                    TestPressure = rc.TestPressure,
+                    Rent = rc.Rent,
+                    Affiliation = new AffiliationDTO 
+                    { 
+                        Id = rc.Affiliation.Id, 
+                        Value = rc.Affiliation.Value 
+                    },
+                    ServiceLifeYears = rc.ServiceLifeYears,
+                    PeriodMajorRepair = rc.PeriodMajorRepair,
+                    PeriodPeriodicTest = rc.PeriodPeriodicTest,
+                    PeriodIntermediateTest = rc.PeriodIntermediateTest,
+                    PeriodDepotRepair = rc.PeriodDepotRepair,
+                    DangerClass = rc.DangerClass,
+                    Substance = rc.Substance,
+                    CreatedAt = rc.CreatedAt,
+                    UpdatedAt = rc.UpdatedAt
+                })
+                .ToListAsync();
 
-            // Проверяем существование связанных сущностей
-            var manufacturer = await context.Manufacturers.FindAsync(request.ManufacturerId);
-            if (manufacturer == null)
-                return Results.NotFound($"Manufacturer with ID {request.ManufacturerId} not found");
+            return Results.Ok(cisterns);
+        })
+        .WithName("SearchDetailedRailwayCisterns")
+        .Produces<List<RailwayCisternDetailDTO>>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status400BadRequest)
+        .RequirePermissions(Permission.Read);
 
-            var type = await context.WagonTypes.FindAsync(request.TypeId);
-            if (type == null)
-                return Results.NotFound($"WagonType with ID {request.TypeId} not found");
+        // Get by ID with detailed info
+        group.MapGet("/{id}", async ([FromServices] ApplicationDbContext context, [FromRoute] Guid id) =>
+        {
+            var cistern = await context.Set<RailwayCistern>()
+                .Include(rc => rc.Manufacturer)
+                .Include(rc => rc.Type)
+                .Include(rc => rc.Model)
+                .Include(rc => rc.Owner)
+                .Include(rc => rc.Registrar)
+                .Include(rc => rc.Affiliation)
+                .Where(rc => rc.Id == id)
+                .Select(rc => new RailwayCisternDetailDTO
+                {
+                    Id = rc.Id,
+                    Number = rc.Number,
+                    Manufacturer = new ManufacturerDTO 
+                    { 
+                        Id = rc.Manufacturer.Id, 
+                        Name = rc.Manufacturer.Name,
+                        Country = rc.Manufacturer.Country,
+                        ShortName = rc.Manufacturer.ShortName,
+                        Code = rc.Manufacturer.Code,
+                        CreatedAt = rc.Manufacturer.CreatedAt,
+                        UpdatedAt = rc.Manufacturer.UpdatedAt
+                    },
+                    BuildDate = rc.BuildDate,
+                    TareWeight = rc.TareWeight,
+                    LoadCapacity = rc.LoadCapacity,
+                    Length = rc.Length,
+                    AxleCount = rc.AxleCount,
+                    Volume = rc.Volume,
+                    FillingVolume = rc.FillingVolume,
+                    InitialTareWeight = rc.InitialTareWeight,
+                    Type = new WagonTypeDTO 
+                    { 
+                        Id = rc.Type.Id, 
+                        Name = rc.Type.Name,
+                        Type = rc.Type.Type
+                    },
+                    Model = rc.Model != null ? new WagonModelDTO 
+                    { 
+                        Id = rc.Model.Id, 
+                        Name = rc.Model.Name 
+                    } : null,
+                    CommissioningDate = rc.CommissioningDate,
+                    SerialNumber = rc.SerialNumber,
+                    RegistrationNumber = rc.RegistrationNumber,
+                    RegistrationDate = rc.RegistrationDate,
+                    Registrar = rc.Registrar != null ? new RegistrarDTO 
+                    { 
+                        Id = rc.Registrar.Id, 
+                        Name = rc.Registrar.Name 
+                    } : null,
+                    Notes = rc.Notes,
+                    Owner = rc.Owner != null ? new OwnerDTO 
+                    { 
+                        Id = rc.Owner.Id, 
+                        Name = rc.Owner.Name,
+                        UNP = rc.Owner.UNP,
+                        ShortName = rc.Owner.ShortName,
+                        Address = rc.Owner.Address,
+                        TreatRepairs = rc.Owner.TreatRepairs,
+                        CreatedAt = rc.Owner.CreatedAt,
+                        UpdatedAt = rc.Owner.UpdatedAt
+                    } : null,
+                    TechConditions = rc.TechConditions,
+                    Pripiska = rc.Pripiska,
+                    ReRegistrationDate = rc.ReRegistrationDate,
+                    Pressure = rc.Pressure,
+                    TestPressure = rc.TestPressure,
+                    Rent = rc.Rent,
+                    Affiliation = new AffiliationDTO 
+                    { 
+                        Id = rc.Affiliation.Id, 
+                        Value = rc.Affiliation.Value 
+                    },
+                    ServiceLifeYears = rc.ServiceLifeYears,
+                    PeriodMajorRepair = rc.PeriodMajorRepair,
+                    PeriodPeriodicTest = rc.PeriodPeriodicTest,
+                    PeriodIntermediateTest = rc.PeriodIntermediateTest,
+                    PeriodDepotRepair = rc.PeriodDepotRepair,
+                    DangerClass = rc.DangerClass,
+                    Substance = rc.Substance,
+                    CreatedAt = rc.CreatedAt,
+                    UpdatedAt = rc.UpdatedAt
+                })
+                .FirstOrDefaultAsync();
 
-            if (request.ModelId.HasValue)
+            return cistern is null ? Results.NotFound() : Results.Ok(cistern);
+        })
+        .WithName("GetRailwayCisternById")
+        .Produces<RailwayCisternDetailDTO>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound)
+        .RequirePermissions(Permission.Read);
+
+        group.MapPost("/", async ([FromServices] ApplicationDbContext context, [FromBody] CreateRailwayCisternDTO dto, HttpContext httpContext) =>
+        {
+            var cistern = new RailwayCistern
             {
-                var model = await context.WagonModels.FindAsync(request.ModelId.Value);
-                if (model == null)
-                    return Results.NotFound($"WagonModel with ID {request.ModelId} not found");
-            }
+                Number = dto.Number,
+                ManufacturerId = dto.ManufacturerId,
+                BuildDate = dto.BuildDate,
+                TareWeight = dto.TareWeight,
+                LoadCapacity = dto.LoadCapacity,
+                Length = dto.Length,
+                AxleCount = dto.AxleCount,
+                Volume = dto.Volume,
+                FillingVolume = dto.FillingVolume,
+                InitialTareWeight = dto.InitialTareWeight,
+                TypeId = dto.TypeId,
+                ModelId = dto.ModelId,
+                CommissioningDate = dto.CommissioningDate,
+                SerialNumber = dto.SerialNumber,
+                RegistrationNumber = dto.RegistrationNumber,
+                RegistrationDate = dto.RegistrationDate,
+                RegistrarId = dto.RegistrarId,
+                Notes = dto.Notes,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow,
+                CreatorId = httpContext.User.FindFirstValue("userId"),
+                OwnerId = dto.OwnerId,
+                TechConditions = dto.TechConditions,
+                Pripiska = dto.Pripiska,
+                ReRegistrationDate = dto.ReRegistrationDate,
+                Pressure = dto.Pressure,
+                TestPressure = dto.TestPressure,
+                Rent = dto.Rent,
+                AffiliationId = dto.AffiliationId,
+                ServiceLifeYears = dto.ServiceLifeYears,
+                PeriodMajorRepair = dto.PeriodMajorRepair,
+                PeriodPeriodicTest = dto.PeriodPeriodicTest,
+                PeriodIntermediateTest = dto.PeriodIntermediateTest,
+                PeriodDepotRepair = dto.PeriodDepotRepair,
+                DangerClass = dto.DangerClass,
+                Substance = dto.Substance
+            };
 
-            if (request.RegistrarId.HasValue)
-            {
-                var registrar = await context.Registrars.FindAsync(request.RegistrarId.Value);
-                if (registrar == null)
-                    return Results.NotFound($"Registrar with ID {request.RegistrarId} not found");
-            }
-
-            // Проверяем уникальность номера вагона
-            var existingWagon = await context.RailwayCisterns.FirstOrDefaultAsync(r => r.Number == request.Number);
-            if (existingWagon != null)
-                return Results.BadRequest($"Railway cistern with number {request.Number} already exists");
-
-            context.RailwayCisterns.Add(railwayCistern);
+            context.Add(cistern);
             await context.SaveChangesAsync();
 
-            return Results.Created($"/api/railway-cisterns/{railwayCistern.Id}", new RailwayCisternResponse
-            {
-                Id = railwayCistern.Id,
-                Number = railwayCistern.Number,
-                ManufacturerId = railwayCistern.ManufacturerId,
-                ManufacturerName = railwayCistern.Manufacturer.Name,
-                ManufacturerCountry = railwayCistern.Manufacturer.Country,
-                BuildDate = railwayCistern.BuildDate,
-                TareWeight = railwayCistern.TareWeight,
-                LoadCapacity = railwayCistern.LoadCapacity,
-                Length = railwayCistern.Length,
-                AxleCount = railwayCistern.AxleCount,
-                Volume = railwayCistern.Volume,
-                FillingVolume = railwayCistern.FillingVolume,
-                InitialTareWeight = railwayCistern.InitialTareWeight,
-                TypeId = railwayCistern.TypeId,
-                TypeName = railwayCistern.Type?.Name ?? string.Empty,
-                ModelId = railwayCistern.ModelId,
-                ModelName = railwayCistern.Model?.Name,
-                CommissioningDate = railwayCistern.CommissioningDate,
-                SerialNumber = railwayCistern.SerialNumber,
-                RegistrationNumber = railwayCistern.RegistrationNumber,
-                RegistrationDate = railwayCistern.RegistrationDate,
-                RegistrarId = railwayCistern.RegistrarId,
-                RegistrarName = railwayCistern.Registrar?.Name,
-                Notes = railwayCistern.Notes,
-                CreatedAt = railwayCistern.CreatedAt,
-                UpdatedAt = railwayCistern.UpdatedAt,
-                CreatorId = railwayCistern.CreatorId,
-                Vessel = railwayCistern.Vessel != null ? new VesselResponse
-                {
-                    Id = railwayCistern.Vessel.Id,
-                    VesselSerialNumber = railwayCistern.Vessel.VesselSerialNumber,
-                    VesselBuildDate = railwayCistern.Vessel.VesselBuildDate
-                } : null
-            });
-        }).RequirePermissions(Permission.Create);
+            return Results.Created($"/api/railway-cisterns/{cistern.Id}", cistern.Id);
+        })
+        .WithName("CreateRailwayCistern")
+        .Produces<Guid>(StatusCodes.Status201Created)
+        .ProducesValidationProblem()
+        .RequirePermissions(Permission.Create);
 
-        group.MapPut("/{id:guid}", async ([FromServices] ApplicationDbContext context, 
-            [FromRoute] Guid id,
-            [FromBody] RailwayCisternRequest request) =>
+        group.MapPut("/{id}", async ([FromServices] ApplicationDbContext context, [FromRoute] Guid id, [FromBody] UpdateRailwayCisternDTO dto) =>
         {
-            var railwayCistern = await context.RailwayCisterns
-                .Include(r => r.Vessel)
-                .FirstOrDefaultAsync(r => r.Id == id);
-
-            if (railwayCistern == null)
+            var cistern = await context.Set<RailwayCistern>().FindAsync(id);
+            if (cistern == null)
                 return Results.NotFound();
 
-            // Проверяем уникальность номера вагона
-            var existingWagon = await context.RailwayCisterns.FirstOrDefaultAsync(r => r.Id != id && r.Number == request.Number);
-            if (existingWagon != null)
-                return Results.BadRequest($"Railway cistern with number {request.Number} already exists");
-
-            // Проверяем существование связанных сущностей
-            var manufacturer = await context.Manufacturers.FindAsync(request.ManufacturerId);
-            if (manufacturer == null)
-                return Results.NotFound($"Manufacturer with ID {request.ManufacturerId} not found");
-
-            var type = await context.WagonTypes.FindAsync(request.TypeId);
-            if (type == null)
-                return Results.NotFound($"WagonType with ID {request.TypeId} not found");
-
-            if (request.ModelId.HasValue)
-            {
-                var model = await context.WagonModels.FindAsync(request.ModelId.Value);
-                if (model == null)
-                    return Results.NotFound($"WagonModel with ID {request.ModelId} not found");
-            }
-
-            if (request.RegistrarId.HasValue)
-            {
-                var registrar = await context.Registrars.FindAsync(request.RegistrarId.Value);
-                if (registrar == null)
-                    return Results.NotFound($"Registrar with ID {request.RegistrarId} not found");
-            }
-
-            // Обновляем основные данные
-            railwayCistern.Number = request.Number;
-            railwayCistern.ManufacturerId = request.ManufacturerId;
-            railwayCistern.BuildDate = request.BuildDate;
-            railwayCistern.TareWeight = request.TareWeight;
-            railwayCistern.LoadCapacity = request.LoadCapacity;
-            railwayCistern.Length = request.Length;
-            railwayCistern.AxleCount = request.AxleCount;
-            railwayCistern.Volume = request.Volume;
-            railwayCistern.FillingVolume = request.FillingVolume;
-            railwayCistern.InitialTareWeight = request.InitialTareWeight;
-            railwayCistern.TypeId = request.TypeId;
-            railwayCistern.ModelId = request.ModelId;
-            railwayCistern.CommissioningDate = request.CommissioningDate;
-            railwayCistern.SerialNumber = request.SerialNumber;
-            railwayCistern.RegistrationNumber = request.RegistrationNumber;
-            railwayCistern.RegistrationDate = request.RegistrationDate;
-            railwayCistern.RegistrarId = request.RegistrarId;
-            railwayCistern.Notes = request.Notes;
-
-            // Обновляем или создаем котел
-            if (!string.IsNullOrEmpty(request.VesselSerialNumber) || request.VesselBuildDate.HasValue)
-            {
-                if (railwayCistern.Vessel == null)
-                {
-                    railwayCistern.Vessel = new Vessel();
-                }
-                railwayCistern.Vessel.VesselSerialNumber = request.VesselSerialNumber;
-                railwayCistern.Vessel.VesselBuildDate = request.VesselBuildDate;
-            }
-            else if (railwayCistern.Vessel != null)
-            {
-                context.Vessels.Remove(railwayCistern.Vessel);
-            }
+            cistern.Number = dto.Number;
+            cistern.ManufacturerId = dto.ManufacturerId;
+            cistern.BuildDate = dto.BuildDate;
+            cistern.TareWeight = dto.TareWeight;
+            cistern.LoadCapacity = dto.LoadCapacity;
+            cistern.Length = dto.Length;
+            cistern.AxleCount = dto.AxleCount;
+            cistern.Volume = dto.Volume;
+            cistern.FillingVolume = dto.FillingVolume;
+            cistern.InitialTareWeight = dto.InitialTareWeight;
+            cistern.TypeId = dto.TypeId;
+            cistern.ModelId = dto.ModelId;
+            cistern.CommissioningDate = dto.CommissioningDate;
+            cistern.SerialNumber = dto.SerialNumber;
+            cistern.RegistrationNumber = dto.RegistrationNumber;
+            cistern.RegistrationDate = dto.RegistrationDate;
+            cistern.RegistrarId = dto.RegistrarId;
+            cistern.Notes = dto.Notes;
+            cistern.UpdatedAt = DateTimeOffset.UtcNow;
+            cistern.OwnerId = dto.OwnerId;
+            cistern.TechConditions = dto.TechConditions;
+            cistern.Pripiska = dto.Pripiska;
+            cistern.ReRegistrationDate = dto.ReRegistrationDate;
+            cistern.Pressure = dto.Pressure;
+            cistern.TestPressure = dto.TestPressure;
+            cistern.Rent = dto.Rent;
+            cistern.AffiliationId = dto.AffiliationId;
+            cistern.ServiceLifeYears = dto.ServiceLifeYears;
+            cistern.PeriodMajorRepair = dto.PeriodMajorRepair;
+            cistern.PeriodPeriodicTest = dto.PeriodPeriodicTest;
+            cistern.PeriodIntermediateTest = dto.PeriodIntermediateTest;
+            cistern.PeriodDepotRepair = dto.PeriodDepotRepair;
+            cistern.DangerClass = dto.DangerClass;
+            cistern.Substance = dto.Substance;
 
             await context.SaveChangesAsync();
-
-            // Получаем обновленные данные со связанными сущностями
-            var updatedCistern = await context.RailwayCisterns
-                .Include(r => r.Manufacturer)
-                .Include(r => r.Type)
-                .Include(r => r.Model)
-                .Include(r => r.Registrar)
-                .Include(r => r.Vessel)
-                .FirstOrDefaultAsync(r => r.Id == id);
-
-            return Results.Ok(MapToResponse(updatedCistern));
-        }).RequirePermissions(Permission.Update);
-
-        group.MapDelete("/{id:guid}", async ([FromServices] ApplicationDbContext context, [FromRoute] Guid id) =>
-        {
-            var railwayCistern = await context.RailwayCisterns
-                .Include(r => r.Vessel)
-                .Include(r => r.PartInstallations)
-                .FirstOrDefaultAsync(r => r.Id == id);
-
-            if (railwayCistern == null)
-            {
-                return Results.NotFound();
-            }
-
-            // Удаляем связанные сущности
-            if (railwayCistern.Vessel != null)
-            {
-                context.Vessels.Remove(railwayCistern.Vessel);
-            }
-
-            if (railwayCistern.PartInstallations.Any())
-            {
-                context.PartInstallations.RemoveRange(railwayCistern.PartInstallations);
-            }
-
-            // Удаляем саму цистерну
-            context.RailwayCisterns.Remove(railwayCistern);
-            
-            await context.SaveChangesAsync();
-
             return Results.NoContent();
-        }).RequirePermissions(Permission.Delete);
-    }
+        })
+        .WithName("UpdateRailwayCistern")
+        .Produces(StatusCodes.Status204NoContent)
+        .Produces(StatusCodes.Status404NotFound)
+        .ProducesValidationProblem()
+        .RequirePermissions(Permission.Update);
 
-    private static RailwayCisternResponse MapToResponse(RailwayCistern railwayCistern)
-    {
-        if (railwayCistern == null) return null!;
-        
-        return new RailwayCisternResponse
+        group.MapDelete("/{id}", async ([FromServices] ApplicationDbContext context, [FromRoute] Guid id) =>
         {
-            Id = railwayCistern.Id,
-            Number = railwayCistern.Number,
-            ManufacturerId = railwayCistern.ManufacturerId,
-            ManufacturerName = railwayCistern.Manufacturer?.Name ?? string.Empty,
-            ManufacturerCountry = railwayCistern.Manufacturer?.Country ?? string.Empty,
-            BuildDate = railwayCistern.BuildDate,
-            TareWeight = railwayCistern.TareWeight,
-            LoadCapacity = railwayCistern.LoadCapacity,
-            Length = railwayCistern.Length,
-            AxleCount = railwayCistern.AxleCount,
-            Volume = railwayCistern.Volume,
-            FillingVolume = railwayCistern.FillingVolume,
-            InitialTareWeight = railwayCistern.InitialTareWeight,
-            TypeId = railwayCistern.TypeId,
-            TypeName = railwayCistern.Type?.Name ?? string.Empty,
-            ModelId = railwayCistern.ModelId,
-            ModelName = railwayCistern.Model?.Name,
-            CommissioningDate = railwayCistern.CommissioningDate,
-            SerialNumber = railwayCistern.SerialNumber,
-            RegistrationNumber = railwayCistern.RegistrationNumber,
-            RegistrationDate = railwayCistern.RegistrationDate,
-            RegistrarId = railwayCistern.RegistrarId,
-            RegistrarName = railwayCistern.Registrar?.Name,
-            Notes = railwayCistern.Notes,
-            CreatedAt = railwayCistern.CreatedAt,
-            UpdatedAt = railwayCistern.UpdatedAt,
-            CreatorId = railwayCistern.CreatorId,
-            Vessel = railwayCistern.Vessel != null ? new VesselResponse
-            {
-                Id = railwayCistern.Vessel.Id,
-                VesselSerialNumber = railwayCistern.Vessel.VesselSerialNumber,
-                VesselBuildDate = railwayCistern.Vessel.VesselBuildDate
-            } : null
-        };
-    }
+            var cistern = await context.Set<RailwayCistern>().FindAsync(id);
+            if (cistern == null)
+                return Results.NotFound();
 
-    private static RailwayCisternDetailResponse MapToDetailResponse(RailwayCistern railwayCistern)
-    {
-        // Создаем детальный ответ, наследуя все свойства из базового ответа
-        var detailResponse = new RailwayCisternDetailResponse();
-        
-        // Копируем все свойства из базового ответа
-        var baseResponse = MapToResponse(railwayCistern);
-        typeof(RailwayCisternResponse).GetProperties().ToList()
-            .ForEach(prop => prop.SetValue(detailResponse, prop.GetValue(baseResponse)));
-        
-        // Добавляем информацию об установленных деталях
-        detailResponse.PartInstallations = railwayCistern.PartInstallations.Select(pi => 
-            new PartInstallationResponse
-            {
-                InstallationId = pi.Id,
-                PartId = pi.PartId,
-                PartName = pi.Part?.StampNumber ?? string.Empty,
-                PartType = pi.Part?.PartType ?? PartType.WheelPair,
-                InstalledAt = pi.InstalledAt,
-                InstalledBy = pi.InstalledBy,
-                RemovedAt = pi.RemovedAt,
-                RemovedBy = pi.RemovedBy,
-                LocationFrom = pi.FromLocation?.Name ?? string.Empty,
-                LocationTo = pi.ToLocation.Name,
-                Notes = pi.Notes
-            }).ToList();
-            
-        return detailResponse;
+            context.Remove(cistern);
+            await context.SaveChangesAsync();
+            return Results.NoContent();
+        })
+        .WithName("DeleteRailwayCistern")
+        .Produces(StatusCodes.Status204NoContent)
+        .Produces(StatusCodes.Status404NotFound)
+        .RequirePermissions(Permission.Delete);
     }
 }
