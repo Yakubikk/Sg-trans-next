@@ -15,7 +15,6 @@ var configuration = builder.Configuration;
 services.AddApiAuthentication(configuration);
 
 services.AddEndpointsApiExplorer();
-services.AddControllers();
 
 // Добавляем CORS
 services.AddCors(options =>
@@ -81,8 +80,6 @@ app.UseSwaggerUI();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.MapControllers();
 
 app.AddMappedEndpoints();
 
