@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using WebApp.Data.Entities.RailwayCisterns;
-using WebApp.Data.Entities.References;
 using WebApp.Data.Entities.Users;
 
 namespace WebApp.Data;
@@ -12,36 +11,6 @@ public class ApplicationDbContext(
     public DbSet<User> Users { get; set; }
     public DbSet<RoleEntity> Roles { get; set; }
     public DbSet<RolePermission> RolePermissions { get; set; }
-
-    // ReferencesModels
-    public DbSet<AbsorberDevice> AbsorberDevices { get; set; }
-    public DbSet<AbsorberDevice1> AbsorberDevices1 { get; set; }
-    public DbSet<AbsorberDeviceAccounting> AbsorberDeviceAccountings { get; set; }
-    public DbSet<AirDistributor> AirDistributors { get; set; }
-    public DbSet<Brake> Brakes { get; set; }
-    public DbSet<Cargo> Cargos { get; set; }
-    public DbSet<Client> Clients { get; set; }
-    public DbSet<Contract> Contracts { get; set; }
-    public DbSet<Cost> Costs { get; set; }
-    public DbSet<Country> Countries { get; set; }
-    public DbSet<Defect> Defects { get; set; }
-    public DbSet<DepotReference> DepotsReferences { get; set; }
-    public DbSet<Employee> Employees { get; set; }
-    public DbSet<EuroCost> EuroCosts { get; set; }
-    public DbSet<Fault> Faults { get; set; }
-    public DbSet<GasContract> GasContracts { get; set; }
-    public DbSet<ModelVC> ModelVCs { get; set; }
-    public DbSet<Modernization> Modernizations { get; set; }
-    public DbSet<PartReference> PartsReferences { get; set; }
-    public DbSet<Railway> Railways { get; set; }
-    public DbSet<Reason> Reasons { get; set; }
-    public DbSet<ReferenceStation> ReferenceStations { get; set; }
-    public DbSet<RepairReference> RepairsReferences { get; set; }
-    public DbSet<RepairTypeReference> RepairTypesReferences { get; set; }
-    public DbSet<Stamp> Stamps { get; set; }
-    public DbSet<Station> Stations { get; set; }
-    public DbSet<VCType> VCTypes { get; set; }
-    public DbSet<Wagon> Wagons { get; set; }
 
     //RailwayCisternsModels
     public DbSet<Affiliation> Affiliations { get; set; }
@@ -170,7 +139,7 @@ public class ApplicationDbContext(
                 .HasColumnType("timestamp with time zone");
             entity.Property(e => e.CreatorId).HasColumnName("CreatorId").IsRequired().HasColumnType("text");
             entity.Property(e => e.OwnerId).HasColumnName("Ownerid"); // Matches SQL column name
-            entity.Property(e => e.TechConditions).HasColumnName("TechСonditions")
+            entity.Property(e => e.TechConditions).HasColumnName("TechСonditions") // С русской буквой С
                 .HasColumnType("text"); // Matches SQL column name
             entity.Property(e => e.Pripiska).HasColumnName("Pripiska").HasColumnType("text");
             entity.Property(e => e.ReRegistrationDate).HasColumnName("ReRegistrationDate").HasColumnType("date");
@@ -188,6 +157,10 @@ public class ApplicationDbContext(
             entity.Property(e => e.DangerClass).HasColumnName("DangerClass").IsRequired().HasDefaultValue(0);
             entity.Property(e => e.Substance).HasColumnName("Substance").IsRequired().HasColumnType("text")
                 .HasDefaultValue("СУГ");
+            entity.Property(e => e.TareWeight2).HasColumnName("TareWeight2").IsRequired().HasColumnType("numeric")
+                .HasDefaultValue(0);
+            entity.Property(e => e.TareWeight3).HasColumnName("TareWeight3").IsRequired().HasColumnType("numeric")
+                .HasDefaultValue(0);
 
 
             entity.HasOne(d => d.Affiliation)

@@ -22,12 +22,12 @@ public class RailwayCisternDetailDTO
     public RegistrarDTO Registrar { get; set; }
     public string Notes { get; set; }
     public OwnerDTO Owner { get; set; }
-    public string TechConditions { get; set; }
-    public string Pripiska { get; set; }
+    public string? TechConditions { get; set; }
+    public string? Pripiska { get; set; }
     public DateOnly? ReRegistrationDate { get; set; }
     public decimal Pressure { get; set; }
     public decimal TestPressure { get; set; }
-    public string Rent { get; set; }
+    public string? Rent { get; set; }
     public AffiliationDTO Affiliation { get; set; }
     public int ServiceLifeYears { get; set; }
     public DateOnly? PeriodMajorRepair { get; set; }
@@ -36,6 +36,8 @@ public class RailwayCisternDetailDTO
     public DateOnly? PeriodDepotRepair { get; set; }
     public int DangerClass { get; set; }
     public string Substance { get; set; }
+    public decimal TareWeight2 { get; set; }
+    public decimal TareWeight3 { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
 }
@@ -75,12 +77,12 @@ public class CreateRailwayCisternDTO
     public Guid? RegistrarId { get; set; }
     public string Notes { get; set; }
     public Guid? OwnerId { get; set; }
-    public string TechConditions { get; set; }
-    public string Pripiska { get; set; }
+    public string? TechConditions { get; set; }
+    public string? Pripiska { get; set; }
     public DateOnly? ReRegistrationDate { get; set; }
     public decimal Pressure { get; set; }
     public decimal TestPressure { get; set; }
-    public string Rent { get; set; }
+    public string? Rent { get; set; }
     public Guid AffiliationId { get; set; }
     public int ServiceLifeYears { get; set; }
     public DateOnly? PeriodMajorRepair { get; set; }
@@ -89,6 +91,8 @@ public class CreateRailwayCisternDTO
     public DateOnly? PeriodDepotRepair { get; set; }
     public int DangerClass { get; set; }
     public string Substance { get; set; }
+    public decimal TareWeight2 { get; set; }
+    public decimal TareWeight3 { get; set; }
 }
 
 public class UpdateRailwayCisternDTO
@@ -112,12 +116,12 @@ public class UpdateRailwayCisternDTO
     public Guid? RegistrarId { get; set; }
     public string Notes { get; set; }
     public Guid? OwnerId { get; set; }
-    public string TechConditions { get; set; }
-    public string Pripiska { get; set; }
+    public string? TechConditions { get; set; }
+    public string? Pripiska { get; set; }
     public DateOnly? ReRegistrationDate { get; set; }
     public decimal Pressure { get; set; }
     public decimal TestPressure { get; set; }
-    public string Rent { get; set; }
+    public string? Rent { get; set; }
     public Guid AffiliationId { get; set; }
     public int ServiceLifeYears { get; set; }
     public DateOnly? PeriodMajorRepair { get; set; }
@@ -126,4 +130,6 @@ public class UpdateRailwayCisternDTO
     public DateOnly? PeriodDepotRepair { get; set; }
     public int DangerClass { get; set; }
     public string Substance { get; set; }
+    public decimal TareWeight2 { get; set; }
+    public decimal TareWeight3 { get; set; }
 }

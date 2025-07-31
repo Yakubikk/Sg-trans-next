@@ -6,7 +6,6 @@ using WebApp.Abstractions.Services;
 using WebApp.Data.Enums;
 using WebApp.Endpoints;
 using WebApp.Endpoints.RailwayCisterns;
-using WebApp.Endpoints.References;
 using WebApp.Services;
 using WebApp.Services.Authentication;
 
@@ -17,36 +16,6 @@ public static class ApiExtensions
     public static void AddMappedEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapUsersEndpoints();
-        
-        // Reference endpoints (справочники)
-        app.MapGasContractEndpoints();
-        app.MapStationEndpoints();
-        //app.MapRepairTypeEndpoints();
-        app.MapRepairEndpoints();
-        app.MapRailwayEndpoints();
-        app.MapCountryEndpoints();
-        app.MapWagonEndpoints();
-        //app.MapDepotEndpoints();
-        app.MapEmployeeEndpoints();
-        app.MapDefectEndpoints();
-        app.MapFaultEndpoints();
-        app.MapEuroCostEndpoints();
-        app.MapModelVCEndpoints();
-        app.MapVcTypeEndpoints();
-        app.MapStampEndpoints();
-        app.MapReferenceStationEndpoints();
-        app.MapAbsorberDeviceEndpoints();
-        app.MapAbsorberDevice1Endpoints();
-        app.MapAbsorberDeviceAccountingEndpoints();
-        app.MapAirDistributorEndpoints();
-        app.MapBrakeEndpoints();
-        app.MapCargoEndpoints();
-        app.MapClientEndpoints();
-        app.MapContractEndpoints();
-        app.MapCostEndpoints();
-        app.MapModernizationEndpoints();
-        app.MapPartEndpoints();
-        app.MapReasonEndpoints();
 
         // Railway cisterns endpoints
         app.MapRailwayCisternEndpoints();

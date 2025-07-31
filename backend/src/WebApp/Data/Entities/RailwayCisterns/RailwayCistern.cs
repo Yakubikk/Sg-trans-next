@@ -39,6 +39,8 @@ public class RailwayCistern
     public DateOnly? PeriodDepotRepair { get; set; }
     public int DangerClass { get; set; }
     public string Substance { get; set; } = null!;
+    public decimal TareWeight2 { get; set; }
+    public decimal TareWeight3 { get; set; }
 
     public Affiliation Affiliation { get; set; } = null!;
     public Manufacturer Manufacturer { get; set; } = null!;
@@ -49,3 +51,4 @@ public class RailwayCistern
     public ICollection<MilageCistern> MilageCisterns { get; set; } = new List<MilageCistern>();
     public ICollection<PartInstallation> PartInstallations { get; set; } = new List<PartInstallation>();
 }
+
