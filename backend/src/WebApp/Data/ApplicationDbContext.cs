@@ -33,6 +33,9 @@ public class ApplicationDbContext(
     public DbSet<PartInstallation> PartInstallations { get; set; }
     public DbSet<RepairType> RepairTypes { get; set; }
     public DbSet<Repair> Repairs { get; set; }
+    public DbSet<PartStatus> PartStatuses { get; set; }
+    public DbSet<PartType> PartTypes { get; set; }
+    public DbSet<StampNumber> StampNumbers { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -284,6 +287,35 @@ public class ApplicationDbContext(
             .HasMany(d => d.Repairs)
             .WithOne(r => r.Depot)
             .HasForeignKey(r => r.DepotId);
+
+        // PartStatus
+        modelBuilder.Entity<PartStatus>(entity =>
+        {
+            entity.ToTable("PartStatus");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("Id").IsRequired();
+            entity.Property(e => e.Name).HasColumnName("Name").IsRequired().HasColumnType("text");
+            entity.Property(e => e.Code).HasColumnName("Code").IsRequired();
+        });
+
+        // PartTypes
+        modelBuilder.Entity<PartType>(entity =>
+        {
+            entity.ToTable("PartTypes");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("Id").IsRequired();
+            entity.Property(e => e.Name).HasColumnName("Name").IsRequired().HasColumnType("text");
+            entity.Property(e => e.Code).HasColumnName("Code").IsRequired().HasDefaultValue(0);
+        });
+
+        // StampNumbers
+        modelBuilder.Entity<StampNumber>(entity =>
+        {
+            entity.ToTable("StampNumbers");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("Id").IsRequired();
+            entity.Property(e => e.Value).HasColumnName("Value").IsRequired().HasColumnType("text");
+        });
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
 
