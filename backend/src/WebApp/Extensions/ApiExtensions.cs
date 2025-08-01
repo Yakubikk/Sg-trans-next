@@ -29,6 +29,11 @@ public static class ApiExtensions
         app.MapMilageCisternEndpoints();
         app.MapLocationEndpoints();
         app.MapDepotEndpoints();
+        
+        // Part related endpoints
+        app.MapPartStatusEndpoints();
+        app.MapPartTypeEndpoints();
+        app.MapStampNumberEndpoints();
     }
 
     public static void AddApiAuthentication(

@@ -1,29 +1,29 @@
 namespace WebApp.Data.Entities.RailwayCisterns;
 
-public enum PartType
-{
-    WheelPair,
-    SideFrame,
-    Bolster,
-    Coupler,
-    ShockAbsorber
-}
-
-public enum PartStatus
-{
-    Active,
-    Decommissioned,
-    Repairing,
-    Reserved,
-    Inspection,
-    Extended
-}
+// public enum PartType
+// {
+//     WheelPair,
+//     SideFrame,
+//     Bolster,
+//     Coupler,
+//     ShockAbsorber
+// }
+//
+// public enum PartStatus
+// {
+//     Active,
+//     Decommissioned,
+//     Repairing,
+//     Reserved,
+//     Inspection,
+//     Extended
+// }
 
 public class Part 
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     
-    public PartType PartType { get; set; }
+    // public PartType PartType { get; set; }
     
     public Guid? DepotId { get; set; }
     public Depot? Depot { get; set; }
@@ -32,7 +32,7 @@ public class Part
     public string? SerialNumber { get; set; }
     public int? ManufactureYear { get; set; }
     public string? CurrentLocation { get; set; }
-    public PartStatus Status { get; set; } = PartStatus.Active;
+    // public PartStatus Status { get; set; } = PartStatus.Active;
     public string? Notes { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
