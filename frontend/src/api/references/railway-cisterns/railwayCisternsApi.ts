@@ -5,7 +5,8 @@ import type {
   RailwayCistern, 
   RailwayCisternDetailed,
   RailwayCisternDetailedResponse,
-  CreateRailwayCisternRequest, 
+  CreateRailwayCisternRequest,
+  CreateRailwayCisternDetailedRequest,
   UpdateRailwayCisternRequest,
   RailwayCisternQueryParams 
 } from './types';
@@ -36,7 +37,7 @@ export const railwayCisternsApi = {
 
   // Получить детальную информацию о цистерне по ID
   getRailwayCisternDetailedById: (id: string): Promise<ApiResponse<RailwayCisternDetailed>> =>
-    makeRequest<RailwayCisternDetailed>(railwayCisternsApiInstance, 'get', `/railway-cisterns/detailed/${id}`),
+    makeRequest<RailwayCisternDetailed>(railwayCisternsApiInstance, 'get', `/railway-cisterns/${id}`),
 
   // Получить детальную информацию о цистерне по номеру
   getRailwayCisternDetailedByNumber: (number: string): Promise<ApiResponse<RailwayCisternDetailed>> =>
@@ -45,6 +46,10 @@ export const railwayCisternsApi = {
   // Создать новую цистерну
   createRailwayCistern: (data: CreateRailwayCisternRequest): Promise<ApiResponse<RailwayCistern>> =>
     makeRequest<RailwayCistern>(railwayCisternsApiInstance, 'post', '/railway-cisterns', data),
+
+  // Создать новую детальную цистерну
+  createRailwayCisternDetailed: (data: CreateRailwayCisternDetailedRequest): Promise<ApiResponse<RailwayCisternDetailed>> =>
+    makeRequest<RailwayCisternDetailed>(railwayCisternsApiInstance, 'post', '/railway-cisterns', data),
 
   // Обновить цистерну
   updateRailwayCistern: (id: string, data: UpdateRailwayCisternRequest): Promise<ApiResponse<RailwayCistern>> =>

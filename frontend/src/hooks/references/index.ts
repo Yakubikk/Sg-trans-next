@@ -1,8 +1,8 @@
-// Справочники
-export * from './useRepairTypes';
+// Хуки для работы со справочниками
+export * from './useAbsorberDevices';
+export * from './useAirDistributors';
 export * from './useBrakes';
 export * from './useCargos';
-export * from './useAirDistributors';
-export * from './useAbsorberDevices';
 export * from './useRailwayCisterns';
-export * from './owners';
+export * from './useRepairTypes';
+export * from './useReferenceData';

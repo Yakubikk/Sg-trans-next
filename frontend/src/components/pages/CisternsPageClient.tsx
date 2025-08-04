@@ -1,31 +1,10 @@
 'use client';
 
 import { CisternsTable } from "@/components/data";
-import { useRailwayCisterns, useDeleteRailwayCistern } from "@/hooks/references";
-import type { RailwayCistern } from "@/api/references/railway-cisterns";
+import { useRailwayCisterns } from "@/hooks/references";
 
 export default function RailwayCisternsPageClient() {
   const { data: railwayCisterns = [], isLoading: loading, error } = useRailwayCisterns();
-  const deleteRailwayCistern = useDeleteRailwayCistern();
-
-  const handleView = (railwayCistern: RailwayCistern) => {
-    console.log('View railway cistern:', railwayCistern);
-  };
-
-  const handleEdit = (railwayCistern: RailwayCistern) => {
-    console.log('Edit railway cistern:', railwayCistern);
-  };
-
-  const handleDelete = async (railwayCistern: RailwayCistern) => {
-    if (confirm(`Удалить цистерну №${railwayCistern.number}?`)) {
-      try {
-        await deleteRailwayCistern.mutateAsync(railwayCistern.id);
-      } catch (err) {
-        alert('Ошибка при удалении цистерны');
-        console.error('Error deleting railway cistern:', err);
-      }
-    }
-  };
 
   if (loading) {
     return (
@@ -59,9 +38,6 @@ export default function RailwayCisternsPageClient() {
   return (
     <CisternsTable 
       data={railwayCisterns}
-      onView={handleView}
-      onEdit={handleEdit}
-      onDelete={handleDelete}
     />
   );
 }

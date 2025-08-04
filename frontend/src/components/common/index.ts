@@ -3,6 +3,8 @@ export { BackButton } from './BackButton';
 export { default as UserManagement } from './UserManagement';
 export { GenericTable } from './GenericTable';
 export { TableActions } from './TableActions';
+export { AddCisternDialog } from './AddCisternDialog';
+export { EditCisternDialog } from './EditCisternDialog';
 
 // Типы для общих компонентов
 export type * from './BackButton';

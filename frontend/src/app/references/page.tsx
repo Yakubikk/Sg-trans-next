@@ -1,73 +1,73 @@
 import { LogoutButton, BackButton } from "@/components";
 import { ReferenceCard } from "@/components/cards";
 import { 
-  Train, 
-  Settings, 
-  // Zap, 
-  // Wind, 
-  // CircleStop, 
-  // Package,
-  Building2
+  Train,
+  Settings,
+  Wind,
+  Disc,
+  Package,
+  Users,
+  Wrench,
 } from "lucide-react";
 
 export default function References() {
   const references = [
     {
       href: "/references/cisterns",
-      title: "Вагоны",
-      subtitle: "Справочник вагонов",
-      description: "Просмотр и управление данными о вагонах, их характеристиках и статусах.",
+      title: "Вагоны-цистерны",
+      subtitle: "Справочник цистерн",
+      description: "Просмотр и управление данными о железнодорожных цистернах, их характеристиках и паспортных данных.",
       icon: Train,
       bgColor: "bg-blue-500"
     },
     {
-      href: "/references/repair-types",
-      title: "Типы ремонта",
-      subtitle: "Справочник типов ремонта",
-      description: "Управление типами ремонтных работ, их категориями и характеристиками.",
+      href: "/references/absorber-devices",
+      title: "Поглощающие аппараты",
+      subtitle: "Справочник поглощающих аппаратов",
+      description: "Каталог поглощающих аппаратов для железнодорожного подвижного состава.",
       icon: Settings,
       bgColor: "bg-green-500"
     },
-    // {
-    //   href: "/references/absorber-devices",
-    //   title: "Поглощающие аппараты",
-    //   subtitle: "Справочник поглощающих аппаратов",
-    //   description: "Управление данными о поглощающих аппаратах и их учете.",
-    //   icon: Zap,
-    //   bgColor: "bg-purple-500"
-    // },
-    // {
-    //   href: "/references/air-distributors",
-    //   title: "Воздухораспределители",
-    //   subtitle: "Справочник воздухораспределителей",
-    //   description: "Управление данными о воздухораспределителях и их характеристиках.",
-    //   icon: Wind,
-    //   bgColor: "bg-cyan-500"
-    // },
-    // {
-    //   href: "/references/brakes",
-    //   title: "Тормоза",
-    //   subtitle: "Справочник тормозных систем",
-    //   description: "Управление данными о тормозных системах и их характеристиках.",
-    //   icon: CircleStop,
-    //   bgColor: "bg-red-500"
-    // },
-    // {
-    //   href: "/references/cargos",
-    //   title: "Грузы",
-    //   subtitle: "Справочник грузов",
-    //   description: "Управление данными о грузах, их названиях и ценах.",
-    //   icon: Package,
-    //   bgColor: "bg-orange-500"
-    // },
+    {
+      href: "/references/air-distributors",
+      title: "Воздухораспределители",
+      subtitle: "Справочник воздухораспределителей",
+      description: "Каталог воздухораспределителей тормозных систем железнодорожного транспорта.",
+      icon: Wind,
+      bgColor: "bg-cyan-500"
+    },
+    {
+      href: "/references/brakes",
+      title: "Тормозные системы",
+      subtitle: "Справочник тормозов",
+      description: "Каталог тормозных систем и их компонентов для железнодорожного подвижного состава.",
+      icon: Disc,
+      bgColor: "bg-red-500"
+    },
+    {
+      href: "/references/cargos",
+      title: "Грузы",
+      subtitle: "Справочник грузов",
+      description: "Классификатор грузов для перевозки железнодорожным транспортом.",
+      icon: Package,
+      bgColor: "bg-orange-500"
+    },
     {
       href: "/references/owners",
       title: "Владельцы",
       subtitle: "Справочник владельцев",
-      description: "Управление данными о владельцах вагонов и их контактной информацией.",
-      icon: Building2,
-      bgColor: "bg-indigo-500"
-    }
+      description: "Реестр владельцев железнодорожного подвижного состава.",
+      icon: Users,
+      bgColor: "bg-purple-500"
+    },
+    {
+      href: "/references/repair-types",
+      title: "Типы ремонта",
+      subtitle: "Справочник видов ремонта",
+      description: "Классификатор типов и видов ремонта железнодорожного подвижного состава.",
+      icon: Wrench,
+      bgColor: "bg-yellow-500"
+    },
   ];
   return (
     <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8">
@@ -78,9 +78,9 @@ export default function References() {
               <BackButton className="mb-4">
                 ← Назад
               </BackButton>
-              <h1 className="text-2xl font-bold text-gray-900">Справочники</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Справочники системы</h1>
               <p className="mt-2 text-sm text-gray-600">
-                Выберите справочник для просмотра и управления данными
+                Управление справочными данными железнодорожного транспорта
               </p>
             </div>
             <LogoutButton />

@@ -1,11 +1,12 @@
 import { railwayCisternsApi, railwayCisternsKeys } from '@/api/references';
-import type { 
-  CreateRailwayCisternRequest, 
+import { createGenericCRUD } from '@/hooks/common';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { 
+  CreateRailwayCisternRequest,
+  CreateRailwayCisternDetailedRequest,
   UpdateRailwayCisternRequest, 
   RailwayCistern,
 } from '@/api/references';
-import { createGenericCRUD } from '../common/useGenericCRUD';
-import { useQuery } from '@tanstack/react-query';
 
 // Создаем CRUD хуки через универсальную фабрику
 const railwayCisternsCRUD = createGenericCRUD<RailwayCistern, CreateRailwayCisternRequest, UpdateRailwayCisternRequest>(railwayCisternsKeys, {
@@ -55,5 +56,19 @@ export const useRailwayCisternDetailedByNumber = (number: string) => {
       return data;
     },
     enabled: !!number,
+  });
+};
+
+// Хук для создания детальной цистерны
+export const useCreateRailwayCisternDetailed = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (data: CreateRailwayCisternDetailedRequest) => 
+      railwayCisternsApi.createRailwayCisternDetailed(data),
+    onSuccess: () => {
+      // Обновляем все запросы железнодорожных цистерн
+      queryClient.invalidateQueries({ queryKey: railwayCisternsKeys.all });
+    },
   });
 };

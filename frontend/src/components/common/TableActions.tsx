@@ -56,7 +56,7 @@ export function TableActions<T>({
       show: !!onEdit,
     },
     {
-      label: "Удалить",
+      label: "В архив",
       icon: Trash2,
       onClick: onDelete!,
       className: "text-red-600",
@@ -80,7 +80,7 @@ export function TableActions<T>({
         {itemId && (
           <>
             <DropdownMenuItem onClick={() => navigator.clipboard.writeText(itemId)}>
-              Копировать ID
+              Копировать Номер/ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>

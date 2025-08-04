@@ -22,7 +22,7 @@ import {
   Button,
   Input,
 } from "@/components/ui";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 
 interface GenericTableProps<T> {
   data: T[];
@@ -32,6 +32,9 @@ interface GenericTableProps<T> {
   emptyMessage?: string;
   className?: string;
   onRowClick?: (item: T) => void;
+  showAddButton?: boolean;
+  addButtonLabel?: string;
+  onAdd?: () => void;
 }
 
 /**
@@ -46,6 +49,9 @@ export function GenericTable<T>({
   emptyMessage = "Нет данных для отображения",
   className = "",
   onRowClick,
+  showAddButton = false,
+  addButtonLabel = "Добавить",
+  onAdd,
 }: GenericTableProps<T>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -112,13 +118,19 @@ export function GenericTable<T>({
   return (
     <div className={`w-full ${className}`}>
       {/* Поиск */}
-      <div className="flex items-center py-4">
+      <div className="flex items-center justify-between py-4">
         <Input
           placeholder={searchPlaceholder}
           value={globalFilter ?? ""}
           onChange={(event) => setGlobalFilter(String(event.target.value))}
           className="max-w-sm"
         />
+        {showAddButton && onAdd && (
+          <Button onClick={onAdd} className="ml-4">
+            <Plus className="h-4 w-4 mr-2" />
+            {addButtonLabel}
+          </Button>
+        )}
       </div>
 
       {/* Таблица */}

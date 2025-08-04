@@ -115,6 +115,43 @@ export interface CreateRailwayCisternRequest {
   affiliationValue: string;
 }
 
+// Создание детальной цистерны
+export interface CreateRailwayCisternDetailedRequest {
+  number: string;
+  manufacturerId: string;
+  buildDate: string;
+  tareWeight?: number;
+  loadCapacity?: number;
+  length?: number;
+  axleCount?: number;
+  volume?: number;
+  fillingVolume?: number;
+  initialTareWeight?: number;
+  typeId: string;
+  modelId: string;
+  commissioningDate?: string;
+  serialNumber?: string;
+  registrationNumber?: string;
+  registrationDate?: string;
+  registrarId?: string;
+  notes?: string;
+  ownerId: string;
+  techConditions?: string;
+  pripiska?: string;
+  reRegistrationDate?: string;
+  pressure?: number;
+  testPressure?: number;
+  rent?: string;
+  affiliationId: string;
+  serviceLifeYears?: number;
+  periodMajorRepair?: string;
+  periodPeriodicTest?: string;
+  periodIntermediateTest?: string;
+  periodDepotRepair?: string;
+  dangerClass?: number;
+  substance?: string;
+}
+
 export type UpdateRailwayCisternRequest = Partial<CreateRailwayCisternRequest>;
 
 export interface RailwayCisternQueryParams {
