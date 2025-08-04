@@ -26,19 +26,19 @@ export default function LoginForm() {
   };
 
   // Быстрый вход для демонстрации
-  const quickLogin = async (role: 'admin' | 'user') => {
-    const credentials = {
-      admin: { email: 'admin@wagon.com', password: 'Admin123!' },
-      user: { email: 'user@wagon.com', password: 'User123!' }
-    };
+  // const quickLogin = async (role: 'admin' | 'user') => {
+  //   const credentials = {
+  //     admin: { email: 'admin@wagon.com', password: 'Admin123!' },
+  //     user: { email: 'user@wagon.com', password: 'User123!' }
+  //   };
 
-    try {
-      await loginMutation.mutateAsync(credentials[role]);
-      router.push('/');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Произошла ошибка при входе');
-    }
-  };
+  //   try {
+  //     await loginMutation.mutateAsync(credentials[role]);
+  //     router.push('/');
+  //   } catch (err) {
+  //     setError(err instanceof Error ? err.message : 'Произошла ошибка при входе');
+  //   }
+  // };
 
   return (
     <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
@@ -95,7 +95,7 @@ export default function LoginForm() {
       </form>
 
       {/* Быстрый вход для демонстрации */}
-      <div className="mt-6">
+      {/* <div className="mt-6">
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-300" />
@@ -122,7 +122,7 @@ export default function LoginForm() {
             Пользователь
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
