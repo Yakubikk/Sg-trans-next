@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using WebApp.Data.Enums;
 using WebApp.Extensions;
 using WebApp.Features.Users.Delete;
+using WebApp.Features.Users.GetAll;
 using WebApp.Features.Users.GetCurrent;
 using WebApp.Features.Users.GetPermissions;
 using WebApp.Features.Users.Login;
 using WebApp.Features.Users.RefreshToken;
 using WebApp.Features.Users.Register;
+using WebApp.Features.Users.ResetPassword;
 using WebApp.Features.Users.Update;
 using WebApp.Features.Users.UpdateRoles;
 
@@ -34,7 +36,11 @@ public static class UsersEndpoints
         protectedGroup.MapGet("{userId:guid}/permissions", GetUserPermissions);
         protectedGroup.MapPut("{userId:guid}", UpdateUser).RequirePermissions(Permission.Update);
         protectedGroup.MapPut("{userId:guid}/roles", UpdateUserRoles).RequirePermissions(Permission.Update);
+        protectedGroup.MapPut("{userId:guid}/reset-password", ResetPassword)
+            .RequirePermissions(Permission.Update);
         protectedGroup.MapDelete("{userId:guid}", DeleteUser).RequirePermissions(Permission.Delete);
+        protectedGroup.MapGet("", GetAllUsers)
+            .RequirePermissions(Permission.Read);
 
         return app;
     }
@@ -53,15 +59,6 @@ public static class UsersEndpoints
     {
         var response = await useCase.ExecuteAsync(request);
         
-        // Устанавливаем refresh token в httpOnly cookie
-        var cookieOptions = new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddDays(7)
-        };
-
         return Results.Ok(response);
     }
 
@@ -143,5 +140,23 @@ public static class UsersEndpoints
         var request = new DeleteUserRequest(userId);
         await useCase.ExecuteAsync(request);
         return Results.NoContent();
+    }
+
+    private static async Task<IResult> ResetPassword(
+        Guid userId,
+        [FromBody] ResetPasswordRequest request,
+        ResetPasswordUseCase useCase)
+    {
+        if (userId != request.UserId)
+            return Results.BadRequest();
+
+        await useCase.ExecuteAsync(request);
+        return Results.Ok();
+    }
+
+    private static async Task<IResult> GetAllUsers(GetAllUsersUseCase useCase)
+    {
+        var users = await useCase.ExecuteAsync();
+        return Results.Ok(users);
     }
 }
