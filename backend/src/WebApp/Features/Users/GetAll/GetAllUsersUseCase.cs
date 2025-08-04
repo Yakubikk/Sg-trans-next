@@ -22,7 +22,10 @@ public class GetAllUsersUseCase
             user.LastName,
             user.Patronymic,
             user.PhoneNumber,
-            user.Roles
+            user.Roles.Select(role => new RoleResponse(
+                role.Id,
+                role.Name
+            )).ToArray()
         ));
     }
 }
