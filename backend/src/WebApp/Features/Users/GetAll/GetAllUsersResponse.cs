@@ -9,5 +9,10 @@ public record GetAllUsersResponse(
     string LastName,
     string Patronymic,
     string PhoneNumber,
-    ICollection<RoleEntity> Roles
+    RoleResponse[] Roles
+);
+
+public record RoleResponse(
+    int Id,
+    string Name
 );
