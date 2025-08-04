@@ -1,9 +1,11 @@
 using WebApp.Features.Users.Delete;
+using WebApp.Features.Users.GetAll;
 using WebApp.Features.Users.GetCurrent;
 using WebApp.Features.Users.GetPermissions;
 using WebApp.Features.Users.Login;
 using WebApp.Features.Users.RefreshToken;
 using WebApp.Features.Users.Register;
+using WebApp.Features.Users.ResetPassword;
 using WebApp.Features.Users.Update;
 using WebApp.Features.Users.UpdateRoles;
 
@@ -22,6 +24,8 @@ public static class ApplicationExtensions
         services.AddScoped<RefreshTokenUseCase>();
         services.AddScoped<GetUserPermissionsUseCase>();
         services.AddScoped<GetCurrentUserUseCase>();
+        services.AddScoped<GetAllUsersUseCase>();
+        services.AddScoped<ResetPasswordUseCase>();
         
         
         return services;
