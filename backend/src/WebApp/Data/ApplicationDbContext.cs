@@ -225,6 +225,102 @@ public class ApplicationDbContext(
             entity.Property(e => e.CreatedAt).HasColumnName("CreatedAt").IsRequired().HasColumnType("timestamp with time zone");
         });
 
+        // Part конфигурация
+        modelBuilder.Entity<Part>(entity =>
+        {
+            entity.ToTable("Parts");
+            entity.HasKey(e => e.Id);
+            
+            entity.Property(e => e.SerialNumber).HasColumnType("text");
+            entity.Property(e => e.CurrentLocation).HasColumnType("text");
+            entity.Property(e => e.Notes).HasColumnType("text");
+            entity.Property(e => e.CreatedAt).HasColumnType("timestamp with time zone");
+            entity.Property(e => e.UpdatedAt).HasColumnType("timestamp with time zone");
+            
+            entity.HasOne(d => d.Depot)
+                .WithMany(p => p.Parts)
+                .HasForeignKey(d => d.DepotId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasOne(d => d.Status)
+                .WithMany()
+                .HasForeignKey(d => d.StatusId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasOne(d => d.PartType)
+                .WithMany()
+                .HasForeignKey(d => d.PartTypeId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasOne(d => d.StampNumber)
+                .WithMany()
+                .HasForeignKey(d => d.StampNumberId)
+                .OnDelete(DeleteBehavior.NoAction);
+        });
+
+        // Специализированные части
+        modelBuilder.Entity<WheelPair>(entity =>
+        {
+            entity.ToTable("WheelPairs");
+            entity.HasKey(e => e.PartId);
+            
+            entity.Property(e => e.ThicknessLeft).HasColumnType("numeric");
+            entity.Property(e => e.ThicknessRight).HasColumnType("numeric");
+            entity.Property(e => e.WheelType).HasColumnType("text");
+            
+            entity.HasOne(d => d.Part)
+                .WithOne(p => p.WheelPair)
+                .HasForeignKey<WheelPair>(d => d.PartId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<SideFrame>(entity =>
+        {
+            entity.ToTable("SideFrames");
+            entity.HasKey(e => e.PartId);
+            
+            entity.HasOne(d => d.Part)
+                .WithOne(p => p.SideFrame)
+                .HasForeignKey<SideFrame>(d => d.PartId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<ShockAbsorber>(entity =>
+        {
+            entity.ToTable("ShockAbsorbers");
+            entity.HasKey(e => e.PartId);
+            
+            entity.Property(e => e.Model).HasColumnType("text");
+            entity.Property(e => e.ManufacturerCode).HasColumnType("text");
+            
+            entity.HasOne(d => d.Part)
+                .WithOne(p => p.ShockAbsorber)
+                .HasForeignKey<ShockAbsorber>(d => d.PartId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Coupler>(entity =>
+        {
+            entity.ToTable("Couplers");
+            entity.HasKey(e => e.PartId);
+            
+            entity.HasOne(d => d.Part)
+                .WithOne(p => p.Coupler)
+                .HasForeignKey<Coupler>(d => d.PartId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Bolster>(entity =>
+        {
+            entity.ToTable("Bolsters");
+            entity.HasKey(e => e.PartId);
+            
+            entity.HasOne(d => d.Part)
+                .WithOne(p => p.Bolster)
+                .HasForeignKey<Bolster>(d => d.PartId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
         // Part - PartInstallation связь
         modelBuilder.Entity<Part>()
             .HasMany(p => p.PartInstallations)

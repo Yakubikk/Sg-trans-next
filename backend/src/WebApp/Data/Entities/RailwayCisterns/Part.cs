@@ -1,42 +1,29 @@
 namespace WebApp.Data.Entities.RailwayCisterns;
 
-// public enum PartType
-// {
-//     WheelPair,
-//     SideFrame,
-//     Bolster,
-//     Coupler,
-//     ShockAbsorber
-// }
-//
-// public enum PartStatus
-// {
-//     Active,
-//     Decommissioned,
-//     Repairing,
-//     Reserved,
-//     Inspection,
-//     Extended
-// }
-
 public class Part 
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     
-    // public PartType PartType { get; set; }
+    public Guid PartTypeId { get; set; }
+    public PartType PartType { get; set; } = null!;
     
     public Guid? DepotId { get; set; }
     public Depot? Depot { get; set; }
     
-    public string StampNumber { get; set; } = string.Empty;
+    public Guid StampNumberId { get; set; }
+    public StampNumber StampNumber { get; set; } = null!;
+    
     public string? SerialNumber { get; set; }
-    public int? ManufactureYear { get; set; }
+    public DateOnly? ManufactureYear { get; set; }
     public string? CurrentLocation { get; set; }
-    // public PartStatus Status { get; set; } = PartStatus.Active;
+    
+    public Guid StatusId { get; set; }
+    public PartStatus Status { get; set; } = null!;
+    
     public string? Notes { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public Guid CreatorId { get; set; }
     
     // Навигационные свойства для специализированных деталей
     public WheelPair? WheelPair { get; set; }
@@ -47,5 +34,4 @@ public class Part
     
     public ICollection<PartInstallation> PartInstallations { get; set; } = new List<PartInstallation>();
     public ICollection<Repair> Repairs { get; set; } = new List<Repair>();
-    public string CreatorId { get; set; }
 }
