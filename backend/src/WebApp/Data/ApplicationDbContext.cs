@@ -18,6 +18,7 @@ public class ApplicationDbContext(
     public DbSet<MilageCistern> MilageCisterns { get; set; }
     public DbSet<Owner> Owners { get; set; }
     public DbSet<RailwayCistern> RailwayCisterns { get; set; }
+    public DbSet<SavedFilter> SavedFilters { get; set; }
     public DbSet<WagonType> WagonTypes { get; set; }
     public DbSet<WagonModel> WagonModels { get; set; }
     public DbSet<Registrar> Registrars { get; set; }
@@ -411,6 +412,24 @@ public class ApplicationDbContext(
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).HasColumnName("Id").IsRequired();
             entity.Property(e => e.Value).HasColumnName("Value").IsRequired().HasColumnType("text");
+        });
+
+        // SavedFilters
+        modelBuilder.Entity<SavedFilter>(entity =>
+        {
+            entity.ToTable("SavedFilters");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasColumnType("text");
+            entity.Property(e => e.FilterJson).IsRequired().HasColumnType("text");
+            entity.Property(e => e.SortFieldsJson).IsRequired().HasColumnType("text");
+            entity.Property(e => e.UserId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired().HasColumnType("timestamp with time zone");
+            entity.Property(e => e.UpdatedAt).IsRequired().HasColumnType("timestamp with time zone");
+
+            entity.HasOne(d => d.User)
+                .WithMany()
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
