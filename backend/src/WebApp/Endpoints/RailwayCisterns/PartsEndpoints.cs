@@ -123,63 +123,6 @@ public static class PartsEndpoints
         {
             operation.Description = "Получение списка деталей с пагинацией и фильтрацией по типу";
             operation.Summary = "Get paginated parts list with optional type filter";
-            
-            var response = new OpenApiResponse
-            {
-                Description = "Success",
-                Content = new Dictionary<string, OpenApiMediaType>
-                {
-                    ["application/json"] = new OpenApiMediaType
-                    {
-                        Example = new Microsoft.OpenApi.Any.OpenApiObject
-                        {
-                            ["items"] = new Microsoft.OpenApi.Any.OpenApiArray
-                            {
-                                new Microsoft.OpenApi.Any.OpenApiObject
-                                {
-                                    ["id"] = new Microsoft.OpenApi.Any.OpenApiString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
-                                    ["partType"] = new Microsoft.OpenApi.Any.OpenApiObject
-                                    {
-                                        ["id"] = new Microsoft.OpenApi.Any.OpenApiString("39762f1d-dee8-440e-890c-89f280d455d9"),
-                                        ["name"] = new Microsoft.OpenApi.Any.OpenApiString("Колесные пары"),
-                                        ["code"] = new Microsoft.OpenApi.Any.OpenApiInteger(1)
-                                    },
-                                    ["depotId"] = new Microsoft.OpenApi.Any.OpenApiString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
-                                    ["stampNumber"] = new Microsoft.OpenApi.Any.OpenApiObject
-                                    {
-                                        ["id"] = new Microsoft.OpenApi.Any.OpenApiString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
-                                        ["value"] = new Microsoft.OpenApi.Any.OpenApiString("12345")
-                                    },
-                                    ["serialNumber"] = new Microsoft.OpenApi.Any.OpenApiString("WP123456"),
-                                    ["manufactureYear"] = new Microsoft.OpenApi.Any.OpenApiInteger(2023),
-                                    ["currentLocation"] = new Microsoft.OpenApi.Any.OpenApiString("Депо №1"),
-                                    ["status"] = new Microsoft.OpenApi.Any.OpenApiObject
-                                    {
-                                        ["id"] = new Microsoft.OpenApi.Any.OpenApiString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
-                                        ["name"] = new Microsoft.OpenApi.Any.OpenApiString("В эксплуатации"),
-                                        ["code"] = new Microsoft.OpenApi.Any.OpenApiInteger(1)
-                                    },
-                                    ["notes"] = new Microsoft.OpenApi.Any.OpenApiString("Примечание"),
-                                    ["createdAt"] = new Microsoft.OpenApi.Any.OpenApiDateTime(DateTime.UtcNow),
-                                    ["updatedAt"] = new Microsoft.OpenApi.Any.OpenApiDateTime(DateTime.UtcNow),
-                                    ["wheelPair"] = new Microsoft.OpenApi.Any.OpenApiObject
-                                    {
-                                        ["thicknessLeft"] = new Microsoft.OpenApi.Any.OpenApiFloat(70.5f),
-                                        ["thicknessRight"] = new Microsoft.OpenApi.Any.OpenApiFloat(70.5f),
-                                        ["wheelType"] = new Microsoft.OpenApi.Any.OpenApiString("Цельнокатаные")
-                                    }
-                                }
-                            },
-                            ["pageNumber"] = new Microsoft.OpenApi.Any.OpenApiInteger(1),
-                            ["totalPages"] = new Microsoft.OpenApi.Any.OpenApiInteger(10),
-                            ["totalCount"] = new Microsoft.OpenApi.Any.OpenApiInteger(100),
-                            ["hasPreviousPage"] = new Microsoft.OpenApi.Any.OpenApiBoolean(false),
-                            ["hasNextPage"] = new Microsoft.OpenApi.Any.OpenApiBoolean(true)
-                        }
-                    }
-                }
-            };
-            operation.Responses["200"] = response;
             return operation;
         })
         .ProducesValidationProblem()
@@ -261,51 +204,6 @@ public static class PartsEndpoints
             operation.Description = "Получение детали по ID";
             operation.Summary = "Get part by ID";
             
-            var response = new OpenApiResponse
-            {
-                Description = "Success",
-                Content = new Dictionary<string, OpenApiMediaType>
-                {
-                    ["application/json"] = new OpenApiMediaType
-                    {
-                        Example = new Microsoft.OpenApi.Any.OpenApiObject
-                        {
-                            ["id"] = new Microsoft.OpenApi.Any.OpenApiString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
-                            ["partType"] = new Microsoft.OpenApi.Any.OpenApiObject
-                            {
-                                ["id"] = new Microsoft.OpenApi.Any.OpenApiString("39762f1d-dee8-440e-890c-89f280d455d9"),
-                                ["name"] = new Microsoft.OpenApi.Any.OpenApiString("Колесные пары"),
-                                ["code"] = new Microsoft.OpenApi.Any.OpenApiInteger(1)
-                            },
-                            ["depotId"] = new Microsoft.OpenApi.Any.OpenApiString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
-                            ["stampNumber"] = new Microsoft.OpenApi.Any.OpenApiObject
-                            {
-                                ["id"] = new Microsoft.OpenApi.Any.OpenApiString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
-                                ["value"] = new Microsoft.OpenApi.Any.OpenApiString("12345")
-                            },
-                            ["serialNumber"] = new Microsoft.OpenApi.Any.OpenApiString("WP123456"),
-                            ["manufactureYear"] = new Microsoft.OpenApi.Any.OpenApiInteger(2023),
-                            ["currentLocation"] = new Microsoft.OpenApi.Any.OpenApiString("Депо №1"),
-                            ["status"] = new Microsoft.OpenApi.Any.OpenApiObject
-                            {
-                                ["id"] = new Microsoft.OpenApi.Any.OpenApiString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
-                                ["name"] = new Microsoft.OpenApi.Any.OpenApiString("В эксплуатации"),
-                                ["code"] = new Microsoft.OpenApi.Any.OpenApiInteger(1)
-                            },
-                            ["notes"] = new Microsoft.OpenApi.Any.OpenApiString("Примечание"),
-                            ["createdAt"] = new Microsoft.OpenApi.Any.OpenApiDateTime(DateTime.UtcNow),
-                            ["updatedAt"] = new Microsoft.OpenApi.Any.OpenApiDateTime(DateTime.UtcNow),
-                            ["wheelPair"] = new Microsoft.OpenApi.Any.OpenApiObject
-                            {
-                                ["thicknessLeft"] = new Microsoft.OpenApi.Any.OpenApiFloat(70.5f),
-                                ["thicknessRight"] = new Microsoft.OpenApi.Any.OpenApiFloat(70.5f),
-                                ["wheelType"] = new Microsoft.OpenApi.Any.OpenApiString("Цельнокатаные")
-                            }
-                        }
-                    }
-                }
-            };
-            operation.Responses["200"] = response;
 
             var notFoundResponse = new OpenApiResponse
             {
