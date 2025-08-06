@@ -5,11 +5,13 @@ import type {
   RailwayCistern, 
   RailwayCisternDetailed,
   RailwayCisternDetailedResponse,
+  RailwayCisternSearchResponse,
   CreateRailwayCisternRequest,
   CreateRailwayCisternDetailedRequest,
   UpdateRailwayCisternRequest,
   RailwayCisternQueryParams 
 } from './types';
+import type { CisternFilter } from '../saved-filters';
 
 // Создаем экземпляр axios для железнодорожных цистерн
 const railwayCisternsApiInstance = createApiInstance(DEFAULT_API_CONFIG);
@@ -58,4 +60,19 @@ export const railwayCisternsApi = {
   // Удалить цистерну
   deleteRailwayCistern: (id: string): Promise<ApiResponse<void>> =>
     makeRequest<void>(railwayCisternsApiInstance, 'delete', `/railway-cisterns/${id}`),
+
+  // Поиск цистерн с фильтрами (серверная фильтрация)
+  searchRailwayCisterns: (filters: CisternFilter): Promise<ApiResponse<RailwayCisternSearchResponse>> => {
+    const requestBody = {
+      filters,
+      sortFields: [],
+    };
+    
+    return makeRequest<RailwayCisternSearchResponse>(
+      railwayCisternsApiInstance,
+      'post',
+      '/railway-cisterns/search/simple',
+      requestBody
+    );
+  },
 };

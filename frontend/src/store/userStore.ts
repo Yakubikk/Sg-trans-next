@@ -1,7 +1,7 @@
-import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
-import { User, LoginRequest, CreateUserRequest, UpdateUserRequest, UserListParams } from '@/types/user';
-import { userApi } from '@/api/users/userApi';
+import { create } from "zustand";
+import { devtools, persist } from "zustand/middleware";
+import { User, LoginRequest, CreateUserRequest, UpdateUserRequest, UserListParams } from "@/types/user";
+import { userApi } from "@/api/users/userApi";
 
 interface UserState {
   // Текущий пользователь
@@ -57,7 +57,7 @@ const initialState = {
   currentPage: 1,
   totalPages: 0,
   isLoadingUsers: false,
-  filters: {}
+  filters: {},
 };
 
 export const useUserStore = create<UserState>()(
@@ -68,37 +68,39 @@ export const useUserStore = create<UserState>()(
 
         // Базовые методы для управления состоянием
         setUser: (user: User) => set({ currentUser: user }),
-        setToken: (token: string, refreshToken?: string) => set({ 
-          token, 
-          isAuthenticated: true,
-          ...(refreshToken && { refreshToken }) 
-        }),
-        clearUser: () => set({ 
-          currentUser: null, 
-          token: null, 
-          refreshToken: null, 
-          isAuthenticated: false 
-        }),
+        setToken: (token: string, refreshToken?: string) =>
+          set({
+            token,
+            isAuthenticated: true,
+            ...(refreshToken && { refreshToken }),
+          }),
+        clearUser: () =>
+          set({
+            currentUser: null,
+            token: null,
+            refreshToken: null,
+            isAuthenticated: false,
+          }),
 
         // Аутентификация
         login: async (credentials: LoginRequest) => {
           set({ isLoading: true });
           try {
             const response = await userApi.login(credentials);
-            
+
             // Сохраняем токены и устанавливаем authenticated в true
             set({
               token: response.data.accessToken,
               refreshToken: response.data.refreshToken,
-              isAuthenticated: true
+              isAuthenticated: true,
             });
-            
+
             // Небольшая задержка для сохранения в localStorage
-            await new Promise(resolve => setTimeout(resolve, 100));
-            
+            await new Promise((resolve) => setTimeout(resolve, 100));
+
             // Получаем данные пользователя после сохранения токенов
             await get().getCurrentUser();
-            
+
             set({ isLoading: false });
           } catch (error) {
             set({ isLoading: false });
@@ -111,29 +113,29 @@ export const useUserStore = create<UserState>()(
             // Вызываем logout из API для очистки localStorage
             await userApi.logout();
           } catch (error) {
-            console.error('Logout error:', error);
+            console.error("Logout error:", error);
           } finally {
             // Очищаем состояние пользователя
             set({
               currentUser: null,
               token: null,
               refreshToken: null,
-              isAuthenticated: false
+              isAuthenticated: false,
             });
           }
         },
 
         getCurrentUser: async () => {
           const { token } = get();
-          console.log('getCurrentUser called with token:', token ? 'exists' : 'missing');
+          console.log("getCurrentUser called with token:", token ? "exists" : "missing");
           if (!token) return;
 
           try {
             const response = await userApi.getCurrentUser();
-            console.log('getCurrentUser success:', response.data);
+            console.log("getCurrentUser success:", response.data);
             set({ currentUser: response.data, isAuthenticated: true });
           } catch (error) {
-            console.error('Get current user error:', error);
+            console.error("Get current user error:", error);
             get().clearUser();
           }
         },
@@ -147,7 +149,7 @@ export const useUserStore = create<UserState>()(
               ...filters,
               ...params,
               page: params?.page || currentPage,
-              limit: params?.limit || 10
+              limit: params?.limit || 10,
             };
 
             const response = await userApi.getUsers(searchParams);
@@ -156,7 +158,7 @@ export const useUserStore = create<UserState>()(
               totalUsers: response.data.total,
               totalPages: response.data.totalPages,
               currentPage: response.data.page,
-              isLoadingUsers: false
+              isLoadingUsers: false,
             });
           } catch (error) {
             set({ isLoadingUsers: false });
@@ -176,15 +178,15 @@ export const useUserStore = create<UserState>()(
           const user = response.data;
           // Обновляем пользователя в списке
           const { users } = get();
-          const updatedUsers = users.map(u => u.id === id ? user : u);
+          const updatedUsers = users.map((u) => (u.id === id ? user : u));
           set({ users: updatedUsers });
-          
+
           // Если обновляем текущего пользователя
           const { currentUser } = get();
           if (currentUser?.id === id) {
             set({ currentUser: user });
           }
-          
+
           return user;
         },
 
@@ -192,7 +194,7 @@ export const useUserStore = create<UserState>()(
           await userApi.deleteUser(id);
           // Удаляем пользователя из списка
           const { users } = get();
-          const filteredUsers = users.filter(u => u.id !== id);
+          const filteredUsers = users.filter((u) => u.id !== id);
           set({ users: filteredUsers });
         },
 
@@ -203,9 +205,9 @@ export const useUserStore = create<UserState>()(
         },
 
         setFilters: (filters: Partial<UserListParams>) => {
-          set({ 
+          set({
             filters: { ...get().filters, ...filters },
-            currentPage: 1 
+            currentPage: 1,
           });
           get().fetchUsers({ ...filters, page: 1 });
         },
@@ -216,10 +218,10 @@ export const useUserStore = create<UserState>()(
         },
 
         // Сброс состояния
-        reset: () => set(initialState)
+        reset: () => set(initialState),
       }),
       {
-        name: 'user-storage',
+        name: "user-storage",
         partialize: (state) => ({
           currentUser: state.currentUser,
           token: state.token,

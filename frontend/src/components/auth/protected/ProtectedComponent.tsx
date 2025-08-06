@@ -4,11 +4,7 @@ import { usePermissions } from "@/hooks/usePermissions";
 import { RoleBasedComponent } from "@/types/permissions";
 
 // Компонент для защиты контента на основе ролей и разрешений
-export function ProtectedComponent({
-  requiredPermissions = [],
-  requiredRoles = [],
-  children,
-}: RoleBasedComponent) {
+export function ProtectedComponent({ requiredPermissions = [], requiredRoles = [], children }: RoleBasedComponent) {
   const { user, isAuthenticated, isLoading, hasAnyPermission, hasAnyRole } = usePermissions();
 
   // Показываем лоадер пока данные загружаются

@@ -6,6 +6,7 @@ import {
   CreateRailwayCisternDetailedRequest,
   UpdateRailwayCisternRequest, 
   RailwayCistern,
+  CisternFilter,
 } from '@/api/references';
 
 // Создаем CRUD хуки через универсальную фабрику
@@ -70,5 +71,40 @@ export const useCreateRailwayCisternDetailed = () => {
       // Обновляем все запросы железнодорожных цистерн
       queryClient.invalidateQueries({ queryKey: railwayCisternsKeys.all });
     },
+  });
+};
+
+// Функция для проверки активных фильтров
+const hasActiveFilters = (filters: CisternFilter): boolean => {
+  return Object.keys(filters).some(key => {
+    const value = filters[key as keyof CisternFilter];
+    const isActive = value !== undefined && value !== null && 
+           (Array.isArray(value) ? value.length > 0 : true);
+    return isActive;
+  });
+};
+
+// Хук для поиска цистерн с фильтрами (серверная фильтрация)
+export const useSearchRailwayCisterns = (filters: CisternFilter) => {
+  return useQuery({
+    queryKey: [...railwayCisternsKeys.all, 'search', JSON.stringify(filters)], // Используем JSON для более точного кеширования
+    queryFn: async () => {
+      const response = await railwayCisternsApi.searchRailwayCisterns(filters);
+      // Проверяем, что именно вернул API
+      if (Array.isArray(response.data)) {
+        // Если API вернул прямо массив, создаем объект с нужной структурой
+        return {
+          railwayCisterns: response.data,
+          totalCount: response.data.length,
+          totalPages: 1,
+          currentPage: 1,
+          pageSize: response.data.length
+        };
+      }
+      return response.data;
+    },
+    enabled: hasActiveFilters(filters), // Выполняем запрос только если есть активные фильтры
+    staleTime: 0, // Всегда считать данные устаревшими
+    gcTime: 0, // Не кешировать данные (в новых версиях React Query)
   });
 };

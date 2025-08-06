@@ -1,3 +1,5 @@
+import { AffiliationReference } from "../affiliations";
+
 // Типы для железнодорожных цистерн
 export interface RailwayCistern {
   id: string;
@@ -50,11 +52,6 @@ export interface Owner {
   updatedAt: string;
 }
 
-export interface Affiliation {
-  id: string;
-  value: string;
-}
-
 export interface RailwayCisternDetailed {
   id: string;
   number: string;
@@ -82,7 +79,7 @@ export interface RailwayCisternDetailed {
   pressure: number;
   testPressure: number;
   rent: string;
-  affiliation: Affiliation;
+  affiliation: AffiliationReference;
   serviceLifeYears: number;
   periodMajorRepair: string;
   periodPeriodicTest: string;
@@ -96,6 +93,15 @@ export interface RailwayCisternDetailed {
 
 export interface RailwayCisternDetailedResponse {
   railwayCisterns: RailwayCisternDetailed[];
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+}
+
+// Ответ для простого поиска цистерн с фильтрами
+export interface RailwayCisternSearchResponse {
+  railwayCisterns: RailwayCistern[];
   totalCount: number;
   totalPages: number;
   currentPage: number;

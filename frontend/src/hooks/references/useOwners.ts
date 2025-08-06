@@ -4,7 +4,7 @@ import type {
   UpdateOwnerRequest, 
   OwnerEntity,
 } from '@/api/references';
-import { createGenericCRUD } from '../../common/useGenericCRUD';
+import { createGenericCRUD } from '../common/useGenericCRUD';
 
 // Создаем CRUD хуки через универсальную фабрику
 const ownersCRUD = createGenericCRUD<OwnerEntity, CreateOwnerRequest, UpdateOwnerRequest>(ownersKeys, {

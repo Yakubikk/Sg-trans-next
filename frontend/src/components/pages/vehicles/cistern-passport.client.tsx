@@ -7,7 +7,7 @@ interface CisternPassportClientProps {
   cisternNumber: string;
 }
 
-export function CisternPassportClient({ cisternNumber }: CisternPassportClientProps) {
+export default function CisternPassportClient({ cisternNumber }: CisternPassportClientProps) {
   const { data: cistern, isLoading, error } = useRailwayCisternDetailedByNumber(cisternNumber);
 
   if (isLoading) {

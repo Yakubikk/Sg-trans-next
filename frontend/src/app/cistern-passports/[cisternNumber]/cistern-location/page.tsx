@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { BackButton, LogoutButton } from '@/components';
-import UnderDevelopmentPage from '@/components/pages/UnderDevelopmentPage';
+import { CisternLocationClient } from '@/components/pages';
 
 interface WagonLocationPageProps {
   params: Promise<{
@@ -39,12 +39,7 @@ export default async function WagonLocationPage({ params }: WagonLocationPagePro
       </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <UnderDevelopmentPage
-          title="Локализация вагона"
-          description="В данном разделе будет отображаться информация о текущем местоположении вагона и история его перемещений."
-          wagonNumber={decodedCisternNumber}
-          iconColor="text-green-500"
-        />
+        <CisternLocationClient cisternNumber={decodedCisternNumber} />
       </main>
     </div>
   );

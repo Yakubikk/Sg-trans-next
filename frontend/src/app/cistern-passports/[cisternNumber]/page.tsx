@@ -1,8 +1,7 @@
-import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
-import { BackButton, LogoutButton } from "@/components";
-import { CisternPassportClient } from './CisternPassportClient';
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import { BackButton, CisternPassportClient, LogoutButton } from "@/components";
 
 interface PageProps {
   params: Promise<{
@@ -13,11 +12,11 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { cisternNumber } = await params;
   const decodedCisternNumber = decodeURIComponent(cisternNumber);
-  
+
   return {
     title: `Паспорт цистерны №${decodedCisternNumber} | SG-Trans`,
     description: `Детальная информация о железнодорожной цистерне №${decodedCisternNumber}. Технические характеристики, сроки обслуживания, эксплуатационные данные.`,
-    keywords: ['цистерна', 'паспорт', 'железнодорожный транспорт', 'технические характеристики'],
+    keywords: ["цистерна", "паспорт", "железнодорожный транспорт", "технические характеристики"],
   };
 }
 
@@ -29,7 +28,7 @@ function LoadingFallback() {
           <BackButton>← Назад к паспортам</BackButton>
           <LogoutButton />
         </div>
-        
+
         <div className="animate-pulse space-y-6">
           <div className="h-32 bg-gray-200 rounded-lg"></div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -46,7 +45,7 @@ function LoadingFallback() {
 export default async function CisternPassportDetailPage({ params }: PageProps) {
   const { cisternNumber } = await params;
   const decodedCisternNumber = decodeURIComponent(cisternNumber);
-  
+
   if (!decodedCisternNumber) {
     notFound();
   }
@@ -58,7 +57,7 @@ export default async function CisternPassportDetailPage({ params }: PageProps) {
           <BackButton>← Назад к паспортам</BackButton>
           <LogoutButton />
         </div>
-        
+
         <Suspense fallback={<LoadingFallback />}>
           <CisternPassportClient cisternNumber={decodedCisternNumber} />
         </Suspense>

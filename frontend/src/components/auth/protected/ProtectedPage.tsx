@@ -37,9 +37,20 @@ export function ProtectedPageComponent({
       // Нет необходимых прав - перенаправляем на страницу отказа в доступе
       router.push(fallbackPath);
     }
-    
+
     setHasChecked(true);
-  }, [user, isAuthenticated, isLoading, hasChecked, requiredPermissions, requiredRoles, fallbackPath, hasAnyPermission, hasAnyRole, router]);
+  }, [
+    user,
+    isAuthenticated,
+    isLoading,
+    hasChecked,
+    requiredPermissions,
+    requiredRoles,
+    fallbackPath,
+    hasAnyPermission,
+    hasAnyRole,
+    router,
+  ]);
 
   if (isLoading || !hasChecked) {
     return (

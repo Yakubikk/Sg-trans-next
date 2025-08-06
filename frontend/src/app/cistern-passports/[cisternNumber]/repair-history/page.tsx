@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { BackButton, LogoutButton } from '@/components';
-import UnderDevelopmentPage from '@/components/pages/UnderDevelopmentPage';
+import { UnderDevelopmentPage } from '@/components/pages';
 
 interface RepairHistoryPageProps {
   params: Promise<{

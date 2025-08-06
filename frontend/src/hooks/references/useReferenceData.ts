@@ -37,18 +37,6 @@ export const useManufacturers = () => {
   });
 };
 
-export const useOwners = () => {
-  return useQuery({
-    queryKey: referenceDataKeys.owners(),
-    queryFn: async () => {
-      const response = await referenceDataApi.getOwners();
-      return response.data;
-    },
-    staleTime: 5 * 60 * 1000, // 5 минут
-    retry: 2,
-  });
-};
-
 export const useWagonTypes = () => {
   return useQuery({
     queryKey: referenceDataKeys.wagonTypes(),
@@ -66,18 +54,6 @@ export const useWagonModels = () => {
     queryKey: referenceDataKeys.wagonModels(),
     queryFn: async () => {
       const response = await referenceDataApi.getWagonModels();
-      return response.data;
-    },
-    staleTime: 5 * 60 * 1000, // 5 минут
-    retry: 2,
-  });
-};
-
-export const useAffiliations = () => {
-  return useQuery({
-    queryKey: referenceDataKeys.affiliations(),
-    queryFn: async () => {
-      const response = await referenceDataApi.getAffiliations();
       return response.data;
     },
     staleTime: 5 * 60 * 1000, // 5 минут
