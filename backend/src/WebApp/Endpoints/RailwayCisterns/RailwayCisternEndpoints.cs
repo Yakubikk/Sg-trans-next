@@ -6,6 +6,7 @@ using WebApp.Data.Entities.RailwayCisterns;
 using WebApp.Data.Enums;
 using WebApp.DTO.RailwayCisterns;
 using WebApp.Extensions;
+using System.Text.Json;
 
 namespace WebApp.Endpoints.RailwayCisterns;
 
@@ -1002,6 +1003,131 @@ public static class RailwayCisternEndpoints
             })
             .WithName("SearchRailwayCisternsSimple")
             .Produces<ResponseForPaginationList>(StatusCodes.Status200OK)
+            .RequirePermissions(Permission.Read);
+
+        // Search by saved filter with pagination
+        group.MapGet("/search/saved/{filterId}", async (
+                [FromRoute] Guid filterId,
+                [FromServices] ApplicationDbContext context,
+                HttpContext httpContext,
+                [FromQuery] int page = 1,
+                [FromQuery] int pageSize = 10) =>
+            {
+                var userId = Guid.Parse(httpContext.User.FindFirstValue("userId")!);
+                var savedFilter = await context.Set<SavedFilter>()
+                    .FirstOrDefaultAsync(f => f.Id == filterId && f.UserId == userId);
+
+                if (savedFilter == null)
+                    return Results.NotFound("Saved filter not found");
+
+                var filterCriteria = JsonSerializer.Deserialize<FilterCriteria>(savedFilter.FilterJson);
+                var sortFields = JsonSerializer.Deserialize<List<SortCriteria>>(savedFilter.SortFieldsJson);
+
+                var query = context.Set<RailwayCistern>()
+                    .Include(rc => rc.Manufacturer)
+                    .Include(rc => rc.Type)
+                    .Include(rc => rc.Model)
+                    .Include(rc => rc.Owner)
+                    .Include(rc => rc.Affiliation)
+                    .AsQueryable();
+
+                if (filterCriteria != null)
+                {
+                    var f = filterCriteria;
+                        
+                    if (f.Numbers != null && f.Numbers.Any())
+                        query = query.Where(rc => f.Numbers.Contains(rc.Number));
+                        
+                    if (f.ManufacturerIds != null && f.ManufacturerIds.Any())
+                        query = query.Where(rc => f.ManufacturerIds.Contains(rc.ManufacturerId));
+                        
+                    if (f.BuildDateFrom.HasValue)
+                        query = query.Where(rc => rc.BuildDate >= f.BuildDateFrom);
+                    if (f.BuildDateTo.HasValue)
+                        query = query.Where(rc => rc.BuildDate <= f.BuildDateTo);
+                        
+                    if (f.TypeIds != null && f.TypeIds.Any())
+                        query = query.Where(rc => f.TypeIds.Contains(rc.TypeId));
+                        
+                    if (f.ModelIds != null && f.ModelIds.Any())
+                        query = query.Where(rc => rc.ModelId.HasValue && f.ModelIds.Contains(rc.ModelId.Value));
+                        
+                    if (f.OwnerIds != null && f.OwnerIds.Any())
+                        query = query.Where(rc => rc.OwnerId.HasValue && f.OwnerIds.Contains(rc.OwnerId.Value));
+                        
+                    if (f.RegistrationNumbers != null && f.RegistrationNumbers.Any())
+                        query = query.Where(rc => f.RegistrationNumbers.Contains(rc.RegistrationNumber));
+                        
+                    if (f.RegistrationDateFrom.HasValue)
+                        query = query.Where(rc => rc.RegistrationDate >= f.RegistrationDateFrom);
+                    if (f.RegistrationDateTo.HasValue)
+                        query = query.Where(rc => rc.RegistrationDate <= f.RegistrationDateTo);
+                        
+                    if (f.AffiliationIds != null && f.AffiliationIds.Any())
+                        query = query.Where(rc => f.AffiliationIds.Contains(rc.AffiliationId));
+                        
+                    if (f.CreatedAtFrom.HasValue)
+                        query = query.Where(rc => rc.CreatedAt >= f.CreatedAtFrom);
+                    if (f.CreatedAtTo.HasValue)
+                        query = query.Where(rc => rc.CreatedAt <= f.CreatedAtTo);
+                        
+                    if (f.UpdatedAtFrom.HasValue)
+                        query = query.Where(rc => rc.UpdatedAt >= f.UpdatedAtFrom);
+                    if (f.UpdatedAtTo.HasValue)
+                        query = query.Where(rc => rc.UpdatedAt <= f.UpdatedAtTo);
+                }
+
+                // Apply sorting
+                if (sortFields != null && sortFields.Any())
+                {
+                    var firstSort = sortFields.First();
+                    var orderedQuery = ApplySort(query, firstSort);
+
+                    foreach (var sortField in sortFields.Skip(1))
+                    {
+                        orderedQuery = ApplyThenBy(orderedQuery, sortField);
+                    }
+
+                    query = orderedQuery;
+                }
+                else
+                {
+                    // Default sorting by UpdatedAt descending if no sort specified
+                    query = query.OrderByDescending(rc => rc.UpdatedAt);
+                }
+
+                var totalCount = await query.CountAsync();
+                var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+                var cisterns = await query
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(rc => new RailwayCisternListDTO
+                    {
+                        Id = rc.Id,
+                        Number = rc.Number,
+                        ManufacturerName = rc.Manufacturer.Name,
+                        BuildDate = rc.BuildDate,
+                        TypeName = rc.Type.Name,
+                        ModelName = rc.Model.Name,
+                        OwnerName = rc.Owner.Name,
+                        RegistrationNumber = rc.RegistrationNumber,
+                        RegistrationDate = rc.RegistrationDate,
+                        AffiliationValue = rc.Affiliation.Value
+                    })
+                    .ToListAsync();
+
+                var response = new ResponseForPaginationList(cisterns,
+                    totalCount,
+                    totalPages,
+                    page,
+                    pageSize);
+
+                return Results.Ok(response);
+            })
+            .WithName("SearchBySavedFilter")
+            .Produces<ResponseForPaginationList>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status404NotFound)
             .RequirePermissions(Permission.Read);
     }
 
