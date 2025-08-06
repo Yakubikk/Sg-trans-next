@@ -897,7 +897,7 @@ public static class RailwayCisternEndpoints
         // Simple search with filtering and sorting
         group.MapPost("/search/simple", async (
                 [FromServices] ApplicationDbContext context,
-                [FromBody] RailwayCisternFilterSortDTO request) =>
+                [FromBody] RailwayCisternFilterSortWithoutPaginationDTO request) =>
             {
                 var query = context.Set<RailwayCistern>()
                     .Include(rc => rc.Manufacturer)
@@ -972,12 +972,7 @@ public static class RailwayCisternEndpoints
                     query = query.OrderByDescending(rc => rc.UpdatedAt);
                 }
 
-                var totalCount = await query.CountAsync();
-                var totalPages = (int)Math.Ceiling(totalCount / (double)request.PageSize);
-
                 var cisterns = await query
-                    .Skip((request.Page - 1) * request.PageSize)
-                    .Take(request.PageSize)
                     .Select(rc => new RailwayCisternListDTO
                     {
                         Id = rc.Id,
@@ -993,25 +988,17 @@ public static class RailwayCisternEndpoints
                     })
                     .ToListAsync();
 
-                var response = new ResponseForPaginationList(cisterns,
-                    totalCount,
-                    totalPages,
-                    request.Page,
-                    request.PageSize);
-
-                return Results.Ok(response);
+                return Results.Ok(cisterns);
             })
             .WithName("SearchRailwayCisternsSimple")
-            .Produces<ResponseForPaginationList>(StatusCodes.Status200OK)
+            .Produces<RailwayCisternListDTO>(StatusCodes.Status200OK)
             .RequirePermissions(Permission.Read);
 
         // Search by saved filter with pagination
         group.MapGet("/search/saved/{filterId}", async (
                 [FromRoute] Guid filterId,
                 [FromServices] ApplicationDbContext context,
-                HttpContext httpContext,
-                [FromQuery] int page = 1,
-                [FromQuery] int pageSize = 10) =>
+                HttpContext httpContext) =>
             {
                 var userId = Guid.Parse(httpContext.User.FindFirstValue("userId")!);
                 var savedFilter = await context.Set<SavedFilter>()
@@ -1096,12 +1083,7 @@ public static class RailwayCisternEndpoints
                     query = query.OrderByDescending(rc => rc.UpdatedAt);
                 }
 
-                var totalCount = await query.CountAsync();
-                var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
-
                 var cisterns = await query
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
                     .Select(rc => new RailwayCisternListDTO
                     {
                         Id = rc.Id,
@@ -1117,16 +1099,10 @@ public static class RailwayCisternEndpoints
                     })
                     .ToListAsync();
 
-                var response = new ResponseForPaginationList(cisterns,
-                    totalCount,
-                    totalPages,
-                    page,
-                    pageSize);
-
-                return Results.Ok(response);
+                return Results.Ok(cisterns);
             })
             .WithName("SearchBySavedFilter")
-            .Produces<ResponseForPaginationList>(StatusCodes.Status200OK)
+            .Produces<RailwayCisternListDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .RequirePermissions(Permission.Read);
     }
