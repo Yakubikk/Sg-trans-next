@@ -5,6 +5,7 @@ using WebApp.Data;
 using WebApp.Endpoints.RailwayCisterns;
 using WebApp.Services;
 using WebApp.Services.Authentication;
+using WebApp.Middlewares;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -71,6 +72,7 @@ services
 services.AddAuthorization();
 
 builder.Services.AddProblemDetails();
+services.AddTransient<GlobalExceptionHandlingMiddleware>();
 
 var app = builder.Build();
 
@@ -78,6 +80,10 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseCors("AllowFrontend");
+
+// Добавляем глобальную обработку ошибок
+app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

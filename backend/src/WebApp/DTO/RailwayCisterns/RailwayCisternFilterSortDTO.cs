@@ -8,6 +8,12 @@ public class RailwayCisternFilterSortDTO
     public int PageSize { get; set; } = 10;
 }
 
+public class RailwayCisternFilterSortWithoutPaginationDTO
+{
+    public FilterCriteria? Filters { get; set; }
+    public List<SortCriteria>? SortFields { get; set; }
+}
+
 public class FilterCriteria
 {
     public List<string>? Numbers { get; set; }

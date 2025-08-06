@@ -1,5 +1,6 @@
 using WebApp.Abstractions.Auth;
 using WebApp.Data.Repositories;
+using WebApp.Exceptions;
 
 namespace WebApp.Features.Users.Login;
 
@@ -25,7 +26,7 @@ public class LoginUseCase
         
         if (!_passwordHasher.Verify(request.Password, user.PasswordHash))
         {
-            throw new Exception("Invalid credentials");
+            throw new ApiException("Неверный email или пароль", 401);
         }
 
         var refreshToken = _jwtProvider.GenerateRefreshToken();

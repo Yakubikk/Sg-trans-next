@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WebApp.Data.Entities.Users;
 using WebApp.Data.Enums;
+using WebApp.Exceptions;
 
 namespace WebApp.Data.Repositories;
 
@@ -40,7 +41,8 @@ public class UserRepository
         var userEntity = await _context.Users
             .AsNoTracking()
             .Include(u => u.Roles)
-            .FirstOrDefaultAsync(u => u.Email == email) ?? throw new Exception();
+            .FirstOrDefaultAsync(u => u.Email == email) 
+            ?? throw new ApiException($"Пользователь с email {email} не найден", 404);
 
         return userEntity;
     }
@@ -67,7 +69,8 @@ public class UserRepository
         var userEntity = await _context.Users
             .AsNoTracking()
             .Include(u => u.Roles)
-            .FirstOrDefaultAsync(u => u.Id == userId) ?? throw new Exception();
+            .FirstOrDefaultAsync(u => u.Id == userId) 
+            ?? throw new ApiException($"Пользователь с ID {userId} не найден", 404);
 
         return userEntity;
     }
@@ -84,15 +87,16 @@ public class UserRepository
     {
         return await _context.Roles
             .AsNoTracking()
-            .FirstOrDefaultAsync(r => r.Id == roleId) ?? throw new InvalidOperationException();
+            .FirstOrDefaultAsync(r => r.Id == roleId) 
+            ?? throw new ApiException($"Роль с ID {roleId} не найдена", 404);
     }
 
     public async Task<User> UpdateUserAsync(User user)
     {
         var userEntity = await _context.Users
-            .Include(u => u.Roles).FirstOrDefaultAsync(u => u.Id == user.Id);
-        if (userEntity == null)
-            throw new Exception("User not found");
+            .Include(u => u.Roles)
+            .FirstOrDefaultAsync(u => u.Id == user.Id)
+            ?? throw new ApiException($"Пользователь с ID {user.Id} не найден", 404);
 
         userEntity.FirstName = user.FirstName;
         userEntity.LastName = user.LastName;
@@ -118,9 +122,10 @@ public class UserRepository
 
     public async Task DeleteUserAsync(User user)
     {
-        var userEntity = await _context.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
-        if (userEntity == null)
-            throw new Exception("User not found");
+        var userEntity = await _context.Users
+            .FirstOrDefaultAsync(u => u.Id == user.Id)
+            ?? throw new ApiException($"Пользователь с ID {user.Id} не найден", 404);
+            
         _context.Users.Remove(userEntity);
         await _context.SaveChangesAsync();
     }

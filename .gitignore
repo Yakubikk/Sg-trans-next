@@ -52,3 +52,8 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+/backend/src/.vs/SgApi
+/backend/src/WebApp/.config
+/backend/src/WebApp/Properties/PublishProfiles
+/backend/src/WebApp/WebApp.csproj.user
+/backend/src/.vs/ProjectEvaluation

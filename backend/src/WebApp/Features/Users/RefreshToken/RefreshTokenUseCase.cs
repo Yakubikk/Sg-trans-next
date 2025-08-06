@@ -1,5 +1,6 @@
 using WebApp.Abstractions.Auth;
 using WebApp.Data.Repositories;
+using WebApp.Exceptions;
 
 namespace WebApp.Features.Users.RefreshToken;
 
@@ -16,18 +17,14 @@ public class RefreshTokenUseCase
 
     public async Task<RefreshTokenResponse> ExecuteAsync(RefreshTokenRequest request)
     {
-        // Найти пользователя по refresh token
         var user = await _userRepository.GetUserByIdAsync(request.Id);
 
-        // Проверить срок действия токена
         if (user.RefreshTokenExpiry <= DateTime.UtcNow || user.RefreshToken != request.RefreshToken)
-            throw new Exception("Refresh token expired");
+            throw new ApiException("Недействительный refresh token", 401);
 
-        // Сгенерировать новые токены
         var newRefreshToken = _jwtProvider.GenerateRefreshToken();
         var newAccessToken = await _jwtProvider.GenerateAccessTokenAsync(user);
 
-        // Обновить refresh token в базе
         user.RefreshToken = newRefreshToken;
         user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
         await _userRepository.UpdateUserAsync(user);
