@@ -16,23 +16,35 @@ public class UserRepository
 
     public async Task AddAsync(User user)
     {
-        var roleEntity = await _context.Roles
-                             .SingleOrDefaultAsync(r => r.Id == (int)Role.User)
-                         ?? throw new InvalidOperationException();
-
-        var userEntity = new User()
+        if (!user.Roles.Any())
         {
-            Id = user.Id,
-            PasswordHash = user.PasswordHash,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            Patronymic = user.Patronymic,
-            PhoneNumber = user.PhoneNumber,
-            Email = user.Email,
-            Roles = [roleEntity]
-        };
+            throw new ApiException("Пользователь должен иметь хотя бы одну роль", 400);
+        }
 
-        await _context.Users.AddAsync(userEntity);
+        // Получаем ID ролей пользователя
+        var roleIds = user.Roles.Select(r => r.Id).ToList();
+        
+        // Очищаем коллекцию ролей, так как мы получим их заново из базы
+        user.Roles.Clear();
+        
+        // Получаем существующие роли из базы данных
+        var existingRoles = await _context.Roles
+            .Where(r => roleIds.Contains(r.Id))
+            .ToListAsync();
+
+        // Проверяем, что все запрошенные роли существуют
+        if (existingRoles.Count != roleIds.Count)
+        {
+            throw new ApiException("Одна или несколько ролей не существуют", 400);
+        }
+
+        // Добавляем существующие роли пользователю
+        foreach (var role in existingRoles)
+        {
+            user.Roles.Add(role);
+        }
+
+        await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
     }
 
@@ -128,5 +140,21 @@ public class UserRepository
             
         _context.Users.Remove(userEntity);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<RoleEntity>> GetAllRolesAsync()
+    {
+        return await _context.Roles
+            .AsNoTracking()
+            .OrderBy(r => r.Id)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<RoleEntity>> GetRolesByIdsAsync(IEnumerable<int> roleIds)
+    {
+        return await _context.Roles
+            .AsNoTracking()
+            .Where(r => roleIds.Contains(r.Id))
+            .ToListAsync();
     }
 }

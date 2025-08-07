@@ -1,6 +1,5 @@
 using WebApp.Abstractions.Auth;
 using WebApp.Data.Entities.Users;
-using WebApp.Data.Enums;
 using WebApp.Data.Repositories;
 
 namespace WebApp.Features.Users.Register;
@@ -21,7 +20,7 @@ public class RegisterUserUseCase
     public async Task ExecuteAsync(RegisterUserRequest request)
     {
         var hashedPassword = _passwordHasher.Generate(request.Password);
-        var role = await _userRepository.GetRoleByIdAsync((int)Role.User);;
+        var roles = await _userRepository.GetRolesByIdsAsync(request.RoleIds);
 
         var user = new User
         {
@@ -32,7 +31,7 @@ public class RegisterUserUseCase
             LastName = request.LastName,
             Patronymic = request.Patronymic,
             PhoneNumber = request.PhoneNumber,
-            Roles = new List<RoleEntity> { role }
+            Roles = roles.ToList()
         };
 
         await _userRepository.AddAsync(user);
