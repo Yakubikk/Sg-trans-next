@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { LogoutButton, BackButton, CisternPassport } from "@/components";
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Паспортные данные вагонов | SG-Trans',
@@ -22,7 +23,11 @@ export default function CisternPassportPage() {
     <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <BackButton>← Назад</BackButton>
+          <div className="flex gap-2">
+            <BackButton>← Назад</BackButton>
+            <div>|</div>
+            <Link href="/">На главную</Link>
+          </div>
           <LogoutButton />
         </div>
         

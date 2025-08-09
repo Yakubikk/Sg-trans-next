@@ -43,6 +43,7 @@ export default function CisternPassportCard({ cistern, className = '' }: Railway
   return (
     <div className={cn("space-y-6", className)}>
       {/* Заголовок паспорта */}
+    
       <Card>
         <CardHeader>
           <div className="text-center">
@@ -79,7 +80,7 @@ export default function CisternPassportCard({ cistern, className = '' }: Railway
                 <p className="text-base font-semibold">{cistern.number}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-600">Серийный номер</label>
+                <label className="text-sm font-medium text-gray-600">Заводской номер</label>
                 <p className="text-base">{cistern.serialNumber || 'Не указан'}</p>
               </div>
               <div>
@@ -150,7 +151,7 @@ export default function CisternPassportCard({ cistern, className = '' }: Railway
             <div className="space-y-3">
               <div>
                 <label className="text-sm font-medium text-gray-600">Длина</label>
-                <p className="text-base">{formatLength(cistern.length)}</p>
+                <p className="text-base">{cistern.length} мм</p>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-600">Количество осей</label>
