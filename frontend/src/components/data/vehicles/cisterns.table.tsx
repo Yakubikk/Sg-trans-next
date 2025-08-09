@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, memo } from "react";
+import { useMemo, memo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ColumnDef } from "@tanstack/react-table";
 import { GenericTable, TableActions } from "@/components/common/tables";
@@ -23,6 +23,7 @@ const CisternsTable = memo(function CisternsTable({
   onView 
 }: CisternsTableProps) {
   const router = useRouter();
+  const [open, setOpen] = useState(false);
 
   // Определяем колонки с возможностью навигации
   const railwayCisternsColumns: ColumnDef<RailwayCistern>[] = useMemo(() => [
@@ -90,7 +91,7 @@ const CisternsTable = memo(function CisternsTable({
 
   return (
     <div className="space-y-4">
-      <GenericTable data={data} columns={columns} isLoading={isLoading} />
+      <GenericTable data={data} columns={columns} isLoading={isLoading} showAddButton />
     </div>
   );
 });
