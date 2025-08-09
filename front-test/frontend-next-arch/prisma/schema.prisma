@@ -1,0 +1,240 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id                   String    @id @default(uuid()) @db.Uuid @map("Id")
+  email                String    @unique @map("Email")
+  passwordHash         String    @map("PasswordHash")
+  firstName            String?   @map("FirstName")
+  lastName             String?   @map("LastName")
+  patronymic           String?   @map("Patronymic")
+  phoneNumber          String?   @map("PhoneNumber")
+  refreshToken         String?   @map("RefreshToken")
+  refreshTokenExpiry   DateTime? @db.Timestamptz(6) @map("RefreshTokenExpiry")
+
+  roles                UserRole[]
+  savedFilters         SavedFilter[]
+
+  @@map("Users")
+}
+
+model Role {
+  id          Int              @id @default(autoincrement()) @map("Id")
+  name        String           @unique @map("Name")
+  users       UserRole[]
+  permissions RolePermissions[]
+
+  @@map("Roles")
+}
+
+model PermissionEntity {
+  id          Int               @id @default(autoincrement()) @map("Id")
+  name        String            @unique @map("Name")
+  roles       RolePermissions[]
+
+  @@map("PermissionEntity")
+}
+
+model RolePermissions {
+  roleId       Int              @map("RoleId")
+  permissionId Int              @map("PermissionId")
+  role         Role             @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   PermissionEntity @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("RolePermissions")
+}
+
+model UserRole {
+  userId String @db.Uuid @map("UserId")
+  roleId Int    @map("RoleId")
+  user   Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("UserRole")
+}
+
+// Справочники
+model Affiliation {
+  id    String @id @default(uuid()) @db.Uuid @map("Id")
+  value String @map("Value")
+
+  railwayCisterns RailwayCistern[]
+
+  @@map("Affiliations")
+}
+
+model Depot {
+  id        String   @id @default(uuid()) @db.Uuid @map("Id")
+  name      String   @map("Name")
+  code      String   @map("Code")
+  location  String?  @map("Location")
+  createdAt DateTime @db.Timestamptz(6) @map("CreatedAt")
+  creatorId String   @map("CreatorId")
+
+  @@map("Depots")
+}
+
+model Location {
+  id          String   @id @default(uuid()) @db.Uuid @map("Id")
+  name        String   @map("Name")
+  type        Int      @map("Type")
+  description String?  @map("Description")
+  createdAt   DateTime @db.Timestamptz(6) @map("CreatedAt")
+  creatorId   String   @map("CreatorId")
+
+  @@map("Locations")
+}
+
+model Manufacturer {
+  id          String   @id @default(uuid()) @db.Uuid @map("Id")
+  name        String   @map("Name")
+  country     String   @map("Country")
+  createdAt   DateTime @db.Timestamptz(6) @map("CreatedAt")
+  updatedAt   DateTime @db.Timestamptz(6) @map("UpdatedAt")
+  creatorId   String   @map("CreatorId")
+  shortName   String?  @map("ShortName")
+  code        Int      @default(0) @map("Code")
+
+  railwayCisterns RailwayCistern[]
+
+  @@map("Manufacturers")
+}
+
+model Owner {
+  id           String    @id @default(uuid()) @db.Uuid @map("Id")
+  name         String    @map("Name")
+  unp          String?   @map("UNP")
+  createdAt    DateTime? @db.Timestamptz(6) @map("CreatedAt")
+  updatedAt    DateTime? @db.Timestamptz(6) @map("UpdatedAt")
+  creatorId    String?   @map("CreatorId")
+  shortName    String    @map("ShortName")
+  address      String?   @map("Address")
+  treatRepairs Boolean   @map("TreatRepairs")
+  code         Int?      @map("Code")
+
+  @@map("Owners")
+}
+
+model Registrar {
+  id   String @id @default(uuid()) @db.Uuid @map("Id")
+  name String @map("Name")
+
+  railwayCisterns RailwayCistern[]
+
+  @@map("Registrars")
+}
+
+model RepairType {
+  id          String   @id @default(uuid()) @db.Uuid @map("Id")
+  name        String   @map("Name")
+  code        String   @map("Code")
+  description String?  @map("Description")
+  createdAt   DateTime @db.Timestamptz(6) @map("CreatedAt")
+
+  @@map("RepairTypes")
+}
+
+model StampNumber {
+  id    String @id @default(uuid()) @db.Uuid @map("Id")
+  value String @map("Value")
+
+  @@map("StampNumbers")
+}
+
+model WagonModel {
+  id   String @id @default(uuid()) @db.Uuid @map("Id")
+  name String @map("Name")
+
+  railwayCisterns RailwayCistern[]
+
+  @@map("WagonModels")
+}
+
+model WagonType {
+  id   String @id @default(uuid()) @db.Uuid @map("Id")
+  name String @map("Name")
+  type String @default("0") @map("Type")
+
+  railwayCisterns RailwayCistern[]
+
+  @@map("WagonTypes")
+}
+
+// Основная модель цистерн
+model RailwayCistern {
+  id                     String    @id @default(uuid()) @db.Uuid @map("Id")
+  number                 String    @map("Number")
+  manufacturerId         String    @db.Uuid @map("ManufacturerId")
+  buildDate              DateTime  @db.Date @map("BuildDate")
+  tareWeight             Decimal   @map("TareWeight")
+  loadCapacity           Decimal   @map("LoadCapacity")
+  length                 Int       @map("Length")
+  axleCount              Int       @map("AxleCount")
+  volume                 Decimal   @map("Volume")
+  fillingVolume          Decimal?  @map("FillingVolume")
+  initialTareWeight      Decimal?  @map("InitialTareWeight")
+  typeId                 String    @db.Uuid @map("TypeId")
+  modelId                String?   @db.Uuid @map("ModelId")
+  commissioningDate      DateTime? @db.Date @map("CommissioningDate")
+  serialNumber           String    @map("SerialNumber")
+  registrationNumber     String    @map("RegistrationNumber")
+  registrationDate       DateTime  @db.Date @map("RegistrationDate")
+  registrarId            String?   @db.Uuid @map("RegistrarId")
+  notes                  String?   @map("Notes")
+  createdAt              DateTime  @db.Timestamptz(6) @map("CreatedAt")
+  updatedAt              DateTime  @db.Timestamptz(6) @map("UpdatedAt")
+  creatorId              String    @map("CreatorId")
+  ownerId                String?   @db.Uuid @map("Ownerid")
+  techConditions         String?   @map("TechСonditions")
+  pripiska               String?   @map("Pripiska")
+  reRegistrationDate     DateTime? @db.Date @map("ReRegistrationDate")
+  pressure               Decimal   @map("Pressure")
+  testPressure           Decimal   @default(0) @map("TestPressure")
+  rent                   String?   @map("Rent")
+  affiliationId          String    @db.Uuid @map("AffiliationId")
+  serviceLifeYears       Int       @default(40) @map("ServiceLifeYears")
+  periodMajorRepair      DateTime? @db.Date @map("PeriodMajorRepair")
+  periodPeriodicTest     DateTime? @db.Date @map("PeriodPeriodicTest")
+  periodIntermediateTest DateTime? @db.Date @map("PeriodIntermediateTest")
+  periodDepotRepair      DateTime? @db.Date @map("PeriodDepotRepair")
+  dangerClass            Int       @default(0) @map("DangerClass")
+  substance              String    @default("СУГ") @map("Substance")
+  tareWeight2            Decimal   @default(0) @map("TareWeight2")
+  tareWeight3            Decimal   @default(0) @map("TareWeight3")
+
+  manufacturer Manufacturer  @relation(fields: [manufacturerId], references: [id], onDelete: Cascade)
+  wagonType    WagonType     @relation(fields: [typeId], references: [id], onDelete: Cascade)
+  wagonModel   WagonModel?   @relation(fields: [modelId], references: [id], onDelete: NoAction)
+  registrar    Registrar?    @relation(fields: [registrarId], references: [id], onDelete: NoAction)
+  affiliation  Affiliation   @relation(fields: [affiliationId], references: [id], onDelete: NoAction)
+
+  @@map("RailwayCisterns")
+}
+
+model SavedFilter {
+  id            String   @id @default(uuid()) @db.Uuid @map("Id")
+  name          String   @map("Name")
+  filterJson    String   @map("FilterJson")
+  sortFieldsJson String  @map("SortFieldsJson")
+  userId        String   @db.Uuid @map("UserId")
+  createdAt     DateTime @db.Timestamptz(6) @map("CreatedAt")
+  updatedAt     DateTime @db.Timestamptz(6) @map("UpdatedAt")
+
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("SavedFilters")
+}
