@@ -32,6 +32,43 @@ public static class RailwayCisternEndpoints
             .RequireAuthorization()
             .WithTags("railway-cisterns");
 
+        // Get all cistern numbers
+        group.MapGet("/numbers", async ([FromServices] ApplicationDbContext context) =>
+            {
+                var numbers = await context.Set<RailwayCistern>()
+                    .Select(rc => rc.Number)
+                    .OrderBy(n => n)
+                    .ToListAsync();
+                return Results.Ok(numbers);
+            })
+            .WithName("GetAllCisternNumbers")
+            .Produces<List<string>>(StatusCodes.Status200OK)
+            .RequirePermissions(Permission.Read);
+
+        // Search cistern numbers by prefix
+        group.MapGet("/numbers/search", async (
+                [FromServices] ApplicationDbContext context,
+                [FromQuery] string prefix) =>
+            {
+                var query = context.Set<RailwayCistern>()
+                    .AsQueryable();
+
+                if (!string.IsNullOrWhiteSpace(prefix))
+                {
+                    query = query.Where(rc => rc.Number.StartsWith(prefix));
+                }
+
+                var numbers = await query
+                    .Select(rc => rc.Number)
+                    .OrderBy(n => n)
+                    .ToListAsync();
+                    
+                return Results.Ok(numbers);
+            })
+            .WithName("SearchCisternNumbersByPrefix")
+            .Produces<List<string>>(StatusCodes.Status200OK)
+            .RequirePermissions(Permission.Read);
+
         // Get basic list
         group.MapGet("/", async ([FromServices] ApplicationDbContext context) =>
             {

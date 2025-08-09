@@ -4,6 +4,7 @@ using WebApp.Data.Enums;
 using WebApp.Extensions;
 using WebApp.Features.Users.Delete;
 using WebApp.Features.Users.GetAll;
+using WebApp.Features.Users.GetAllRoles;
 using WebApp.Features.Users.GetCurrent;
 using WebApp.Features.Users.GetPermissions;
 using WebApp.Features.Users.Login;
@@ -23,22 +24,28 @@ public static class UsersEndpoints
         var publicGroup = app.MapGroup("/users")
             .WithTags("Users");
 
-        publicGroup.MapPost("register", RegisterUser);
         publicGroup.MapPost("login", Login);
         publicGroup.MapPost("refresh-token", RefreshToken);
 
         // Protected Endpoints Group
         var protectedGroup = app.MapGroup("/users")
-            .RequireAuthorization() // Apply authorization to this group
-            .WithTags("Users"); // You might want to keep tags for both
+            .RequireAuthorization()
+            .WithTags("Users");
 
+        protectedGroup.MapPost("register", RegisterUser)
+            .RequirePermissions(Permission.Update);
+        protectedGroup.MapGet("roles", GetAllRoles)
+            .RequirePermissions(Permission.Read);
         protectedGroup.MapGet("me", GetCurrentUser);
         protectedGroup.MapGet("{userId:guid}/permissions", GetUserPermissions);
-        protectedGroup.MapPut("{userId:guid}", UpdateUser).RequirePermissions(Permission.Update);
-        protectedGroup.MapPut("{userId:guid}/roles", UpdateUserRoles).RequirePermissions(Permission.Update);
+        protectedGroup.MapPut("{userId:guid}", UpdateUser)
+            .RequirePermissions(Permission.Update);
+        protectedGroup.MapPut("{userId:guid}/roles", UpdateUserRoles)
+            .RequirePermissions(Permission.Update);
         protectedGroup.MapPut("{userId:guid}/reset-password", ResetPassword)
             .RequirePermissions(Permission.Update);
-        protectedGroup.MapDelete("{userId:guid}", DeleteUser).RequirePermissions(Permission.Delete);
+        protectedGroup.MapDelete("{userId:guid}", DeleteUser)
+            .RequirePermissions(Permission.Delete);
         protectedGroup.MapGet("", GetAllUsers)
             .RequirePermissions(Permission.Read);
 
@@ -158,5 +165,12 @@ public static class UsersEndpoints
     {
         var users = await useCase.ExecuteAsync();
         return Results.Ok(users);
+    }
+
+    private static async Task<IResult> GetAllRoles(
+        GetAllRolesUseCase useCase)
+    {
+        var roles = await useCase.ExecuteAsync();
+        return Results.Ok(roles);
     }
 }

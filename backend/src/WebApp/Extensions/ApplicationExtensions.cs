@@ -1,5 +1,6 @@
 using WebApp.Features.Users.Delete;
 using WebApp.Features.Users.GetAll;
+using WebApp.Features.Users.GetAllRoles;
 using WebApp.Features.Users.GetCurrent;
 using WebApp.Features.Users.GetPermissions;
 using WebApp.Features.Users.Login;
@@ -26,6 +27,7 @@ public static class ApplicationExtensions
         services.AddScoped<GetCurrentUserUseCase>();
         services.AddScoped<GetAllUsersUseCase>();
         services.AddScoped<ResetPasswordUseCase>();
+        services.AddScoped<GetAllRolesUseCase>();
         
         
         return services;

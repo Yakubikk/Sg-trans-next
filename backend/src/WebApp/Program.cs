@@ -15,6 +15,7 @@ var configuration = builder.Configuration;
 
 services.AddApiAuthentication(configuration);
 
+
 services.AddEndpointsApiExplorer();
 
 // Добавляем CORS

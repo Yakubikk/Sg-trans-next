@@ -8,5 +8,6 @@ public record RegisterUserRequest(
     [Required] string FirstName,
     [Required] string LastName,
     [Required] string Patronymic,
-    [Required] string PhoneNumber
+    [Required] string PhoneNumber,
+    [Required] int[] RoleIds
 );
