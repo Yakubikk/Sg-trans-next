@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { savedFilterService } from "@/lib/saved-filters";
 import { requireAuth } from "@/server/auth";
+import { saveFilterSchema } from "@/lib/validations";
+import { z } from "zod";
 
 /**
  * @swagger
@@ -140,20 +142,18 @@ export async function POST(request: NextRequest) {
     const userId = session.sub;
 
     const body = await request.json();
-    const { name, filterJson, sortFieldsJson } = body;
-
-    if (!name || !filterJson || !sortFieldsJson) {
-      return NextResponse.json(
-        { error: "name, filterJson, and sortFieldsJson are required" },
-        { status: 400 }
-      );
-    }
+    
+    // Валидация входных данных
+    const validatedData = saveFilterSchema.parse({
+      ...body,
+      userId,
+    });
 
     const savedFilter = await savedFilterService.create({
-      userId,
-      name,
-      filterJson,
-      sortFieldsJson,
+      userId: validatedData.userId!,
+      name: validatedData.name,
+      filterJson: validatedData.filterJson,
+      sortFieldsJson: validatedData.sortFieldsJson,
     });
 
     if (!savedFilter) {
@@ -165,6 +165,13 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(savedFilter, { status: 201 });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Некорректные данные", details: error.issues },
+        { status: 400 }
+      );
+    }
+    
     if (error instanceof Error && error.message === "UNAUTHORIZED") {
       return NextResponse.json(
         { error: "Unauthorized" },

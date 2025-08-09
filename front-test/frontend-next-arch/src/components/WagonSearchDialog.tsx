@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,9 +15,11 @@ import {
 } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import Link from "next/link";
 import { Search, Train, Loader2, MapPin, Calendar, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { wagonSearchSchema, type WagonSearchFormData } from "@/lib/validations";
 
 interface RailwayCistern {
   id: string;
@@ -38,25 +42,29 @@ interface WagonSearchDialogProps {
 
 export default function WagonSearchDialog({ children }: WagonSearchDialogProps) {
   const [open, setOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<RailwayCistern[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
+  const form = useForm<WagonSearchFormData>({
+    resolver: zodResolver(wagonSearchSchema),
+    defaultValues: {
+      query: "",
+    },
+  });
 
+  const handleSearch = async (data: WagonSearchFormData) => {
     setIsLoading(true);
     setHasSearched(true);
 
     try {
-      const response = await fetch(`/api/railway-cisterns/search?query=${encodeURIComponent(searchQuery)}`);
-      const data = await response.json();
+      const response = await fetch(`/api/railway-cisterns/search?query=${encodeURIComponent(data.query)}`);
+      const responseData = await response.json();
 
       if (response.ok) {
-        setSearchResults(data);
+        setSearchResults(responseData);
       } else {
-        console.error("Error searching wagons:", data.error);
+        console.error("Error searching wagons:", responseData.error);
         setSearchResults([]);
       }
     } catch (error) {
@@ -67,14 +75,8 @@ export default function WagonSearchDialog({ children }: WagonSearchDialogProps) 
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
-  };
-
   const resetSearch = () => {
-    setSearchQuery("");
+    form.reset();
     setSearchResults([]);
     setHasSearched(false);
   };
@@ -102,18 +104,29 @@ export default function WagonSearchDialog({ children }: WagonSearchDialogProps) 
         </DialogHeader>
 
         <div className="space-y-4 flex-1 overflow-hidden flex flex-col">
-          <div className="flex gap-2">
-            <Input
-              placeholder="Введите номер вагона (например: 12345678)"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleKeyPress}
-              className="flex-1"
-            />
-            <Button onClick={handleSearch} disabled={isLoading || !searchQuery.trim()}>
-              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-            </Button>
-          </div>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSearch)} className="flex gap-2 p-1">
+              <FormField
+                control={form.control}
+                name="query"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormControl>
+                      <Input
+                        placeholder="Введите номер вагона (например: 12345678)"
+                        {...field}
+                        className="flex-1"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+              </Button>
+            </form>
+          </Form>
 
           <div className="flex-1 overflow-y-auto">
             {isLoading && (
@@ -139,10 +152,14 @@ export default function WagonSearchDialog({ children }: WagonSearchDialogProps) 
             )}
 
             {searchResults.length > 0 && (
-              <div className={cn(searchResults.length > 1 && "grid grid-cols-2 space-x-2 space-y-2")}>
+              <div className={cn(
+                searchResults.length > 1 
+                  ? "grid grid-cols-2 gap-3 p-1" 
+                  : "p-2"
+              )}>
                 {searchResults.map((cistern) => (
                   <Card key={cistern.id} className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
+                    <CardContent>
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center space-x-3">
                           <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">

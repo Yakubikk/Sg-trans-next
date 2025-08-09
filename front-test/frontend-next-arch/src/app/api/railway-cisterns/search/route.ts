@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/server/db";
 import { getSession } from "@/server/auth";
+import { quickSearchSchema } from "@/lib/validations";
+import { z } from "zod";
 
 /**
  * @swagger
@@ -62,15 +64,14 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("query");
 
-    if (!query) {
-      return NextResponse.json({ error: "Query parameter is required" }, { status: 400 });
-    }
+    // Валидация параметра поиска
+    const validatedData = quickSearchSchema.parse({ query });
 
     // Поиск по номеру вагона (частичное совпадение)
     const cisterns = await prisma.railwayCistern.findMany({
       where: {
         number: {
-          contains: query,
+          startsWith: validatedData.query,
           mode: 'insensitive',
         },
       },
@@ -82,12 +83,18 @@ export async function GET(request: NextRequest) {
       },
       orderBy: {
         number: 'asc',
-      },
-      take: 20, // Ограничиваем результаты
+      }
     });
 
     return NextResponse.json(cisterns);
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Некорректные параметры поиска", details: error.issues },
+        { status: 400 }
+      );
+    }
+    
     console.error("Error searching cisterns:", error);
     return NextResponse.json(
       { error: "Internal server error" },

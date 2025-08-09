@@ -1,17 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/server/db";
 import { hashPassword, getSession } from "@/server/auth";
+import { registerAPISchema } from "@/lib/validations";
 import { z } from "zod";
-
-const registerSchema = z.object({
-  email: z.email(),
-  password: z.string().min(6),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  patronymic: z.string().optional(),
-  phoneNumber: z.string().optional(),
-  roleIds: z.array(z.number()).min(1),
-});
 
 /**
  * @swagger
@@ -102,7 +93,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const validatedData = registerSchema.parse(body);
+    const validatedData = registerAPISchema.parse(body);
 
     // Проверяем, что пользователь с таким email не существует
     const existingUser = await prisma.users.findUnique({
@@ -145,7 +136,7 @@ export async function POST(req: Request) {
 
     // Назначаем роли пользователю
     await prisma.userRole.createMany({
-      data: validatedData.roleIds.map(roleId => ({
+      data: validatedData.roleIds.map((roleId: number) => ({
         userId: user.id,
         roleId,
       })),

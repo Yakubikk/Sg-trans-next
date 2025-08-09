@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/server/db";
-import { verifyRefreshToken, issueAccessToken, getUserRolesAndPerms } from "@/server/auth";
+import { verifyRefreshToken, issueAccessToken, issueRefreshToken, getUserRolesAndPerms } from "@/server/auth";
 
 /**
  * @swagger
@@ -80,6 +80,9 @@ export async function POST(req: Request) {
     const { roles, perms } = await getUserRolesAndPerms(dbUser.id);
     const access = await issueAccessToken({ sub: dbUser.id, email: dbUser.email, roles, perms });
     
+    // Выдаем новый refresh token для дополнительной безопасности
+    const newRefresh = await issueRefreshToken(dbUser.id);
+    
     console.log(`Token refreshed successfully for user ${dbUser.email}`);
     
     const res = NextResponse.json({ ok: true });
@@ -88,6 +91,12 @@ export async function POST(req: Request) {
       sameSite: "lax", 
       path: "/",
       maxAge: 60 * 15 // 15 minutes
+    });
+    res.cookies.set("refresh_token", newRefresh, {
+      httpOnly: true,
+      sameSite: "lax", 
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7 // 7 days
     });
     return res;
   } catch (error) {

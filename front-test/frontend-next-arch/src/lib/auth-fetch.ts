@@ -3,16 +3,18 @@
 // Глобальный interceptor для автоматического обновления токенов
 let isRefreshing = false;
 let failedQueue: Array<{
-  resolve: (value?: unknown) => void;
+  resolve: (value: Response) => void;
   reject: (reason?: unknown) => void;
+  originalRequest: () => Promise<Response>;
 }> = [];
 
-const processQueue = (error: unknown, token: string | null = null) => {
-  failedQueue.forEach(({ resolve, reject }) => {
-    if (error) {
-      reject(error);
+const processQueue = (error: unknown, success: boolean = false) => {
+  failedQueue.forEach(({ resolve, reject, originalRequest }) => {
+    if (error || !success) {
+      reject(error || new Error('Token refresh failed'));
     } else {
-      resolve(token);
+      // Повторяем оригинальный запрос после успешного обновления токена
+      originalRequest().then(resolve).catch(reject);
     }
   });
   
@@ -22,8 +24,23 @@ const processQueue = (error: unknown, token: string | null = null) => {
 // Сохраняем оригинальный fetch до патчинга
 const originalFetch = typeof window !== 'undefined' ? window.fetch : global.fetch;
 
+// Попытка обновить токен
+const refreshToken = async (): Promise<boolean> => {
+  try {
+    const refreshResponse = await originalFetch('/api/auth/refresh', {
+      method: 'POST',
+      credentials: 'include',
+    });
+
+    return refreshResponse.ok;
+  } catch (error) {
+    console.error('Token refresh error:', error);
+    return false;
+  }
+};
+
 // Wrapper для fetch с автоматическим обновлением токенов
-export const authFetch = async (url: string, options: RequestInit = {}) => {
+export const authFetch = async (url: string, options: RequestInit = {}): Promise<Response> => {
   const makeRequest = async (): Promise<Response> => {
     return originalFetch(url, {
       ...options,
@@ -36,50 +53,62 @@ export const authFetch = async (url: string, options: RequestInit = {}) => {
   // Если получили 401 ошибку, пытаемся обновить токен
   if (response.status === 401) {
     if (isRefreshing) {
-      // Если токен уже обновляется, ждем завершения
+      // Если токен уже обновляется, добавляем запрос в очередь
       return new Promise((resolve, reject) => {
-        failedQueue.push({ resolve, reject });
-      }).then(() => {
-        return makeRequest();
-      }).catch((err) => {
-        return Promise.reject(err);
+        failedQueue.push({ 
+          resolve, 
+          reject, 
+          originalRequest: makeRequest 
+        });
       });
     }
 
     isRefreshing = true;
 
     try {
-      const refreshResponse = await originalFetch('/api/auth/refresh', {
-        method: 'POST',
-        credentials: 'include',
-      });
-
-      if (refreshResponse.ok) {
-        processQueue(null, 'success');
+      const refreshSuccess = await refreshToken();
+      
+      if (refreshSuccess) {
+        // Токен успешно обновлен
+        processQueue(null, true);
         isRefreshing = false;
         // Повторяем оригинальный запрос
         return makeRequest();
       } else {
-        processQueue(new Error('Token refresh failed'), null);
+        // Не удалось обновить токен
+        processQueue(new Error('Token refresh failed'), false);
         isRefreshing = false;
-        // Редиректим на страницу входа
-        if (typeof window !== 'undefined') {
-          window.location.href = '/guest';
-        }
+        
+        // Вместо редиректа просто возвращаем ошибку
+        // Компоненты сами решат, что делать
         return response;
       }
     } catch (error) {
-      processQueue(error, null);
+      processQueue(error, false);
       isRefreshing = false;
-      // Редиректим на страницу входа
-      if (typeof window !== 'undefined') {
-        window.location.href = '/guest';
-      }
       return response;
     }
   }
 
   return response;
+};
+
+// Функция для принудительного обновления токена
+export const forceRefreshToken = async (): Promise<boolean> => {
+  if (isRefreshing) {
+    return new Promise((resolve) => {
+      failedQueue.push({
+        resolve: (success) => resolve(!!success),
+        reject: () => resolve(false),
+        originalRequest: async () => new Response()
+      });
+    });
+  }
+
+  isRefreshing = true;
+  const success = await refreshToken();
+  isRefreshing = false;
+  return success;
 };
 
 // Патчим глобальный fetch для автоматического обновления токенов
