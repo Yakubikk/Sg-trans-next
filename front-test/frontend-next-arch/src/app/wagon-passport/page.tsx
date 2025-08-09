@@ -3,74 +3,67 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { 
-  ArrowLeft, 
-  Train, 
-  Search, 
+import { prisma } from "@/server/db";
+import WagonSearchDialog from "@/components/WagonSearchDialog";
+import {
+  ArrowLeft,
+  Train,
   Plus,
   Calendar,
   MapPin,
   Settings,
   FileText,
   AlertTriangle,
-  CheckCircle
+  CheckCircle,
+  Eye,
+  Search,
 } from "lucide-react";
 
 export default async function WagonPassportPage() {
   const session = await getSession();
 
-  const recentWagons = [
-    {
-      number: "№ 12345678",
-      type: "Цистерна 8-осная",
-      status: "В эксплуатации",
-      statusColor: "bg-green-500",
-      location: "Новополоцк",
-      lastService: "15.07.2025",
-      nextService: "15.01.2026",
+  // Получаем актуальные данные из базы
+  const cisterns = await prisma.railwayCistern.findMany({
+    include: {
+      manufacturer: true,
+      wagonType: true,
+      wagonModel: true,
+      affiliation: true,
     },
-    {
-      number: "№ 87654321",
-      type: "Цистерна 4-осная", 
-      status: "На ремонте",
-      statusColor: "bg-orange-500",
-      location: "Минск-Сорт.",
-      lastService: "22.06.2025",
-      nextService: "22.12.2025",
+    take: 3, // Показываем последние 3 вагона
+    orderBy: {
+      updatedAt: "desc",
     },
-    {
-      number: "№ 11223344",
-      type: "Цистерна 8-осная",
-      status: "В рейсе",
-      statusColor: "bg-blue-500", 
-      location: "Гомель",
-      lastService: "03.07.2025",
-      nextService: "03.01.2026",
-    },
-  ];
+  });
+
+  // Статистика из базы данных
+  const totalCisterns = await prisma.railwayCistern.count();
+  const inServiceCisterns = await prisma.railwayCistern.count({
+    // Можно добавить условие для статуса "в эксплуатации"
+  });
 
   const stats = [
     {
       title: "Всего вагонов",
-      value: "842",
+      value: totalCisterns.toString(),
       icon: Train,
       color: "bg-blue-500",
     },
     {
       title: "В эксплуатации",
-      value: "756",
+      value: inServiceCisterns.toString(),
       icon: CheckCircle,
       color: "bg-green-500",
     },
     {
       title: "На ремонте",
-      value: "45",
+      value: "45", // Временно статичное значение
       icon: Settings,
       color: "bg-orange-500",
     },
     {
       title: "Требуют ТО",
-      value: "12",
+      value: "12", // Временно статичное значение
       icon: AlertTriangle,
       color: "bg-red-500",
     },
@@ -99,11 +92,9 @@ export default async function WagonPassportPage() {
                 </div>
               </div>
             </div>
-            
+
             <div className="text-right">
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
-                {session?.email}
-              </p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">{session?.email}</p>
             </div>
           </div>
         </div>
@@ -114,18 +105,18 @@ export default async function WagonPassportPage() {
         <div className="mb-8">
           <div className="flex justify-between items-start mb-6">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                Паспорта вагонов-цистерн
-              </h1>
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Паспорта вагонов-цистерн</h1>
               <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl">
                 Управление техническими паспортами и документацией подвижного состава РУП СГ-ТРАНС
               </p>
             </div>
             <div className="flex gap-3">
-              <Button variant="outline">
-                <Search className="w-4 h-4 mr-2" />
-                Поиск вагона
-              </Button>
+              <WagonSearchDialog>
+                <Button variant="outline">
+                  <Search className="w-4 h-4 mr-2" />
+                  Поиск вагона
+                </Button>
+              </WagonSearchDialog>
               <Button>
                 <Plus className="w-4 h-4 mr-2" />
                 Добавить вагон
@@ -145,12 +136,8 @@ export default async function WagonPassportPage() {
                         <IconComponent className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                          {stat.value}
-                        </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
-                          {stat.title}
-                        </div>
+                        <div className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">{stat.title}</div>
                       </div>
                     </div>
                   </CardContent>
@@ -166,15 +153,15 @@ export default async function WagonPassportPage() {
             <Card className="border-0 bg-white/80 dark:bg-gray-800/80 mb-6">
               <CardHeader>
                 <CardTitle>Быстрые действия</CardTitle>
-                <CardDescription>
-                  Часто используемые операции
-                </CardDescription>
+                <CardDescription>Часто используемые операции</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button className="w-full justify-start" variant="outline">
-                  <Search className="w-4 h-4 mr-2" />
-                  Найти вагон по номеру
-                </Button>
+                <WagonSearchDialog>
+                  <Button className="w-full justify-start" variant="outline">
+                    <Search className="w-4 h-4 mr-2" />
+                    Найти вагон по номеру
+                  </Button>
+                </WagonSearchDialog>
                 <Button className="w-full justify-start" variant="outline">
                   <FileText className="w-4 h-4 mr-2" />
                   Создать паспорт
@@ -194,9 +181,7 @@ export default async function WagonPassportPage() {
             <Card className="border-0 bg-white/80 dark:bg-gray-800/80">
               <CardHeader>
                 <CardTitle>Уведомления</CardTitle>
-                <CardDescription>
-                  Важные события
-                </CardDescription>
+                <CardDescription>Важные события</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-start space-x-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
@@ -205,33 +190,23 @@ export default async function WagonPassportPage() {
                     <p className="text-sm font-medium text-red-900 dark:text-red-200">
                       12 вагонов требуют планового ТО
                     </p>
-                    <p className="text-xs text-red-700 dark:text-red-300">
-                      До 31.08.2025
-                    </p>
+                    <p className="text-xs text-red-700 dark:text-red-300">До 31.08.2025</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start space-x-3 p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
                   <Settings className="w-4 h-4 text-orange-500 mt-0.5" />
                   <div>
-                    <p className="text-sm font-medium text-orange-900 dark:text-orange-200">
-                      45 вагонов на ремонте
-                    </p>
-                    <p className="text-xs text-orange-700 dark:text-orange-300">
-                      Средний срок: 12 дней
-                    </p>
+                    <p className="text-sm font-medium text-orange-900 dark:text-orange-200">45 вагонов на ремонте</p>
+                    <p className="text-xs text-orange-700 dark:text-orange-300">Средний срок: 12 дней</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start space-x-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
                   <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
                   <div>
-                    <p className="text-sm font-medium text-green-900 dark:text-green-200">
-                      15 вагонов прошли ТО
-                    </p>
-                    <p className="text-xs text-green-700 dark:text-green-300">
-                      За последнюю неделю
-                    </p>
+                    <p className="text-sm font-medium text-green-900 dark:text-green-200">15 вагонов прошли ТО</p>
+                    <p className="text-xs text-green-700 dark:text-green-300">За последнюю неделю</p>
                   </div>
                 </div>
               </CardContent>
@@ -243,59 +218,57 @@ export default async function WagonPassportPage() {
             <Card className="border-0 bg-white/80 dark:bg-gray-800/80">
               <CardHeader>
                 <CardTitle>Последние изменения</CardTitle>
-                <CardDescription>
-                  Недавно обновленные паспорта вагонов
-                </CardDescription>
+                <CardDescription>Недавно обновленные паспорта вагонов</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {recentWagons.map((wagon, index) => (
-                    <div key={index} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                            <Train className="w-5 h-5 text-green-600 dark:text-green-400" />
+                  {cisterns.map((cistern) => (
+                    <div key={cistern.id}>
+                      <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                              <Train className="w-5 h-5 text-green-600 dark:text-green-400" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-gray-900 dark:text-white">№ {cistern.number}</h3>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">{cistern.wagonType.name}</p>
+                            </div>
                           </div>
-                          <div>
-                            <h3 className="font-semibold text-gray-900 dark:text-white">
-                              {wagon.number}
-                            </h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                              {wagon.type}
-                            </p>
+                          <Badge className="bg-green-500 text-white" variant="secondary">
+                            В эксплуатации
+                          </Badge>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-4 text-sm">
+                          <div className="flex items-center space-x-2">
+                            <MapPin className="w-4 h-4 text-gray-400" />
+                            <span className="text-gray-600 dark:text-gray-400">{cistern.affiliation.value}</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Calendar className="w-4 h-4 text-gray-400" />
+                            <span className="text-gray-600 dark:text-gray-400">
+                              Изг.: {new Date(cistern.buildDate).toLocaleDateString("ru-RU")}
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Settings className="w-4 h-4 text-gray-400" />
+                            <span className="text-gray-600 dark:text-gray-400">{cistern.manufacturer.name}</span>
                           </div>
                         </div>
-                        <Badge 
-                          className={`${wagon.statusColor} text-white`}
-                          variant="secondary"
-                        >
-                          {wagon.status}
-                        </Badge>
-                      </div>
-                      
-                      <div className="grid grid-cols-3 gap-4 text-sm">
-                        <div className="flex items-center space-x-2">
-                          <MapPin className="w-4 h-4 text-gray-400" />
-                          <span className="text-gray-600 dark:text-gray-400">
-                            {wagon.location}
-                          </span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Calendar className="w-4 h-4 text-gray-400" />
-                          <span className="text-gray-600 dark:text-gray-400">
-                            ТО: {wagon.lastService}
-                          </span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Calendar className="w-4 h-4 text-gray-400" />
-                          <span className="text-gray-600 dark:text-gray-400">
-                            След.: {wagon.nextService}
-                          </span>
+
+                        <div className="mt-3 flex justify-end">
+                          <Button variant="outline" size="sm" asChild>
+                            <Link href={`/wagon-passport/${cistern.id}`}>
+                              <Eye className="w-4 h-4 mr-2" />
+                              Открыть паспорт
+                            </Link>
+                          </Button>
                         </div>
                       </div>
                     </div>
                   ))}
-                  
+
                   <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                     <Button variant="outline" className="w-full">
                       Показать все вагоны

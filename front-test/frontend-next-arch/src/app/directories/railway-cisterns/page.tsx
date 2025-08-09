@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -187,6 +188,7 @@ const allColumns: ColumnDef<RailwayCistern>[] = [
 ];
 
 export default function RailwayCisternsPage() {
+  const router = useRouter();
   const [cisterns, setCisterns] = useState<RailwayCistern[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -315,6 +317,10 @@ export default function RailwayCisternsPage() {
     return unique;
   }, [cisterns]);
 
+  const handleRowClick = (cistern: RailwayCistern) => {
+    router.push(`/wagon-passport/${cistern.id}`);
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto py-6">
@@ -358,6 +364,7 @@ export default function RailwayCisternsPage() {
 
           <div className="text-sm text-muted-foreground">
             Показано {filteredData.length} из {cisterns.length} цистерн
+            <span className="ml-4 text-xs">💡 Нажмите на строку для просмотра паспорта цистерны</span>
           </div>
         </div>
 
@@ -366,6 +373,7 @@ export default function RailwayCisternsPage() {
           data={filteredData}
           searchPlaceholder="Поиск по номеру цистерны..."
           searchColumn="number"
+          onRowClick={handleRowClick}
         />
       </div>
     </div>

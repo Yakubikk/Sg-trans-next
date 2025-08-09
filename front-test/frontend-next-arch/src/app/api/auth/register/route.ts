@@ -4,7 +4,7 @@ import { hashPassword, getSession } from "@/server/auth";
 import { z } from "zod";
 
 const registerSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(6),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
@@ -13,6 +13,83 @@ const registerSchema = z.object({
   roleIds: z.array(z.number()).min(1),
 });
 
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Регистрация нового пользователя
+ *     description: Создает нового пользователя в системе. Доступно только администраторам.
+ *     tags:
+ *       - Authentication
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *               - roleIds
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Email пользователя
+ *                 example: newuser@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 minLength: 6
+ *                 description: Пароль пользователя (минимум 6 символов)
+ *                 example: password123
+ *               firstName:
+ *                 type: string
+ *                 description: Имя пользователя
+ *                 example: Иван
+ *               lastName:
+ *                 type: string
+ *                 description: Фамилия пользователя
+ *                 example: Иванов
+ *               patronymic:
+ *                 type: string
+ *                 description: Отчество пользователя
+ *                 example: Иванович
+ *               phoneNumber:
+ *                 type: string
+ *                 description: Номер телефона
+ *                 example: +7 900 123-45-67
+ *               roleIds:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *                 minItems: 1
+ *                 description: Массив ID ролей для пользователя
+ *                 example: [1, 2]
+ *     responses:
+ *       201:
+ *         description: Пользователь успешно создан
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       403:
+ *         description: Доступ запрещен (только для администраторов)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       409:
+ *         description: Пользователь с таким email уже существует
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 export async function POST(req: Request) {
   try {
     // Проверяем, что запрос идет от авторизованного администратора

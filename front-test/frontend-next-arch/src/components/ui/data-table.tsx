@@ -37,6 +37,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[]
   searchPlaceholder?: string
   searchColumn?: string
+  onRowClick?: (row: TData) => void
 }
 
 export function DataTable<TData, TValue>({
@@ -44,6 +45,7 @@ export function DataTable<TData, TValue>({
   data,
   searchPlaceholder = "Поиск...",
   searchColumn,
+  onRowClick,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
@@ -109,7 +111,10 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="border-b border-gray-400 hover:bg-blue-50/50 transition-colors"
+                  className={`border-b border-gray-400 hover:bg-blue-50/50 transition-colors ${
+                    onRowClick ? 'cursor-pointer' : ''
+                  }`}
+                  onClick={() => onRowClick?.(row.original)}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="text-center border-r border-gray-300 last:border-r-0">

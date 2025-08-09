@@ -1,6 +1,117 @@
 import { NextRequest, NextResponse } from "next/server";
 import { railwayCisterns } from "@/lib/directories";
 
+/**
+ * @swagger
+ * /api/directories/railway-cisterns:
+ *   get:
+ *     summary: Получить справочник железнодорожных цистерн
+ *     description: Возвращает полный список всех цистерн из справочника
+ *     tags:
+ *       - Directories
+ *     responses:
+ *       200:
+ *         description: Справочник цистерн получен успешно
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/RailwayCistern'
+ *       500:
+ *         description: Ошибка загрузки данных
+ *   post:
+ *     summary: Создать новую цистерну в справочнике
+ *     description: Добавляет новую цистерну в справочник
+ *     tags:
+ *       - Directories
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - number
+ *               - manufacturerId
+ *               - buildDate
+ *               - tareWeight
+ *               - loadCapacity
+ *               - length
+ *               - axleCount
+ *               - volume
+ *               - typeId
+ *               - serialNumber
+ *               - registrationNumber
+ *               - registrationDate
+ *               - creatorId
+ *               - affiliationId
+ *               - pressure
+ *             properties:
+ *               number:
+ *                 type: string
+ *                 description: Номер цистерны
+ *               manufacturerId:
+ *                 type: string
+ *                 format: uuid
+ *                 description: ID производителя
+ *               buildDate:
+ *                 type: string
+ *                 format: date
+ *                 description: Дата постройки
+ *               tareWeight:
+ *                 type: number
+ *                 description: Масса тары
+ *               loadCapacity:
+ *                 type: number
+ *                 description: Грузоподъемность
+ *               length:
+ *                 type: integer
+ *                 description: Длина в мм
+ *               axleCount:
+ *                 type: integer
+ *                 description: Количество осей
+ *               volume:
+ *                 type: number
+ *                 description: Объем
+ *               typeId:
+ *                 type: string
+ *                 format: uuid
+ *                 description: ID типа вагона
+ *               serialNumber:
+ *                 type: string
+ *                 description: Серийный номер
+ *               registrationNumber:
+ *                 type: string
+ *                 description: Регистрационный номер
+ *               registrationDate:
+ *                 type: string
+ *                 format: date
+ *                 description: Дата регистрации
+ *               creatorId:
+ *                 type: string
+ *                 description: ID создателя записи
+ *               affiliationId:
+ *                 type: string
+ *                 format: uuid
+ *                 description: ID принадлежности
+ *               pressure:
+ *                 type: number
+ *                 description: Рабочее давление
+ *     responses:
+ *       201:
+ *         description: Цистерна успешно создана
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/RailwayCistern'
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       500:
+ *         description: Ошибка создания цистерны
+ */
 export async function GET() {
   try {
     const data = await railwayCisterns.getAll();

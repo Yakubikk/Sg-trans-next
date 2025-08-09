@@ -2,6 +2,53 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/server/db";
 import { verifyRefreshToken, issueAccessToken, getUserRolesAndPerms } from "@/server/auth";
 
+/**
+ * @swagger
+ * /api/auth/refresh:
+ *   post:
+ *     summary: Обновление токена доступа
+ *     description: Обновляет access token используя refresh token из cookies
+ *     tags:
+ *       - Authentication
+ *     security: []
+ *     responses:
+ *       200:
+ *         description: Токен успешно обновлен
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   format: uuid
+ *                   description: ID пользователя
+ *                 email:
+ *                   type: string
+ *                   format: email
+ *                   description: Email пользователя
+ *                 roles:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   description: Роли пользователя
+ *                 perms:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   description: Права пользователя
+ *         headers:
+ *           Set-Cookie:
+ *             description: Новый access token устанавливается как HTTP-only cookie
+ *             schema:
+ *               type: string
+ *       401:
+ *         description: Недействительный или отсутствующий refresh token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 export async function POST(req: Request) {
   const cookiesHeader = req.headers.get("cookie") || "";
   const refresh = cookiesHeader.split(/;\s*/).map((c) => c.split("=")).find(([k]) => k === "refresh_token")?.[1];

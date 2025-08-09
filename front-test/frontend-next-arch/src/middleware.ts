@@ -20,11 +20,35 @@ function getAccessSecret() {
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const protectedPaths = ["/dashboard", "/admin", "/"];
-  const publicPaths = ["/guest", "/login", "/register", "/api"];
+  const publicPaths = ["/guest", "/login", "/register"];
+  const publicApiPaths = ["/api/auth/login", "/api/auth/register", "/api/auth/refresh"];
   
-  // Разрешаем доступ к публичным путям
-  if (publicPaths.some((p) => pathname.startsWith(p))) {
+  // Разрешаем доступ к публичным путям и публичным API эндпоинтам
+  if (publicPaths.some((p) => pathname.startsWith(p)) || 
+      publicApiPaths.some((p) => pathname === p)) {
     return NextResponse.next();
+  }
+  
+  // Для API роутов (кроме публичных) требуем авторизацию
+  if (pathname.startsWith("/api/")) {
+    const access = req.cookies.get("access_token")?.value;
+    
+    if (!access) {
+      return NextResponse.json(
+        { error: "Доступ запрещен. Требуется авторизация." },
+        { status: 401 }
+      );
+    }
+    
+    try {
+      await jwtVerify(access, getAccessSecret());
+      return NextResponse.next();
+    } catch {
+      return NextResponse.json(
+        { error: "Недействительный токен авторизации." },
+        { status: 401 }
+      );
+    }
   }
   
   // Для корневого пути и защищенных путей проверяем авторизацию
