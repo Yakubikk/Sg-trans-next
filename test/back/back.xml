@@ -1,0 +1,214 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>back</name>
+    </assembly>
+    <members>
+        <member name="M:back.Controllers.AuthController.Login(back.DTOs.LoginDto)">
+            <summary>
+            Вход в систему
+            </summary>
+            <param name="loginDto">Данные для входа</param>
+            <returns>JWT токен и информация о пользователе</returns>
+        </member>
+        <member name="M:back.Controllers.AuthController.Register(back.DTOs.RegisterDto)">
+            <summary>
+            Регистрация нового пользователя (только для администраторов)
+            </summary>
+            <param name="registerDto">Данные для регистрации</param>
+            <returns>Информация о созданном пользователе</returns>
+        </member>
+        <member name="M:back.Controllers.AuthController.GetCurrentUser">
+            <summary>
+            Получить информацию о текущем пользователе
+            </summary>
+            <returns>Информация о пользователе</returns>
+        </member>
+        <member name="M:back.Controllers.AuthController.ValidateToken">
+            <summary>
+            Проверка действительности токена
+            </summary>
+            <returns>Статус токена</returns>
+        </member>
+        <member name="M:back.Controllers.RailwayCisternsController.GetCisterns(System.Int32,System.Int32)">
+            <summary>
+            Получить список цистерн
+            </summary>
+            <param name="page">Номер страницы (начиная с 1)</param>
+            <param name="size">Размер страницы</param>
+            <returns>Список железнодорожных цистерн с пагинацией</returns>
+        </member>
+        <member name="M:back.Controllers.RailwayCisternsController.GetCistern(System.Guid)">
+            <summary>
+            Получить цистерну по ID
+            </summary>
+            <param name="id">Уникальный идентификатор цистерны</param>
+            <returns>Детальная информация о цистерне</returns>
+        </member>
+        <member name="M:back.Controllers.RailwayCisternsController.CreateCistern(back.DTOs.CreateRailwayCisternDto)">
+            <summary>
+            Создать новую цистерну
+            </summary>
+            <param name="createDto">Данные для создания цистерны</param>
+            <returns>Созданная цистерна</returns>
+        </member>
+        <member name="M:back.Controllers.RailwayCisternsController.UpdateCistern(System.Guid,back.DTOs.UpdateRailwayCisternDto)">
+            <summary>
+            Обновить цистерну
+            </summary>
+            <param name="id">Уникальный идентификатор цистерны</param>
+            <param name="updateDto">Данные для обновления</param>
+            <returns>Обновленная цистерна</returns>
+        </member>
+        <member name="M:back.Controllers.RailwayCisternsController.DeleteCistern(System.Guid)">
+            <summary>
+            Удалить цистерну
+            </summary>
+            <param name="id">Уникальный идентификатор цистерны</param>
+            <returns>Результат удаления</returns>
+        </member>
+        <member name="M:back.Controllers.RolesController.GetRoles">
+            <summary>
+            Получить список всех ролей
+            </summary>
+            <returns>Список ролей с разрешениями</returns>
+        </member>
+        <member name="M:back.Controllers.RolesController.GetPermissions">
+            <summary>
+            Получить список всех разрешений
+            </summary>
+            <returns>Список разрешений</returns>
+        </member>
+        <member name="M:back.Controllers.RolesController.GetInitializationStatus">
+            <summary>
+            Получить статус инициализации системы
+            </summary>
+            <returns>Информация о состоянии инициализации</returns>
+        </member>
+        <member name="T:back.DTOs.LoginDto">
+            <summary>
+            Данные для входа в систему
+            </summary>
+        </member>
+        <member name="P:back.DTOs.LoginDto.Email">
+            <summary>
+            Email пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.LoginDto.Password">
+            <summary>
+            Пароль пользователя
+            </summary>
+        </member>
+        <member name="T:back.DTOs.RegisterDto">
+            <summary>
+            Данные для регистрации пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.RegisterDto.Email">
+            <summary>
+            Email пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.RegisterDto.Password">
+            <summary>
+            Пароль пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.RegisterDto.FirstName">
+            <summary>
+            Имя пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.RegisterDto.LastName">
+            <summary>
+            Фамилия пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.RegisterDto.Patronymic">
+            <summary>
+            Отчество пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.RegisterDto.PhoneNumber">
+            <summary>
+            Номер телефона пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.RegisterDto.RoleIds">
+            <summary>
+            Список идентификаторов ролей для назначения пользователю
+            </summary>
+        </member>
+        <member name="T:back.DTOs.AuthResponseDto">
+            <summary>
+            Ответ с данными аутентификации
+            </summary>
+        </member>
+        <member name="P:back.DTOs.AuthResponseDto.Token">
+            <summary>
+            JWT токен для доступа к API
+            </summary>
+        </member>
+        <member name="P:back.DTOs.AuthResponseDto.Email">
+            <summary>
+            Email пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.AuthResponseDto.FullName">
+            <summary>
+            Полное имя пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.AuthResponseDto.Roles">
+            <summary>
+            Список ролей пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.AuthResponseDto.Permissions">
+            <summary>
+            Список разрешений пользователя
+            </summary>
+        </member>
+        <member name="T:back.DTOs.UserDto">
+            <summary>
+            Информация о пользователе
+            </summary>
+        </member>
+        <member name="P:back.DTOs.UserDto.Id">
+            <summary>
+            Уникальный идентификатор пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.UserDto.Email">
+            <summary>
+            Email пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.UserDto.FirstName">
+            <summary>
+            Имя пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.UserDto.LastName">
+            <summary>
+            Фамилия пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.UserDto.Patronymic">
+            <summary>
+            Отчество пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.UserDto.PhoneNumber">
+            <summary>
+            Номер телефона пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.UserDto.Roles">
+            <summary>
+            Список ролей пользователя
+            </summary>
+        </member>
+    </members>
+</doc>
