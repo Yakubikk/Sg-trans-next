@@ -7,13 +7,9 @@ using back.Models;
 namespace back.Controllers;
 
 [Route("api/[controller]")]
-public class LocationsController : BaseCrudController<Location, LocationDto, CreateLocationDto, UpdateLocationDto>
+public class LocationsController(ApplicationDbContext context) : BaseCrudController<Location, LocationDto, CreateLocationDto, UpdateLocationDto>(context, "locations")
 {
-    public LocationsController(ApplicationDbContext context) : base(context, "location")
-    {
-    }
-
-    protected override LocationDto MapToDto(Location entity)
+  protected override LocationDto MapToDto(Location entity)
     {
         return new LocationDto
         {

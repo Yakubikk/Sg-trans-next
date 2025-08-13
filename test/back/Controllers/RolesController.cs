@@ -10,20 +10,15 @@ namespace back.Controllers;
 [Route("api/[controller]")]
 [Authorize]
 [Produces("application/json")]
-public class RolesController : ControllerBase
+public class RolesController(ApplicationDbContext context) : ControllerBase
 {
-    private readonly ApplicationDbContext _context;
+    private readonly ApplicationDbContext _context = context;
 
-    public RolesController(ApplicationDbContext context)
-    {
-        _context = context;
-    }
-
-    /// <summary>
-    /// Получить список всех ролей
-    /// </summary>
-    /// <returns>Список ролей с разрешениями</returns>
-    [HttpGet]
+  /// <summary>
+  /// Получить список всех ролей
+  /// </summary>
+  /// <returns>Список ролей с разрешениями</returns>
+  [HttpGet]
     [RequirePermission("users.read")]
     [ProducesResponseType(200)]
     [ProducesResponseType(401)]

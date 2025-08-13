@@ -7,13 +7,9 @@ using back.Models;
 namespace back.Controllers;
 
 [Route("api/[controller]")]
-public class OwnersController : BaseCrudController<Owner, OwnerDto, CreateOwnerDto, UpdateOwnerDto>
+public class OwnersController(ApplicationDbContext context) : BaseCrudController<Owner, OwnerDto, CreateOwnerDto, UpdateOwnerDto>(context, "owners")
 {
-    public OwnersController(ApplicationDbContext context) : base(context, "owner")
-    {
-    }
-
-    protected override OwnerDto MapToDto(Owner entity)
+  protected override OwnerDto MapToDto(Owner entity)
     {
         return new OwnerDto
         {

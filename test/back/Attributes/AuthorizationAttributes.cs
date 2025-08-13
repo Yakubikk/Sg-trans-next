@@ -17,7 +17,7 @@ public class RequirePermissionAttribute(string permission) : Attribute, IAuthori
         }
 
         var permissions = context.HttpContext.User.Claims
-            .Where(c => c.Type == "permission")
+            .Where(c => c.Type == "Permission")
             .Select(c => c.Value)
             .ToList();
 

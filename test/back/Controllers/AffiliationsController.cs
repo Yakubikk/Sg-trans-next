@@ -7,13 +7,9 @@ using back.Models;
 namespace back.Controllers;
 
 [Route("api/[controller]")]
-public class AffiliationsController : BaseCrudController<Affiliation, AffiliationDto, CreateAffiliationDto, UpdateAffiliationDto>
+public class AffiliationsController(ApplicationDbContext context) : BaseCrudController<Affiliation, AffiliationDto, CreateAffiliationDto, UpdateAffiliationDto>(context, "affiliations")
 {
-    public AffiliationsController(ApplicationDbContext context) : base(context, "affiliation")
-    {
-    }
-
-    protected override AffiliationDto MapToDto(Affiliation entity)
+  protected override AffiliationDto MapToDto(Affiliation entity)
     {
         return new AffiliationDto
         {

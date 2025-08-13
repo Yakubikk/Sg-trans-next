@@ -1,219 +1,67 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using back.Controllers.Base;
 using back.DTOs;
 using back.Models;
-using back.Attributes;
 
 namespace back.Controllers;
 
-[ApiController]
 [Route("api/[controller]")]
-[Authorize]
-[Produces("application/json")]
-public class RailwayCisternsController : ControllerBase
+public class RailwayCisternsController(ApplicationDbContext context) : BaseCrudController<RailwayCistern, RailwayCisternDto, CreateRailwayCisternDto, UpdateRailwayCisternDto>(context, "cisterns")
 {
-    private readonly ApplicationDbContext _context;
-
-    public RailwayCisternsController(ApplicationDbContext context)
+    protected override RailwayCisternDto MapToDto(RailwayCistern entity)
     {
-        _context = context;
+        return new RailwayCisternDto
+        {
+            Id = entity.Id,
+            Number = entity.Number,
+            ManufacturerId = entity.ManufacturerId,
+            ManufacturerName = entity.Manufacturer?.Name,
+            BuildDate = entity.BuildDate,
+            TareWeight = entity.TareWeight,
+            LoadCapacity = entity.LoadCapacity,
+            Length = entity.Length,
+            AxleCount = entity.AxleCount,
+            Volume = entity.Volume,
+            FillingVolume = entity.FillingVolume,
+            InitialTareWeight = entity.InitialTareWeight,
+            TypeId = entity.TypeId,
+            TypeName = entity.Type?.Name,
+            ModelId = entity.ModelId,
+            ModelName = entity.Model?.Name,
+            CommissioningDate = entity.CommissioningDate,
+            SerialNumber = entity.SerialNumber,
+            RegistrationNumber = entity.RegistrationNumber,
+            RegistrationDate = entity.RegistrationDate,
+            RegistrarId = entity.RegistrarId,
+            RegistrarName = entity.Registrar?.Name,
+            Notes = entity.Notes,
+            Ownerid = entity.Ownerid,
+            OwnerName = entity.Owner?.Name,
+            TechСonditions = entity.TechСonditions,
+            Pripiska = entity.Pripiska,
+            ReRegistrationDate = entity.ReRegistrationDate,
+            Pressure = entity.Pressure,
+            TestPressure = entity.TestPressure,
+            Rent = entity.Rent,
+            AffiliationId = entity.AffiliationId,
+            AffiliationName = entity.Affiliation?.Value,
+            ServiceLifeYears = entity.ServiceLifeYears,
+            PeriodMajorRepair = entity.PeriodMajorRepair,
+            PeriodPeriodicTest = entity.PeriodPeriodicTest,
+            PeriodIntermediateTest = entity.PeriodIntermediateTest,
+            PeriodDepotRepair = entity.PeriodDepotRepair,
+            DangerClass = entity.DangerClass,
+            Substance = entity.Substance,
+            TareWeight2 = entity.TareWeight2,
+            TareWeight3 = entity.TareWeight3
+        };
     }
 
-    /// <summary>
-    /// Получить список цистерн
-    /// </summary>
-    /// <param name="page">Номер страницы (начиная с 1)</param>
-    /// <param name="size">Размер страницы</param>
-    /// <returns>Список железнодорожных цистерн с пагинацией</returns>
-    [HttpGet]
-    [RequirePermission("cisterns.read")]
-    [ProducesResponseType(typeof(object), 200)]
-    [ProducesResponseType(401)]
-    [ProducesResponseType(403)]
-    public async Task<IActionResult> GetCisterns([FromQuery] int page = 1, [FromQuery] int size = 20)
+    protected override Task<RailwayCistern> MapToEntityAsync(CreateRailwayCisternDto createDto)
     {
-        var skip = (page - 1) * size;
-        
-        var query = _context.RailwayCisterns
-            .Include(c => c.Manufacturer)
-            .Include(c => c.Model)
-            .Include(c => c.Type)
-            .Include(c => c.Owner)
-            .Include(c => c.Affiliation)
-            .Include(c => c.Registrar)
-            .Skip(skip)
-            .Take(size);
-
-        var cisterns = await query.Select(c => new RailwayCisternDto
-            {
-                Id = c.Id,
-                Number = c.Number,
-                ManufacturerId = c.ManufacturerId,
-                ManufacturerName = c.Manufacturer.Name,
-                BuildDate = c.BuildDate,
-                TareWeight = c.TareWeight,
-                LoadCapacity = c.LoadCapacity,
-                Length = c.Length,
-                AxleCount = c.AxleCount,
-                Volume = c.Volume,
-                FillingVolume = c.FillingVolume,
-                InitialTareWeight = c.InitialTareWeight,
-                TypeId = c.TypeId,
-                TypeName = c.Type.Name,
-                ModelId = c.ModelId,
-                ModelName = c.Model != null ? c.Model.Name : null,
-                CommissioningDate = c.CommissioningDate,
-                SerialNumber = c.SerialNumber,
-                RegistrationNumber = c.RegistrationNumber,
-                RegistrationDate = c.RegistrationDate,
-                RegistrarId = c.RegistrarId,
-                RegistrarName = c.Registrar != null ? c.Registrar.Name : null,
-                Notes = c.Notes,
-                Ownerid = c.Ownerid,
-                OwnerName = c.Owner != null ? c.Owner.Name : null,
-                TechСonditions = c.TechСonditions,
-                Pripiska = c.Pripiska,
-                ReRegistrationDate = c.ReRegistrationDate,
-                Pressure = c.Pressure,
-                TestPressure = c.TestPressure,
-                Rent = c.Rent,
-                AffiliationId = c.AffiliationId,
-                AffiliationName = c.Affiliation.Value,
-                ServiceLifeYears = c.ServiceLifeYears,
-                PeriodMajorRepair = c.PeriodMajorRepair,
-                PeriodPeriodicTest = c.PeriodPeriodicTest,
-                PeriodIntermediateTest = c.PeriodIntermediateTest,
-                PeriodDepotRepair = c.PeriodDepotRepair,
-                DangerClass = c.DangerClass,
-                Substance = c.Substance,
-                TareWeight2 = c.TareWeight2,
-                TareWeight3 = c.TareWeight3
-            })
-            .ToListAsync();
-
-        var total = await _context.RailwayCisterns.CountAsync();
-
-        return Ok(new
+        var entity = new RailwayCistern
         {
-            data = cisterns,
-            total,
-            page,
-            size,
-            totalPages = (int)Math.Ceiling((double)total / size)
-        });
-    }
-
-    /// <summary>
-    /// Получить цистерну по ID
-    /// </summary>
-    /// <param name="id">Уникальный идентификатор цистерны</param>
-    /// <returns>Детальная информация о цистерне</returns>
-    [HttpGet("{id}")]
-    [RequirePermission("cisterns.read")]
-    [ProducesResponseType(typeof(RailwayCisternDto), 200)]
-    [ProducesResponseType(401)]
-    [ProducesResponseType(403)]
-    [ProducesResponseType(404)]
-    public async Task<IActionResult> GetCistern(Guid id)
-    {
-        var query = _context.RailwayCisterns
-            .Include(c => c.Manufacturer)
-            .Include(c => c.Model)
-            .Include(c => c.Type)
-            .Include(c => c.Owner)
-            .Include(c => c.Affiliation)
-            .Include(c => c.Registrar)
-            .Where(c => c.Id == id);
-
-        var cistern = await query.Select(c => new RailwayCisternDto
-            {
-                Id = c.Id,
-                Number = c.Number,
-                ManufacturerId = c.ManufacturerId,
-                ManufacturerName = c.Manufacturer.Name,
-                BuildDate = c.BuildDate,
-                TareWeight = c.TareWeight,
-                LoadCapacity = c.LoadCapacity,
-                Length = c.Length,
-                AxleCount = c.AxleCount,
-                Volume = c.Volume,
-                FillingVolume = c.FillingVolume,
-                InitialTareWeight = c.InitialTareWeight,
-                TypeId = c.TypeId,
-                TypeName = c.Type.Name,
-                ModelId = c.ModelId,
-                ModelName = c.Model != null ? c.Model.Name : null,
-                CommissioningDate = c.CommissioningDate,
-                SerialNumber = c.SerialNumber,
-                RegistrationNumber = c.RegistrationNumber,
-                RegistrationDate = c.RegistrationDate,
-                RegistrarId = c.RegistrarId,
-                RegistrarName = c.Registrar != null ? c.Registrar.Name : null,
-                Notes = c.Notes,
-                Ownerid = c.Ownerid,
-                OwnerName = c.Owner != null ? c.Owner.Name : null,
-                TechСonditions = c.TechСonditions,
-                Pripiska = c.Pripiska,
-                ReRegistrationDate = c.ReRegistrationDate,
-                Pressure = c.Pressure,
-                TestPressure = c.TestPressure,
-                Rent = c.Rent,
-                AffiliationId = c.AffiliationId,
-                AffiliationName = c.Affiliation.Value,
-                ServiceLifeYears = c.ServiceLifeYears,
-                PeriodMajorRepair = c.PeriodMajorRepair,
-                PeriodPeriodicTest = c.PeriodPeriodicTest,
-                PeriodIntermediateTest = c.PeriodIntermediateTest,
-                PeriodDepotRepair = c.PeriodDepotRepair,
-                DangerClass = c.DangerClass,
-                Substance = c.Substance,
-                TareWeight2 = c.TareWeight2,
-                TareWeight3 = c.TareWeight3
-            })
-            .FirstOrDefaultAsync();
-
-        if (cistern == null)
-        {
-            return NotFound($"Цистерна с ID {id} не найдена");
-        }
-
-        return Ok(cistern);
-    }
-
-    /// <summary>
-    /// Создать новую цистерну
-    /// </summary>
-    /// <param name="createDto">Данные для создания цистерны</param>
-    /// <returns>Созданная цистерна</returns>
-    [HttpPost]
-    [RequirePermission("cisterns.create")]
-    [ProducesResponseType(typeof(RailwayCistern), 201)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(401)]
-    [ProducesResponseType(403)]
-    public async Task<IActionResult> CreateCistern([FromBody] CreateRailwayCisternDto createDto)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        // Проверяем, что номер уникален
-        if (await _context.RailwayCisterns.AnyAsync(c => c.Number == createDto.Number))
-        {
-            return BadRequest("Цистерна с таким номером уже существует");
-        }
-
-        // Проверяем существование связанных сущностей
-        if (!await _context.Affiliations.AnyAsync(a => a.Id == createDto.AffiliationId))
-        {
-            return BadRequest("Указанная принадлежность не существует");
-        }
-
-        var cistern = new RailwayCistern
-        {
-            Id = Guid.NewGuid(),
             Number = createDto.Number,
             ManufacturerId = createDto.ManufacturerId,
             BuildDate = createDto.BuildDate,
@@ -250,184 +98,203 @@ public class RailwayCisternsController : ControllerBase
             TareWeight2 = createDto.TareWeight2,
             TareWeight3 = createDto.TareWeight3,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-            CreatorId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? string.Empty
+            CreatorId = GetCurrentUserId().ToString()
         };
-
-        _context.RailwayCisterns.Add(cistern);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetCistern), new { id = cistern.Id }, cistern);
+        
+        return Task.FromResult(entity);
     }
 
-    /// <summary>
-    /// Обновить цистерну
-    /// </summary>
-    /// <param name="id">Уникальный идентификатор цистерны</param>
-    /// <param name="updateDto">Данные для обновления</param>
-    /// <returns>Обновленная цистерна</returns>
-    [HttpPut("{id}")]
-    [RequirePermission("cisterns.update")]
-    [ProducesResponseType(typeof(RailwayCistern), 200)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(401)]
-    [ProducesResponseType(403)]
-    [ProducesResponseType(404)]
-    public async Task<IActionResult> UpdateCistern(Guid id, [FromBody] UpdateRailwayCisternDto updateDto)
+    protected override Task ApplyUpdateAsync(RailwayCistern entity, UpdateRailwayCisternDto updateDto)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        var cistern = await _context.RailwayCisterns.FindAsync(id);
-        if (cistern == null)
-        {
-            return NotFound($"Цистерна с ID {id} не найдена");
-        }
-
-        // Проверяем уникальность номера при изменении
-        if (!string.IsNullOrEmpty(updateDto.Number) && updateDto.Number != cistern.Number)
-        {
-            if (await _context.RailwayCisterns.AnyAsync(c => c.Number == updateDto.Number && c.Id != id))
-            {
-                return BadRequest("Цистерна с таким номером уже существует");
-            }
-            cistern.Number = updateDto.Number;
-        }
-
-        // Обновляем только переданные поля
+        if (!string.IsNullOrEmpty(updateDto.Number))
+            entity.Number = updateDto.Number;
+            
         if (updateDto.ManufacturerId.HasValue)
-            cistern.ManufacturerId = updateDto.ManufacturerId.Value;
-        
+            entity.ManufacturerId = updateDto.ManufacturerId.Value;
+            
         if (updateDto.BuildDate.HasValue)
-            cistern.BuildDate = updateDto.BuildDate.Value;
-        
+            entity.BuildDate = updateDto.BuildDate.Value;
+            
         if (updateDto.TareWeight.HasValue)
-            cistern.TareWeight = updateDto.TareWeight.Value;
-        
+            entity.TareWeight = updateDto.TareWeight.Value;
+            
         if (updateDto.LoadCapacity.HasValue)
-            cistern.LoadCapacity = updateDto.LoadCapacity.Value;
-        
+            entity.LoadCapacity = updateDto.LoadCapacity.Value;
+            
         if (updateDto.Length.HasValue)
-            cistern.Length = updateDto.Length.Value;
-        
+            entity.Length = updateDto.Length.Value;
+            
         if (updateDto.AxleCount.HasValue)
-            cistern.AxleCount = updateDto.AxleCount.Value;
-        
+            entity.AxleCount = updateDto.AxleCount.Value;
+            
         if (updateDto.Volume.HasValue)
-            cistern.Volume = updateDto.Volume.Value;
-        
+            entity.Volume = updateDto.Volume.Value;
+            
         if (updateDto.FillingVolume.HasValue)
-            cistern.FillingVolume = updateDto.FillingVolume;
-        
+            entity.FillingVolume = updateDto.FillingVolume.Value;
+            
         if (updateDto.InitialTareWeight.HasValue)
-            cistern.InitialTareWeight = updateDto.InitialTareWeight;
-        
+            entity.InitialTareWeight = updateDto.InitialTareWeight.Value;
+            
         if (updateDto.TypeId.HasValue)
-            cistern.TypeId = updateDto.TypeId.Value;
-        
+            entity.TypeId = updateDto.TypeId.Value;
+            
         if (updateDto.ModelId.HasValue)
-            cistern.ModelId = updateDto.ModelId;
-        
+            entity.ModelId = updateDto.ModelId;
+            
         if (updateDto.CommissioningDate.HasValue)
-            cistern.CommissioningDate = updateDto.CommissioningDate;
-        
+            entity.CommissioningDate = updateDto.CommissioningDate;
+            
         if (!string.IsNullOrEmpty(updateDto.SerialNumber))
-            cistern.SerialNumber = updateDto.SerialNumber;
-        
+            entity.SerialNumber = updateDto.SerialNumber;
+            
         if (!string.IsNullOrEmpty(updateDto.RegistrationNumber))
-            cistern.RegistrationNumber = updateDto.RegistrationNumber;
-        
+            entity.RegistrationNumber = updateDto.RegistrationNumber;
+            
         if (updateDto.RegistrationDate.HasValue)
-            cistern.RegistrationDate = updateDto.RegistrationDate.Value;
-        
+            entity.RegistrationDate = updateDto.RegistrationDate.Value;
+            
         if (updateDto.RegistrarId.HasValue)
-            cistern.RegistrarId = updateDto.RegistrarId;
-        
+            entity.RegistrarId = updateDto.RegistrarId;
+            
         if (updateDto.Notes != null)
-            cistern.Notes = updateDto.Notes;
-        
+            entity.Notes = updateDto.Notes;
+            
         if (updateDto.Ownerid.HasValue)
-            cistern.Ownerid = updateDto.Ownerid;
-        
+            entity.Ownerid = updateDto.Ownerid;
+            
         if (updateDto.TechСonditions != null)
-            cistern.TechСonditions = updateDto.TechСonditions;
-        
+            entity.TechСonditions = updateDto.TechСonditions;
+            
         if (updateDto.Pripiska != null)
-            cistern.Pripiska = updateDto.Pripiska;
-        
+            entity.Pripiska = updateDto.Pripiska;
+            
         if (updateDto.ReRegistrationDate.HasValue)
-            cistern.ReRegistrationDate = updateDto.ReRegistrationDate;
-        
+            entity.ReRegistrationDate = updateDto.ReRegistrationDate;
+            
         if (updateDto.Pressure.HasValue)
-            cistern.Pressure = updateDto.Pressure.Value;
-        
+            entity.Pressure = updateDto.Pressure.Value;
+            
         if (updateDto.TestPressure.HasValue)
-            cistern.TestPressure = updateDto.TestPressure.Value;
-        
-        if (updateDto.Rent != null)
-            cistern.Rent = updateDto.Rent;
-        
+            entity.TestPressure = updateDto.TestPressure.Value;
+            
+        if (!string.IsNullOrEmpty(updateDto.Rent))
+            entity.Rent = updateDto.Rent;
+            
         if (updateDto.AffiliationId.HasValue)
-            cistern.AffiliationId = updateDto.AffiliationId.Value;
-        
+            entity.AffiliationId = updateDto.AffiliationId.Value;
+            
         if (updateDto.ServiceLifeYears.HasValue)
-            cistern.ServiceLifeYears = updateDto.ServiceLifeYears.Value;
-        
+            entity.ServiceLifeYears = updateDto.ServiceLifeYears.Value;
+            
         if (updateDto.PeriodMajorRepair.HasValue)
-            cistern.PeriodMajorRepair = updateDto.PeriodMajorRepair;
-        
+            entity.PeriodMajorRepair = updateDto.PeriodMajorRepair.Value;
+            
         if (updateDto.PeriodPeriodicTest.HasValue)
-            cistern.PeriodPeriodicTest = updateDto.PeriodPeriodicTest;
-        
+            entity.PeriodPeriodicTest = updateDto.PeriodPeriodicTest.Value;
+            
         if (updateDto.PeriodIntermediateTest.HasValue)
-            cistern.PeriodIntermediateTest = updateDto.PeriodIntermediateTest;
-        
+            entity.PeriodIntermediateTest = updateDto.PeriodIntermediateTest.Value;
+            
         if (updateDto.PeriodDepotRepair.HasValue)
-            cistern.PeriodDepotRepair = updateDto.PeriodDepotRepair;
-        
+            entity.PeriodDepotRepair = updateDto.PeriodDepotRepair.Value;
+            
         if (updateDto.DangerClass.HasValue)
-            cistern.DangerClass = updateDto.DangerClass.Value;
-        
-        if (!string.IsNullOrEmpty(updateDto.Substance))
-            cistern.Substance = updateDto.Substance;
-        
+            entity.DangerClass = updateDto.DangerClass.Value;
+            
+        if (updateDto.Substance != null)
+            entity.Substance = updateDto.Substance;
+            
         if (updateDto.TareWeight2.HasValue)
-            cistern.TareWeight2 = updateDto.TareWeight2.Value;
-        
+            entity.TareWeight2 = updateDto.TareWeight2.Value;
+            
         if (updateDto.TareWeight3.HasValue)
-            cistern.TareWeight3 = updateDto.TareWeight3.Value;
+            entity.TareWeight3 = updateDto.TareWeight3.Value;
 
-        cistern.UpdatedAt = DateTime.UtcNow;
-
-        await _context.SaveChangesAsync();
-
-        return Ok(cistern);
+        return Task.CompletedTask;
     }
 
-    /// <summary>
-    /// Удалить цистерну
-    /// </summary>
-    /// <param name="id">Уникальный идентификатор цистерны</param>
-    /// <returns>Результат удаления</returns>
-    [HttpDelete("{id}")]
-    [RequirePermission("cisterns.delete")]
-    [ProducesResponseType(204)]
-    [ProducesResponseType(401)]
-    [ProducesResponseType(403)]
-    [ProducesResponseType(404)]
-    public async Task<IActionResult> DeleteCistern(Guid id)
+    protected override Guid GetEntityId(RailwayCistern entity)
     {
-        var cistern = await _context.RailwayCisterns.FindAsync(id);
-        if (cistern == null)
+        return entity.Id;
+    }
+
+    protected override async Task ValidateEntity(RailwayCistern entity, bool isUpdate)
+    {
+        if (string.IsNullOrWhiteSpace(entity.Number))
         {
-            return NotFound($"Цистерна с ID {id} не найдена");
+            throw new ArgumentException("Номер цистерны обязателен");
         }
 
-        _context.RailwayCisterns.Remove(cistern);
-        await _context.SaveChangesAsync();
+        // Проверка уникальности номера
+        var existingCistern = await _context.RailwayCisterns
+            .FirstOrDefaultAsync(c => c.Number == entity.Number && c.Id != entity.Id);
+        
+        if (existingCistern != null)
+        {
+            throw new ArgumentException($"Цистерна с номером {entity.Number} уже существует");
+        }
 
-        return NoContent();
+        // Проверка существования связанных сущностей
+        if (!await _context.Manufacturers.AnyAsync(m => m.Id == entity.ManufacturerId))
+        {
+            throw new ArgumentException("Указанный производитель не найден");
+        }
+
+        if (!await _context.WagonTypes.AnyAsync(t => t.Id == entity.TypeId))
+        {
+            throw new ArgumentException("Указанный тип вагона не найден");
+        }
+
+        if (entity.ModelId.HasValue && !await _context.WagonModels.AnyAsync(m => m.Id == entity.ModelId))
+        {
+            throw new ArgumentException("Указанная модель вагона не найдена");
+        }
+
+        if (entity.RegistrarId.HasValue && !await _context.Registrars.AnyAsync(r => r.Id == entity.RegistrarId))
+        {
+            throw new ArgumentException("Указанный регистратор не найден");
+        }
+
+        if (entity.Ownerid.HasValue && !await _context.Owners.AnyAsync(o => o.Id == entity.Ownerid))
+        {
+            throw new ArgumentException("Указанный владелец не найден");
+        }
+
+        if (!await _context.Affiliations.AnyAsync(a => a.Id == entity.AffiliationId))
+        {
+            throw new ArgumentException("Указанная принадлежность не найдена");
+        }
+    }
+
+    protected override Task<(bool CanDelete, string? Reason)> CanDeleteAsync(RailwayCistern entity)
+    {
+        // Проверяем, есть ли связанные записи
+        // Для упрощения пока считаем что можно всегда удалить
+        return Task.FromResult((true, (string?)null));
+    }
+
+    protected override IQueryable<RailwayCistern> GetBaseQuery()
+    {
+        return _context.RailwayCisterns
+            .Include(c => c.Manufacturer)
+            .Include(c => c.Model)
+            .Include(c => c.Type)
+            .Include(c => c.Owner)
+            .Include(c => c.Affiliation)
+            .Include(c => c.Registrar);
+    }
+
+    protected override IQueryable<RailwayCistern> ApplySearch(IQueryable<RailwayCistern> query, string search)
+    {
+        return query.Where(c => 
+            c.Number.Contains(search) ||
+            c.Manufacturer.Name.Contains(search) ||
+            c.Type.Name.Contains(search) ||
+            (c.Model != null && c.Model.Name.Contains(search)) ||
+            (c.Owner != null && c.Owner.Name.Contains(search)) ||
+            c.Affiliation.Value.Contains(search) ||
+            (c.Registrar != null && c.Registrar.Name.Contains(search))
+        );
     }
 }

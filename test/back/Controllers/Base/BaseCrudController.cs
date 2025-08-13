@@ -69,6 +69,64 @@ public abstract class BaseCrudController<TEntity, TDto, TCreateDto, TUpdateDto> 
     }
 
     /// <summary>
+    /// Получить список записей с применением сохраненного фильтра
+    /// </summary>
+    [HttpPost("apply-filter")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(404)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    public virtual async Task<IActionResult> GetAllWithFilter([FromBody] ApplyFilterDto applyFilterDto, [FromQuery] int page = 1, [FromQuery] int size = 20)
+    {
+        if (!HasPermission("read"))
+            return Forbid();
+
+        try
+        {
+            var userId = GetCurrentUserId();
+            var savedFilter = await _context.SavedFilters
+                .FirstOrDefaultAsync(f => f.Id == applyFilterDto.FilterId && f.UserId == userId);
+
+            if (savedFilter == null)
+                return NotFound("Сохраненный фильтр не найден");
+
+            var skip = (page - 1) * size;
+            var query = GetBaseQuery();
+
+            // Применяем фильтрацию из сохраненного фильтра
+            query = await ApplyFilterFromJson(query, savedFilter.FilterJson);
+
+            // Применяем сортировку из сохраненного фильтра
+            query = await ApplySortFromJson(query, savedFilter.SortFieldsJson);
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .Skip(skip)
+                .Take(size)
+                .ToListAsync();
+
+            var dtos = items.Select(MapToDto).ToList();
+
+            // Применяем выбранные столбцы (если поддерживается)
+            var filteredDtos = await ApplyColumnSelection(dtos, savedFilter.SelectedColumnsJson);
+
+            var result = new PaginatedResult<TDto>
+            {
+                Items = filteredDtos,
+                TotalCount = totalCount,
+                Page = page,
+                Size = size
+            };
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Ошибка при применении фильтра: {ex.Message}");
+        }
+    }
+
+    /// <summary>
     /// Получить запись по ID
     /// </summary>
     [HttpGet("{id}")]
@@ -306,11 +364,73 @@ public abstract class BaseCrudController<TEntity, TDto, TCreateDto, TUpdateDto> 
     protected bool HasPermission(string action)
     {
         var permission = $"{_entityName}.{action}";
-        var permissions = User.Claims
-            .Where(c => c.Type == "permission")
-            .Select(c => c.Value)
-            .ToList();
+        return User.Claims.Any(c => c.Type == "Permission" && c.Value == permission);
+    }
 
-        return permissions.Contains(permission) || User.IsInRole("Admin");
+    protected Guid GetCurrentUserId()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+        {
+            throw new UnauthorizedAccessException("Пользователь не авторизован");
+        }
+        return userId;
+    }
+
+    protected virtual Task<IQueryable<TEntity>> ApplyFilterFromJson(IQueryable<TEntity> query, string filterJson)
+    {
+        if (string.IsNullOrEmpty(filterJson) || filterJson == "{}")
+            return Task.FromResult(query);
+
+        try
+        {
+            // Базовая реализация - просто возвращаем исходный запрос
+            // Каждый наследник может переопределить этот метод для применения специфичных фильтров
+            return Task.FromResult(query);
+        }
+        catch
+        {
+            return Task.FromResult(query);
+        }
+    }
+
+    protected virtual Task<IQueryable<TEntity>> ApplySortFromJson(IQueryable<TEntity> query, string sortJson)
+    {
+        if (string.IsNullOrEmpty(sortJson) || sortJson == "[]")
+            return Task.FromResult(query);
+
+        try
+        {
+            // Базовая реализация - сортировка по Id
+            IQueryable<TEntity> sortedQuery = query.OrderBy(e => EF.Property<Guid>(e, "Id"));
+            return Task.FromResult(sortedQuery);
+        }
+        catch
+        {
+            return Task.FromResult(query);
+        }
+    }
+
+    /// <summary>
+    /// Применяет выбор колонок к списку DTO объектов
+    /// </summary>
+    /// <param name="dtos">Список DTO объектов</param>
+    /// <param name="selectedColumnsJson">JSON с выбранными колонками</param>
+    /// <returns>Отфильтрованный список DTO</returns>
+    protected virtual Task<List<TDto>> ApplyColumnSelection(List<TDto> dtos, string selectedColumnsJson)
+    {
+        if (string.IsNullOrEmpty(selectedColumnsJson) || selectedColumnsJson == "[]")
+            return Task.FromResult(dtos);
+
+        try
+        {
+            // Базовая реализация - возвращаем все данные
+            // Каждый наследник может переопределить для фильтрации столбцов
+            return Task.FromResult(dtos);
+        }
+        catch
+        {
+            return Task.FromResult(dtos);
+        }
     }
 }

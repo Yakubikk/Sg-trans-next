@@ -7,13 +7,9 @@ using back.Models;
 namespace back.Controllers;
 
 [Route("api/[controller]")]
-public class PartStatusesController : BaseCrudController<PartStatus, PartStatusDto, CreatePartStatusDto, UpdatePartStatusDto>
+public class PartStatusesController(ApplicationDbContext context) : BaseCrudController<PartStatus, PartStatusDto, CreatePartStatusDto, UpdatePartStatusDto>(context, "partstatuses")
 {
-    public PartStatusesController(ApplicationDbContext context) : base(context, "partStatus")
-    {
-    }
-
-    protected override PartStatusDto MapToDto(PartStatus entity)
+  protected override PartStatusDto MapToDto(PartStatus entity)
     {
         return new PartStatusDto
         {

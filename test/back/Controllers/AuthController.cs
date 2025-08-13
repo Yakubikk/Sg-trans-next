@@ -10,21 +10,16 @@ namespace back.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
-public class AuthController : ControllerBase
+public class AuthController(IAuthService authService) : ControllerBase
 {
-    private readonly IAuthService _authService;
+    private readonly IAuthService _authService = authService;
 
-    public AuthController(IAuthService authService)
-    {
-        _authService = authService;
-    }
-
-    /// <summary>
-    /// Вход в систему
-    /// </summary>
-    /// <param name="loginDto">Данные для входа</param>
-    /// <returns>JWT токен и информация о пользователе</returns>
-    [HttpPost("login")]
+  /// <summary>
+  /// Вход в систему
+  /// </summary>
+  /// <param name="loginDto">Данные для входа</param>
+  /// <returns>JWT токен и информация о пользователе</returns>
+  [HttpPost("login")]
     [ProducesResponseType(typeof(AuthResponseDto), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(401)]

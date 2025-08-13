@@ -11,16 +11,11 @@ public interface IJwtService
     ClaimsPrincipal? ValidateToken(string token);
 }
 
-public class JwtService : IJwtService
+public class JwtService(IConfiguration configuration) : IJwtService
 {
-    private readonly IConfiguration _configuration;
+    private readonly IConfiguration _configuration = configuration;
 
-    public JwtService(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
-
-    public string GenerateToken(Guid userId, string email, List<string> roles, List<string> permissions)
+  public string GenerateToken(Guid userId, string email, List<string> roles, List<string> permissions)
     {
         var jwtSettings = _configuration.GetSection("JwtSettings");
         var secretKey = jwtSettings["SecretKey"];
@@ -48,7 +43,7 @@ public class JwtService : IJwtService
         // Добавляем разрешения
         foreach (var permission in permissions)
         {
-            claims.Add(new Claim("permission", permission));
+            claims.Add(new Claim("Permission", permission));
         }
 
         var token = new JwtSecurityToken(

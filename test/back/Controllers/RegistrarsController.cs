@@ -7,13 +7,9 @@ using back.Models;
 namespace back.Controllers;
 
 [Route("api/[controller]")]
-public class RegistrarsController : BaseCrudController<Registrar, RegistrarDto, CreateRegistrarDto, UpdateRegistrarDto>
+public class RegistrarsController(ApplicationDbContext context) : BaseCrudController<Registrar, RegistrarDto, CreateRegistrarDto, UpdateRegistrarDto>(context, "registrars")
 {
-    public RegistrarsController(ApplicationDbContext context) : base(context, "registrar")
-    {
-    }
-
-    protected override RegistrarDto MapToDto(Registrar entity)
+  protected override RegistrarDto MapToDto(Registrar entity)
     {
         return new RegistrarDto
         {

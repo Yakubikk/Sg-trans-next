@@ -35,6 +35,11 @@
             Получить список записей с пагинацией
             </summary>
         </member>
+        <member name="M:back.Controllers.Base.BaseCrudController`4.GetAllWithFilter(back.DTOs.ApplyFilterDto,System.Int32,System.Int32)">
+            <summary>
+            Получить список записей с применением сохраненного фильтра
+            </summary>
+        </member>
         <member name="M:back.Controllers.Base.BaseCrudController`4.GetById(System.Guid)">
             <summary>
             Получить запись по ID
@@ -55,42 +60,13 @@
             Удалить запись
             </summary>
         </member>
-        <member name="M:back.Controllers.RailwayCisternsController.GetCisterns(System.Int32,System.Int32)">
+        <member name="M:back.Controllers.Base.BaseCrudController`4.ApplyColumnSelection(System.Collections.Generic.List{`1},System.String)">
             <summary>
-            Получить список цистерн
+            Применяет выбор колонок к списку DTO объектов
             </summary>
-            <param name="page">Номер страницы (начиная с 1)</param>
-            <param name="size">Размер страницы</param>
-            <returns>Список железнодорожных цистерн с пагинацией</returns>
-        </member>
-        <member name="M:back.Controllers.RailwayCisternsController.GetCistern(System.Guid)">
-            <summary>
-            Получить цистерну по ID
-            </summary>
-            <param name="id">Уникальный идентификатор цистерны</param>
-            <returns>Детальная информация о цистерне</returns>
-        </member>
-        <member name="M:back.Controllers.RailwayCisternsController.CreateCistern(back.DTOs.CreateRailwayCisternDto)">
-            <summary>
-            Создать новую цистерну
-            </summary>
-            <param name="createDto">Данные для создания цистерны</param>
-            <returns>Созданная цистерна</returns>
-        </member>
-        <member name="M:back.Controllers.RailwayCisternsController.UpdateCistern(System.Guid,back.DTOs.UpdateRailwayCisternDto)">
-            <summary>
-            Обновить цистерну
-            </summary>
-            <param name="id">Уникальный идентификатор цистерны</param>
-            <param name="updateDto">Данные для обновления</param>
-            <returns>Обновленная цистерна</returns>
-        </member>
-        <member name="M:back.Controllers.RailwayCisternsController.DeleteCistern(System.Guid)">
-            <summary>
-            Удалить цистерну
-            </summary>
-            <param name="id">Уникальный идентификатор цистерны</param>
-            <returns>Результат удаления</returns>
+            <param name="dtos">Список DTO объектов</param>
+            <param name="selectedColumnsJson">JSON с выбранными колонками</param>
+            <returns>Отфильтрованный список DTO</returns>
         </member>
         <member name="M:back.Controllers.RolesController.GetRoles">
             <summary>
@@ -109,6 +85,56 @@
             Получить статус инициализации системы
             </summary>
             <returns>Информация о состоянии инициализации</returns>
+        </member>
+        <member name="T:back.Controllers.SavedFiltersController">
+            <summary>
+            Контроллер для управления сохраненными фильтрами пользователей
+            </summary>
+        </member>
+        <member name="M:back.Controllers.SavedFiltersController.#ctor(back.Models.ApplicationDbContext,Microsoft.Extensions.Logging.ILogger{back.Controllers.SavedFiltersController})">
+            <summary>
+            Контроллер для управления сохраненными фильтрами пользователей
+            </summary>
+        </member>
+        <member name="M:back.Controllers.SavedFiltersController.GetFiltersByEntityType(System.String)">
+            <summary>
+            Получить все сохраненные фильтры пользователя для определенного типа сущности
+            </summary>
+        </member>
+        <member name="M:back.Controllers.SavedFiltersController.GetAllFilters">
+            <summary>
+            Получить все сохраненные фильтры пользователя
+            </summary>
+        </member>
+        <member name="M:back.Controllers.SavedFiltersController.GetFilter(System.Guid)">
+            <summary>
+            Получить фильтр по ID
+            </summary>
+        </member>
+        <member name="M:back.Controllers.SavedFiltersController.CreateFilter(back.DTOs.CreateSavedFilterDto)">
+            <summary>
+            Создать новый сохраненный фильтр
+            </summary>
+        </member>
+        <member name="M:back.Controllers.SavedFiltersController.UpdateFilter(System.Guid,back.DTOs.UpdateSavedFilterDto)">
+            <summary>
+            Обновить сохраненный фильтр
+            </summary>
+        </member>
+        <member name="M:back.Controllers.SavedFiltersController.DeleteFilter(System.Guid)">
+            <summary>
+            Удалить сохраненный фильтр
+            </summary>
+        </member>
+        <member name="M:back.Controllers.SavedFiltersController.SetAsDefault(System.Guid)">
+            <summary>
+            Установить фильтр как фильтр по умолчанию
+            </summary>
+        </member>
+        <member name="M:back.Controllers.SavedFiltersController.GetDefaultFilter(System.String)">
+            <summary>
+            Получить фильтр по умолчанию для типа сущности
+            </summary>
         </member>
         <member name="T:back.DTOs.LoginDto">
             <summary>
@@ -233,6 +259,36 @@
         <member name="P:back.DTOs.UserDto.Roles">
             <summary>
             Список ролей пользователя
+            </summary>
+        </member>
+        <member name="T:back.DTOs.SavedFilterDto">
+            <summary>
+            DTO для сохраненного фильтра
+            </summary>
+        </member>
+        <member name="T:back.DTOs.CreateSavedFilterDto">
+            <summary>
+            DTO для создания сохраненного фильтра
+            </summary>
+        </member>
+        <member name="T:back.DTOs.UpdateSavedFilterDto">
+            <summary>
+            DTO для обновления сохраненного фильтра
+            </summary>
+        </member>
+        <member name="T:back.DTOs.FilterConfigDto">
+            <summary>
+            DTO для конфигурации фильтра
+            </summary>
+        </member>
+        <member name="T:back.DTOs.SortFieldDto">
+            <summary>
+            DTO для поля сортировки
+            </summary>
+        </member>
+        <member name="T:back.DTOs.ApplyFilterDto">
+            <summary>
+            DTO для быстрого применения фильтра
             </summary>
         </member>
     </members>

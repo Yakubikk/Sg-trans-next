@@ -3,6 +3,15 @@
   <component name="CopilotDiffPersistence">
     <option name="pendingDiffs">
       <map>
+        <entry key="$APPLICATION_CONFIG_DIR$/consoles/db/10832ea4-ca22-45be-a4b1-88c44e90ce44/console_1.sql">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$APPLICATION_CONFIG_DIR$/consoles/db/10832ea4-ca22-45be-a4b1-88c44e90ce44/console_1.sql" />
+              <option name="originalContent" value="create table if not exists public.&quot;SavedFilters&quot;&#10;(&#10;    &quot;Id&quot;             uuid                     not null&#10;        primary key,&#10;    &quot;Name&quot;           text                     not null,&#10;    &quot;FilterJson&quot;     text                     not null,&#10;    &quot;SortFieldsJson&quot; text                     not null,&#10;    &quot;UserId&quot;         uuid                     not null&#10;        constraint &quot;FK_SavedFilters_User_UserId&quot;&#10;            references public.&quot;Users&quot;&#10;            on delete cascade,&#10;    &quot;CreatedAt&quot;      timestamp with time zone not null,&#10;    &quot;UpdatedAt&quot;      timestamp with time zone not null&#10;);&#10;&#10;alter table public.&quot;SavedFilters&quot;&#10;    owner to postgres;&#10;&#10;" />
+              <option name="updatedContent" value="-- Добавляем недостающие поля в таблицу SavedFilters&#10;ALTER TABLE public.&quot;SavedFilters&quot; &#10;ADD COLUMN IF NOT EXISTS &quot;EntityType&quot; text NOT NULL DEFAULT '';&#10;&#10;ALTER TABLE public.&quot;SavedFilters&quot; &#10;ADD COLUMN IF NOT EXISTS &quot;SelectedColumnsJson&quot; text NOT NULL DEFAULT '[]';&#10;&#10;ALTER TABLE public.&quot;SavedFilters&quot; &#10;ADD COLUMN IF NOT EXISTS &quot;IsDefault&quot; boolean NOT NULL DEFAULT false;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/DTOs/AuthDTOs.cs">
           <value>
             <PendingDiffInfo>

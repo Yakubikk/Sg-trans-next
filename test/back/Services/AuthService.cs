@@ -11,18 +11,12 @@ public interface IAuthService
     Task<UserDto?> GetUserByIdAsync(Guid userId);
 }
 
-public class AuthService : IAuthService
+public class AuthService(ApplicationDbContext context, IJwtService jwtService) : IAuthService
 {
-    private readonly ApplicationDbContext _context;
-    private readonly IJwtService _jwtService;
+    private readonly ApplicationDbContext _context = context;
+    private readonly IJwtService _jwtService = jwtService;
 
-    public AuthService(ApplicationDbContext context, IJwtService jwtService)
-    {
-        _context = context;
-        _jwtService = jwtService;
-    }
-
-    public async Task<AuthResponseDto?> LoginAsync(LoginDto loginDto)
+  public async Task<AuthResponseDto?> LoginAsync(LoginDto loginDto)
     {
         var user = await _context.Users
             .Include(u => u.Roles)

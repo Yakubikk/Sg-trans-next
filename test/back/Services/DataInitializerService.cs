@@ -8,18 +8,12 @@ public interface IDataInitializerService
     Task InitializeAsync();
 }
 
-public class DataInitializerService : IDataInitializerService
+public class DataInitializerService(ApplicationDbContext context, ILogger<DataInitializerService> logger) : IDataInitializerService
 {
-    private readonly ApplicationDbContext _context;
-    private readonly ILogger<DataInitializerService> _logger;
+    private readonly ApplicationDbContext _context = context;
+    private readonly ILogger<DataInitializerService> _logger = logger;
 
-    public DataInitializerService(ApplicationDbContext context, ILogger<DataInitializerService> logger)
-    {
-        _context = context;
-        _logger = logger;
-    }
-
-    public async Task InitializeAsync()
+  public async Task InitializeAsync()
     {
         try
         {
