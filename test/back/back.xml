@@ -30,6 +30,31 @@
             </summary>
             <returns>Статус токена</returns>
         </member>
+        <member name="M:back.Controllers.Base.BaseCrudController`4.GetAll(System.Int32,System.Int32,System.String)">
+            <summary>
+            Получить список записей с пагинацией
+            </summary>
+        </member>
+        <member name="M:back.Controllers.Base.BaseCrudController`4.GetById(System.Guid)">
+            <summary>
+            Получить запись по ID
+            </summary>
+        </member>
+        <member name="M:back.Controllers.Base.BaseCrudController`4.Create(`2)">
+            <summary>
+            Создать новую запись
+            </summary>
+        </member>
+        <member name="M:back.Controllers.Base.BaseCrudController`4.Update(System.Guid,`3)">
+            <summary>
+            Обновить существующую запись
+            </summary>
+        </member>
+        <member name="M:back.Controllers.Base.BaseCrudController`4.Delete(System.Guid)">
+            <summary>
+            Удалить запись
+            </summary>
+        </member>
         <member name="M:back.Controllers.RailwayCisternsController.GetCisterns(System.Int32,System.Int32)">
             <summary>
             Получить список цистерн

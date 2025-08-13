@@ -68,9 +68,75 @@ public class DataInitializerService : IDataInitializerService
             "repairs.update",
             "repairs.delete",
             
-            // Разрешения для справочников
+            // Разрешения для справочников - общие
             "references.read",
             "references.update",
+            
+            // Разрешения для справочника "Принадлежности"
+            "affiliations.read",
+            "affiliations.create",
+            "affiliations.update",
+            "affiliations.delete",
+            
+            // Разрешения для справочника "Депо"
+            "depots.read",
+            "depots.create",
+            "depots.update",
+            "depots.delete",
+            
+            // Разрешения для справочника "Локации"
+            "locations.read",
+            "locations.create",
+            "locations.update",
+            "locations.delete",
+            
+            // Разрешения для справочника "Производители"
+            "manufacturers.read",
+            "manufacturers.create",
+            "manufacturers.update",
+            "manufacturers.delete",
+            
+            // Разрешения для справочника "Владельцы"
+            "owners.read",
+            "owners.create",
+            "owners.update",
+            "owners.delete",
+            
+            // Разрешения для справочника "Статусы деталей"
+            "partstatuses.read",
+            "partstatuses.create",
+            "partstatuses.update",
+            "partstatuses.delete",
+            
+            // Разрешения для справочника "Типы деталей"
+            "parttypes.read",
+            "parttypes.create",
+            "parttypes.update",
+            "parttypes.delete",
+            
+            // Разрешения для справочника "Регистраторы"
+            "registrars.read",
+            "registrars.create",
+            "registrars.update",
+            "registrars.delete",
+            
+            // Разрешения для справочника "Типы ремонтов"
+            "repairtypes.read",
+            "repairtypes.create",
+            "repairtypes.update",
+            "repairtypes.delete",
+            
+            // Разрешения для справочника "Типы вагонов"
+            "wagontypes.read",
+            "wagontypes.create",
+            "wagontypes.update",
+            "wagontypes.delete",
+            
+            // Разрешения для справочника "Модели вагонов"
+            "wagonmodels.read",
+            "wagonmodels.create",
+            "wagonmodels.update",
+            "wagonmodels.delete",
             
             // Административные разрешения
             "admin.full",
@@ -125,7 +191,19 @@ public class DataInitializerService : IDataInitializerService
                     "cisterns.read", "cisterns.create", "cisterns.update", "cisterns.delete",
                     "parts.read", "parts.create", "parts.update", "parts.delete",
                     "repairs.read", "repairs.create", "repairs.update", "repairs.delete",
-                    "references.read", "references.update", "admin.reports", "admin.settings"
+                    "references.read", "references.update", "admin.reports", "admin.settings",
+                    // Все справочники - полные права
+                    "affiliations.read", "affiliations.create", "affiliations.update", "affiliations.delete",
+                    "depots.read", "depots.create", "depots.update", "depots.delete",
+                    "locations.read", "locations.create", "locations.update", "locations.delete",
+                    "manufacturers.read", "manufacturers.create", "manufacturers.update", "manufacturers.delete",
+                    "owners.read", "owners.create", "owners.update", "owners.delete",
+                    "partstatuses.read", "partstatuses.create", "partstatuses.update", "partstatuses.delete",
+                    "parttypes.read", "parttypes.create", "parttypes.update", "parttypes.delete",
+                    "registrars.read", "registrars.create", "registrars.update", "registrars.delete",
+                    "repairtypes.read", "repairtypes.create", "repairtypes.update", "repairtypes.delete",
+                    "wagontypes.read", "wagontypes.create", "wagontypes.update", "wagontypes.delete",
+                    "wagonmodels.read", "wagonmodels.create", "wagonmodels.update", "wagonmodels.delete"
                 }
             },
             new 
@@ -136,7 +214,19 @@ public class DataInitializerService : IDataInitializerService
                     "cisterns.read", "cisterns.create", "cisterns.update",
                     "parts.read", "parts.create", "parts.update",
                     "repairs.read", "repairs.create", "repairs.update",
-                    "references.read", "admin.reports"
+                    "references.read", "admin.reports",
+                    // Справочники - чтение и редактирование
+                    "affiliations.read", "affiliations.update",
+                    "depots.read", "depots.update",
+                    "locations.read", "locations.update",
+                    "manufacturers.read", "manufacturers.update",
+                    "owners.read", "owners.update",
+                    "partstatuses.read", "partstatuses.update",
+                    "parttypes.read", "parttypes.update",
+                    "registrars.read", "registrars.update",
+                    "repairtypes.read", "repairtypes.update",
+                    "wagontypes.read", "wagontypes.update",
+                    "wagonmodels.read", "wagonmodels.update"
                 }
             },
             new 
@@ -147,7 +237,19 @@ public class DataInitializerService : IDataInitializerService
                     "cisterns.read", "cisterns.update",
                     "parts.read", "parts.update",
                     "repairs.read", "repairs.create", "repairs.update",
-                    "references.read"
+                    "references.read",
+                    // Справочники - только чтение
+                    "affiliations.read",
+                    "depots.read",
+                    "locations.read",
+                    "manufacturers.read",
+                    "owners.read",
+                    "partstatuses.read",
+                    "parttypes.read",
+                    "registrars.read",
+                    "repairtypes.read",
+                    "wagontypes.read",
+                    "wagonmodels.read"
                 }
             },
             new 
@@ -155,7 +257,19 @@ public class DataInitializerService : IDataInitializerService
                 Name = "Viewer", 
                 Permissions = new[] 
                 { 
-                    "cisterns.read", "parts.read", "repairs.read", "references.read"
+                    "cisterns.read", "parts.read", "repairs.read", "references.read",
+                    // Справочники - только чтение
+                    "affiliations.read",
+                    "depots.read",
+                    "locations.read",
+                    "manufacturers.read",
+                    "owners.read",
+                    "partstatuses.read",
+                    "parttypes.read",
+                    "registrars.read",
+                    "repairtypes.read",
+                    "wagontypes.read",
+                    "wagonmodels.read"
                 }
             }
         };
@@ -194,6 +308,11 @@ public class DataInitializerService : IDataInitializerService
             {
                 // Получаем роль для отслеживания
                 role = await _context.Roles.FindAsync(existingRole.Id);
+                if (role == null)
+                {
+                    _logger.LogError($"Не удалось найти роль с ID {existingRole.Id}");
+                    return;
+                }
                 _logger.LogInformation($"Обновляется роль: {roleName}");
             }
 

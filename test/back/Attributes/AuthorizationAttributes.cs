@@ -4,16 +4,11 @@ using System.Security.Claims;
 
 namespace back.Attributes;
 
-public class RequirePermissionAttribute : Attribute, IAuthorizationFilter
+public class RequirePermissionAttribute(string permission) : Attribute, IAuthorizationFilter
 {
-    private readonly string _permission;
+    private readonly string _permission = permission;
 
-    public RequirePermissionAttribute(string permission)
-    {
-        _permission = permission;
-    }
-
-    public void OnAuthorization(AuthorizationFilterContext context)
+  public void OnAuthorization(AuthorizationFilterContext context)
     {
         if (!context.HttpContext.User.Identity?.IsAuthenticated ?? true)
         {
@@ -33,16 +28,11 @@ public class RequirePermissionAttribute : Attribute, IAuthorizationFilter
     }
 }
 
-public class RequireRoleAttribute : Attribute, IAuthorizationFilter
+public class RequireRoleAttribute(string role) : Attribute, IAuthorizationFilter
 {
-    private readonly string _role;
+    private readonly string _role = role;
 
-    public RequireRoleAttribute(string role)
-    {
-        _role = role;
-    }
-
-    public void OnAuthorization(AuthorizationFilterContext context)
+  public void OnAuthorization(AuthorizationFilterContext context)
     {
         if (!context.HttpContext.User.Identity?.IsAuthenticated ?? true)
         {
