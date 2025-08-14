@@ -36,6 +36,7 @@ public class ApplicationDbContext(
     public DbSet<Repair> Repairs { get; set; }
     public DbSet<PartStatus> PartStatuses { get; set; }
     public DbSet<PartType> PartTypes { get; set; }
+    public DbSet<FilterType> FilterTypes { get; set; }
     public DbSet<StampNumber> StampNumbers { get; set; }
 
 
@@ -423,6 +424,7 @@ public class ApplicationDbContext(
             entity.Property(e => e.FilterJson).IsRequired().HasColumnType("text");
             entity.Property(e => e.SortFieldsJson).IsRequired().HasColumnType("text");
             entity.Property(e => e.UserId).IsRequired();
+            entity.Property(e => e.FilterTypeId).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired().HasColumnType("timestamp with time zone");
             entity.Property(e => e.UpdatedAt).IsRequired().HasColumnType("timestamp with time zone");
 
@@ -430,6 +432,19 @@ public class ApplicationDbContext(
                 .WithMany()
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(d => d.FilterType)
+                .WithMany(p => p.SavedFilters)
+                .HasForeignKey(d => d.FilterTypeId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // FilterTypes
+        modelBuilder.Entity<FilterType>(entity =>
+        {
+            entity.ToTable("FilterTypes");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasColumnType("text");
         });
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);

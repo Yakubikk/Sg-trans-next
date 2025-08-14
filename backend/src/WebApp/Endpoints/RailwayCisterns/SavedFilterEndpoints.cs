@@ -25,14 +25,17 @@ public static class SavedFilterEndpoints
             {
                 var userId = Guid.Parse(httpContext.User.FindFirstValue("userId")!);
                 var filters = await context.Set<SavedFilter>()
+                    .Include(f => f.FilterType)
                     .Where(f => f.UserId == userId)
-                    .Select(f => new 
+                    .Select(f => new
                     {
                         f.Id,
                         f.Name,
                         f.FilterJson,
                         f.SortFieldsJson,
                         f.UserId,
+                        f.FilterTypeId,
+                        FilterType = new { f.FilterType.Id, f.FilterType.Name },
                         f.CreatedAt,
                         f.UpdatedAt
                     })
@@ -45,6 +48,12 @@ public static class SavedFilterEndpoints
                     Filter = JsonSerializer.Deserialize<FilterCriteria>(f.FilterJson),
                     SortFields = JsonSerializer.Deserialize<List<SortCriteria>>(f.SortFieldsJson),
                     UserId = f.UserId,
+                    FilterTypeId = f.FilterTypeId,
+                    FilterType = new FilterTypeDTO 
+                    { 
+                        Id = f.FilterType.Id, 
+                        Name = f.FilterType.Name 
+                    },
                     CreatedAt = f.CreatedAt,
                     UpdatedAt = f.UpdatedAt
                 }).ToList();
@@ -63,6 +72,7 @@ public static class SavedFilterEndpoints
             {
                 var userId = Guid.Parse(httpContext.User.FindFirstValue("userId")!);
                 var filter = await context.Set<SavedFilter>()
+                    .Include(f => f.FilterType)
                     .Where(f => f.Id == id && f.UserId == userId)
                     .Select(f => new
                     {
@@ -71,6 +81,8 @@ public static class SavedFilterEndpoints
                         f.FilterJson,
                         f.SortFieldsJson,
                         f.UserId,
+                        f.FilterTypeId,
+                        FilterType = new { f.FilterType.Id, f.FilterType.Name },
                         f.CreatedAt,
                         f.UpdatedAt
                     })
@@ -86,6 +98,12 @@ public static class SavedFilterEndpoints
                     Filter = JsonSerializer.Deserialize<FilterCriteria>(filter.FilterJson),
                     SortFields = JsonSerializer.Deserialize<List<SortCriteria>>(filter.SortFieldsJson),
                     UserId = filter.UserId,
+                    FilterTypeId = filter.FilterTypeId,
+                    FilterType = new FilterTypeDTO 
+                    { 
+                        Id = filter.FilterType.Id, 
+                        Name = filter.FilterType.Name 
+                    },
                     CreatedAt = filter.CreatedAt,
                     UpdatedAt = filter.UpdatedAt
                 };
@@ -104,6 +122,13 @@ public static class SavedFilterEndpoints
                 HttpContext httpContext) =>
             {
                 var userId = Guid.Parse(httpContext.User.FindFirstValue("userId")!);
+                
+                var filterType = await context.Set<FilterType>()
+                    .FirstOrDefaultAsync(ft => ft.Id == dto.FilterTypeId);
+                    
+                if (filterType == null)
+                    return Results.NotFound("Filter type not found");
+
                 var filter = new SavedFilter
                 {
                     Id = Guid.NewGuid(),
@@ -111,6 +136,7 @@ public static class SavedFilterEndpoints
                     FilterJson = JsonSerializer.Serialize(dto.Filter),
                     SortFieldsJson = JsonSerializer.Serialize(dto.SortFields),
                     UserId = userId,
+                    FilterTypeId = dto.FilterTypeId,
                     CreatedAt = DateTimeOffset.UtcNow,
                     UpdatedAt = DateTimeOffset.UtcNow
                 };
@@ -118,19 +144,28 @@ public static class SavedFilterEndpoints
                 context.Add(filter);
                 await context.SaveChangesAsync();
 
-                return Results.Created($"/api/saved-filters/{filter.Id}", new SavedFilterDTO
+                var result = new SavedFilterDTO
                 {
                     Id = filter.Id,
                     Name = filter.Name,
                     Filter = dto.Filter,
                     SortFields = dto.SortFields,
                     UserId = filter.UserId,
+                    FilterTypeId = filter.FilterTypeId,
+                    FilterType = new FilterTypeDTO 
+                    { 
+                        Id = filterType.Id, 
+                        Name = filterType.Name 
+                    },
                     CreatedAt = filter.CreatedAt,
                     UpdatedAt = filter.UpdatedAt
-                });
+                };
+
+                return Results.Created($"/api/saved-filters/{filter.Id}", result);
             })
             .WithName("CreateSavedFilter")
             .Produces<SavedFilterDTO>(StatusCodes.Status201Created)
+            .Produces(StatusCodes.Status404NotFound)
             .ProducesValidationProblem()
             .RequirePermissions(Permission.Create);
 
@@ -148,13 +183,19 @@ public static class SavedFilterEndpoints
                 if (filter == null)
                     return Results.NotFound();
 
+                var filterType = await context.Set<FilterType>()
+                    .FirstOrDefaultAsync(ft => ft.Id == dto.FilterTypeId);
+                    
+                if (filterType == null)
+                    return Results.NotFound("Filter type not found");
+
                 filter.Name = dto.Name;
                 filter.FilterJson = JsonSerializer.Serialize(dto.Filter);
                 filter.SortFieldsJson = JsonSerializer.Serialize(dto.SortFields);
+                filter.FilterTypeId = dto.FilterTypeId;
                 filter.UpdatedAt = DateTimeOffset.UtcNow;
 
                 await context.SaveChangesAsync();
-
                 return Results.NoContent();
             })
             .WithName("UpdateSavedFilter")
@@ -162,6 +203,53 @@ public static class SavedFilterEndpoints
             .Produces(StatusCodes.Status404NotFound)
             .ProducesValidationProblem()
             .RequirePermissions(Permission.Update);
+
+        // Get filters by type
+        group.MapGet("/by-type/{typeId}", async (
+                [FromServices] ApplicationDbContext context,
+                [FromRoute] Guid typeId,
+                HttpContext httpContext) =>
+            {
+                var userId = Guid.Parse(httpContext.User.FindFirstValue("userId")!);
+                var filters = await context.Set<SavedFilter>()
+                    .Include(f => f.FilterType)
+                    .Where(f => f.UserId == userId && f.FilterTypeId == typeId)
+                    .Select(f => new
+                    {
+                        f.Id,
+                        f.Name,
+                        f.FilterJson,
+                        f.SortFieldsJson,
+                        f.UserId,
+                        f.FilterTypeId,
+                        FilterType = new { f.FilterType.Id, f.FilterType.Name },
+                        f.CreatedAt,
+                        f.UpdatedAt
+                    })
+                    .ToListAsync();
+
+                var result = filters.Select(f => new SavedFilterDTO
+                {
+                    Id = f.Id,
+                    Name = f.Name,
+                    Filter = JsonSerializer.Deserialize<FilterCriteria>(f.FilterJson),
+                    SortFields = JsonSerializer.Deserialize<List<SortCriteria>>(f.SortFieldsJson),
+                    UserId = f.UserId,
+                    FilterTypeId = f.FilterTypeId,
+                    FilterType = new FilterTypeDTO 
+                    { 
+                        Id = f.FilterType.Id, 
+                        Name = f.FilterType.Name 
+                    },
+                    CreatedAt = f.CreatedAt,
+                    UpdatedAt = f.UpdatedAt
+                }).ToList();
+
+                return Results.Ok(result);
+            })
+            .WithName("GetFiltersByType")
+            .Produces<List<SavedFilterDTO>>(StatusCodes.Status200OK)
+            .RequirePermissions(Permission.Read);
 
         // Delete filter
         group.MapDelete("/{id}", async (
@@ -178,7 +266,6 @@ public static class SavedFilterEndpoints
 
                 context.Remove(filter);
                 await context.SaveChangesAsync();
-
                 return Results.NoContent();
             })
             .WithName("DeleteSavedFilter")

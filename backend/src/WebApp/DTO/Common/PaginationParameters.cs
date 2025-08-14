@@ -6,7 +6,7 @@ namespace WebApp.DTO.Common;
 [BindProperties]
 public class PaginationParameters
 {
-    private const int MaxPageSize = 50;
+    private const int MaxPageSize = 100;
     private int _pageSize = 10;
     
     [DefaultValue(1)]

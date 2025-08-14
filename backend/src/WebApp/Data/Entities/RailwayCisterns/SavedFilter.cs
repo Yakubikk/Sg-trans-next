@@ -11,6 +11,8 @@ public class SavedFilter
     public string SortFieldsJson { get; set; }
     public Guid UserId { get; set; }
     public User User { get; set; }
+    public Guid FilterTypeId { get; set; }
+    public FilterType FilterType { get; set; } = null!;
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
 }
