@@ -21,7 +21,8 @@ export function ProtectedRoute({
 
   useEffect(() => {
     initializeAuth();
-  }, [initializeAuth]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Убираем initializeAuth из зависимостей
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {

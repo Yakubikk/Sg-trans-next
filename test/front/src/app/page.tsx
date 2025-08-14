@@ -11,7 +11,8 @@ export default function HomePage() {
 
   useEffect(() => {
     initializeAuth();
-  }, [initializeAuth]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Убираем initializeAuth из зависимостей, так как теперь она защищена от повторных вызовов
 
   useEffect(() => {
     if (!isLoading) {

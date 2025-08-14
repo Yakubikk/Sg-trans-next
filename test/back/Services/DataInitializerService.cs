@@ -286,7 +286,7 @@ public class DataInitializerService(ApplicationDbContext context, ILogger<DataIn
                 .AsNoTracking()
                 .FirstOrDefaultAsync(r => r.Name == roleName);
 
-            Role role;
+            Role? role;
             if (existingRole == null)
             {
                 // Создаем новую роль без ручного назначения ID
@@ -310,11 +310,7 @@ public class DataInitializerService(ApplicationDbContext context, ILogger<DataIn
                 _logger.LogInformation($"Обновляется роль: {roleName}");
             }
 
-            if (role == null)
-            {
-                _logger.LogError($"Не удалось получить роль {roleName}");
-                return;
-            }
+            // role не может быть null здесь, так как мы создали новую или получили существующую
 
             // Получаем все разрешения без отслеживания
             var allPermissions = await _context.PermissionEntities

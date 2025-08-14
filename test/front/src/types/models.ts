@@ -2,6 +2,7 @@ export interface RailwayCistern {
   id: string;
   number: string;
   manufacturerId: string;
+  manufacturerName?: string;
   buildDate: string;
   tareWeight: number;
   loadCapacity: number;
@@ -11,17 +12,39 @@ export interface RailwayCistern {
   fillingVolume?: number;
   initialTareWeight?: number;
   typeId: string;
+  typeName?: string;
   modelId?: string;
+  modelName?: string;
   commissioningDate?: string;
   serialNumber: string;
   registrationNumber: string;
   registrationDate: string;
   registrarId?: string;
+  registrarName?: string;
   notes?: string;
+  ownerId?: string;
+  ownerName?: string;
+  techConditions?: string;
+  pripiska?: string;
+  reRegistrationDate?: string;
+  pressure: number;
+  testPressure: number;
+  rent?: string;
+  affiliationId: string;
+  affiliationName?: string;
+  serviceLifeYears: number;
+  periodMajorRepair?: string;
+  periodPeriodicTest?: string;
+  periodIntermediateTest?: string;
+  periodDepotRepair?: string;
+  dangerClass: number;
+  substance: string;
+  tareWeight2: number;
+  tareWeight3: number;
   createdAt: string;
   updatedAt: string;
   creatorId: string;
-  // Relations
+  // Relations (deprecated - use Name fields instead)
   manufacturer?: Manufacturer;
   type?: WagonType;
   model?: WagonModel;
@@ -118,7 +141,7 @@ export interface Location {
 
 export interface Affiliation {
   id: string;
-  name: string;
+  value: string;
   description?: string;
   createdAt: string;
   updatedAt: string;
@@ -191,4 +214,105 @@ export interface PaginationParams {
   page?: number;
   size?: number;
   search?: string;
+}
+
+// Railway Cistern Passport DTOs
+export interface RailwayCisternPassport {
+  id: string;
+  number: string;
+  serialNumber: string;
+  registrationNumber: string;
+  
+  // Производство
+  manufacturer?: string;
+  buildDate: string;
+  commissioningDate?: string;
+  
+  // Тип и модель
+  type?: string;
+  model?: string;
+  
+  // Весовые характеристики
+  tareWeight: number;
+  tareWeight2: number;
+  tareWeight3: number;
+  initialTareWeight?: number;
+  loadCapacity: number;
+  
+  // Размеры
+  length: number;
+  axleCount: number;
+  volume: number;
+  fillingVolume?: number;
+  
+  // Давление
+  pressure: number;
+  testPressure: number;
+  
+  // Опасность
+  dangerClass: number;
+  substance: string;
+  
+  // Регистрация
+  registrationDate: string;
+  reRegistrationDate?: string;
+  registrar?: string;
+  
+  // Владение
+  owner?: string;
+  affiliation?: string;
+  rent?: string;
+  pripiska?: string;
+  
+  // Ремонт и обслуживание
+  serviceLifeYears: number;
+  periodMajorRepair?: string;
+  periodPeriodicTest?: string;
+  periodIntermediateTest?: string;
+  periodDepotRepair?: string;
+  
+  // Дополнительно
+  techСonditions?: string;
+  notes?: string;
+  
+  createdAt: string;
+  updatedAt: string;
+  
+  // Установленные части
+  installedParts: InstalledPart[];
+  
+  // Сосуд под давлением
+  vesselInfo?: VesselInfo;
+}
+
+export interface InstalledPart {
+  id: string;
+  partId: string;
+  partTypeName?: string;
+  partStatusName?: string;
+  serialNumber?: string;
+  manufactureYear?: string;
+  installedAt: string;
+  installedBy?: string;
+  removedAt?: string;
+  removedBy?: string;
+  fromLocationName?: string;
+  toLocationName?: string;
+  notes?: string;
+}
+
+export interface VesselInfo {
+  id: string;
+  // Добавить необходимые поля в зависимости от модели Vessel
+}
+
+// Дополнительные типы для пагинации
+export interface PaginatedResult<T> {
+  items: T[];
+  totalCount: number;
+  page: number;
+  size: number;
+  totalPages?: number;
+  hasNextPage?: boolean;
+  hasPreviousPage?: boolean;
 }
