@@ -142,3 +142,39 @@ public class UserDto
     /// </summary>
     public List<string> Roles { get; set; } = new();
 }
+
+/// <summary>
+/// DTO для обновления пользователя
+/// </summary>
+public class UpdateUserDto
+{
+    /// <summary>
+    /// Email пользователя
+    /// </summary>
+    public string? Email { get; set; }
+    
+    /// <summary>
+    /// Имя пользователя
+    /// </summary>
+    public string? FirstName { get; set; }
+    
+    /// <summary>
+    /// Фамилия пользователя
+    /// </summary>
+    public string? LastName { get; set; }
+    
+    /// <summary>
+    /// Отчество пользователя
+    /// </summary>
+    public string? Patronymic { get; set; }
+    
+    /// <summary>
+    /// Номер телефона пользователя
+    /// </summary>
+    public string? PhoneNumber { get; set; }
+    
+    /// <summary>
+    /// Список идентификаторов ролей для назначения пользователю
+    /// </summary>
+    public List<int>? RoleIds { get; set; }
+}

@@ -2,6 +2,7 @@ import { apiClient } from './client';
 import {
   RailwayCistern,
   RailwayCisternCreateDto,
+  RailwayCisternPassport,
   Manufacturer,
   WagonType,
   WagonModel,
@@ -18,6 +19,7 @@ import {
   PaginationParams,
   BaseCreateDto,
 } from '@/types/models';
+import { UserDto, RegisterDto, UpdateUserDto } from '@/types/auth';
 
 // Generic CRUD service
 class CrudService<T, TCreate = BaseCreateDto, TUpdate = Partial<TCreate>> {
@@ -61,6 +63,13 @@ export const railwayCisternsService = new CrudService<
   Partial<RailwayCisternCreateDto>
 >('railwaycisterns');
 
+// Users
+export const usersService = new CrudService<
+  UserDto,
+  RegisterDto,
+  UpdateUserDto
+>('users');
+
 // Reference data services
 export const manufacturersService = new CrudService<Manufacturer>('manufacturers');
 export const wagonTypesService = new CrudService<WagonType>('wagontypes');
@@ -86,10 +95,29 @@ export const railwayCisternsServiceExtended = {
   ...railwayCisternsService,
   getByNumber: (number: string): Promise<RailwayCistern> =>
     apiClient.get(`/railwaycisterns/bynumber/${number}`),
+  getPassport: (id: string): Promise<RailwayCisternPassport> =>
+    apiClient.get(`/railwaycisterns/${id}/passport`),
   exportToPdf: (id: string): Promise<Blob> =>
     apiClient.get(`/railwaycisterns/${id}/export/pdf`),
   exportToExcel: (filters?: Record<string, unknown>): Promise<Blob> =>
     apiClient.post('/railwaycisterns/export/excel', filters),
+  applyFilter: (filterId: string, pagination?: PaginationParams): Promise<PaginatedResponse<RailwayCistern>> => {
+    const queryParams: Record<string, string> = {
+      page: (pagination?.page || 1).toString(),
+      size: (pagination?.size || 10).toString(),
+    };
+    if (pagination?.search) {
+      queryParams.search = pagination.search;
+    }
+    const requestBody = { FilterId: filterId };
+    const url = `/railwaycisterns/apply-filter?${new URLSearchParams(queryParams).toString()}`;
+    
+    console.log('Applying filter API call:');
+    console.log('URL:', url);
+    console.log('Request body:', requestBody);
+    
+    return apiClient.post(url, requestBody);
+  },
 };
 
 export const savedFiltersServiceExtended = {

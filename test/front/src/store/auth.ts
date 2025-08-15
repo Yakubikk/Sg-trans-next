@@ -15,7 +15,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       isAuthenticated: false,
       isLoading: false,
@@ -58,6 +58,12 @@ export const useAuthStore = create<AuthState>()(
       },
 
       initializeAuth: async () => {
+        const state = get();
+        // Если уже идет загрузка или пользователь уже аутентифицирован, не запускаем повторно
+        if (state.isLoading || (state.isAuthenticated && state.user)) {
+          return;
+        }
+
         const token = apiClient.getToken();
         if (!token) {
           set({ isAuthenticated: false, user: null });

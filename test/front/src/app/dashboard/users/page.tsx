@@ -4,12 +4,15 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ColumnDef } from '@tanstack/react-table';
 import { toast } from 'sonner';
+import Link from 'next/link';
 
 import { ServerDataTable } from '@/components/common/server-data-table';
 import { UserDto } from '@/types/auth';
 import { PaginationParams } from '@/types/models';
-import { apiClient } from '@/lib/api/client';
+import { usersService } from '@/lib/api/services';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
 import { ProtectedRoute } from '@/components/auth/protected-route';
 import {
   AlertDialog,
@@ -26,10 +29,26 @@ const columns: ColumnDef<UserDto>[] = [
   {
     accessorKey: 'firstName',
     header: 'Имя',
+    cell: ({ row }) => (
+      <Link 
+        href={`/dashboard/users/${row.original.id}`}
+        className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+      >
+        {row.getValue('firstName')}
+      </Link>
+    ),
   },
   {
     accessorKey: 'lastName',
     header: 'Фамилия',
+  },
+  {
+    accessorKey: 'patronymic',
+    header: 'Отчество',
+  },
+  {
+    accessorKey: 'email',
+    header: 'Email',
   },
   {
     accessorKey: 'phoneNumber',
@@ -69,32 +88,13 @@ export default function UsersPage() {
 
   const queryClient = useQueryClient();
 
-  // Функция для получения пользователей с пагинацией
-  const fetchUsers = async (params: PaginationParams) => {
-    const users = await apiClient.get<UserDto[]>('/users');
-    // Эмулируем пагинацию для существующего API
-    const startIndex = ((params.page || 1) - 1) * (params.size || 20);
-    const endIndex = startIndex + (params.size || 20);
-    const items = users.slice(startIndex, endIndex);
-    
-    return {
-      items,
-      totalCount: users.length,
-      page: params.page || 1,
-      size: params.size || 20,
-      totalPages: Math.ceil(users.length / (params.size || 20)),
-      hasNextPage: endIndex < users.length,
-      hasPreviousPage: (params.page || 1) > 1,
-    };
-  };
-
   const { data, isLoading } = useQuery({
     queryKey: ['users', pagination],
-    queryFn: () => fetchUsers(pagination),
+    queryFn: () => usersService.getAll(pagination),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiClient.delete(`/users/${id}`),
+    mutationFn: usersService.delete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast.success('Пользователь удален');
@@ -144,20 +144,28 @@ export default function UsersPage() {
   return (
     <ProtectedRoute requiredRole="Admin">
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-            Пользователи
-          </h1>
-          <p className="text-gray-500">
-            Управление пользователями системы
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+              Пользователи
+            </h1>
+            <p className="text-gray-500">
+              Управление пользователями системы
+            </p>
+          </div>
+          <Link href="/dashboard/users/new">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Добавить пользователя
+            </Button>
+          </Link>
         </div>
 
         <ServerDataTable
           columns={columns}
           data={tableData}
           title="Пользователи системы"
-          searchPlaceholder="Поиск пользователей..."
+          searchPlaceholder="Поиск по имени, фамилии, email..."
           onDelete={handleDelete}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}

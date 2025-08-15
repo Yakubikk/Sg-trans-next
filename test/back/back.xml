@@ -68,6 +68,13 @@
             <param name="selectedColumnsJson">JSON с выбранными колонками</param>
             <returns>Отфильтрованный список DTO</returns>
         </member>
+        <member name="M:back.Controllers.RailwayCisternsController.GetPassport(System.Guid)">
+            <summary>
+            Получить паспорт цистерны с детальной информацией
+            </summary>
+            <param name="id">Идентификатор цистерны</param>
+            <returns>Паспорт цистерны</returns>
+        </member>
         <member name="M:back.Controllers.RolesController.GetRoles">
             <summary>
             Получить список всех ролей
@@ -135,6 +142,81 @@
             <summary>
             Получить фильтр по умолчанию для типа сущности
             </summary>
+        </member>
+        <member name="T:back.Controllers.UsersController">
+            <summary>
+            Контроллер для управления пользователями
+            </summary>
+            <remarks>
+            Инициализирует новый экземпляр контроллера пользователей
+            </remarks>
+            <param name="context">Контекст базы данных</param>
+        </member>
+        <member name="M:back.Controllers.UsersController.#ctor(back.Models.ApplicationDbContext)">
+            <summary>
+            Контроллер для управления пользователями
+            </summary>
+            <remarks>
+            Инициализирует новый экземпляр контроллера пользователей
+            </remarks>
+            <param name="context">Контекст базы данных</param>
+        </member>
+        <member name="M:back.Controllers.UsersController.GetBaseQuery">
+            <summary>
+            Получает базовый запрос для пользователей
+            </summary>
+            <returns>Запрос с включенными ролями</returns>
+        </member>
+        <member name="M:back.Controllers.UsersController.GetEntityByIdQuery(System.Linq.IQueryable{back.Models.User},System.Guid)">
+            <summary>
+            Получает запрос для конкретного пользователя по ID с включенными ролями
+            </summary>
+            <param name="query">Базовый запрос</param>
+            <param name="id">Идентификатор пользователя</param>
+            <returns>Запрос для получения пользователя по ID</returns>
+        </member>
+        <member name="M:back.Controllers.UsersController.ApplySearch(System.Linq.IQueryable{back.Models.User},System.String)">
+            <summary>
+            Применяет поиск к запросу пользователей
+            </summary>
+            <param name="query">Базовый запрос</param>
+            <param name="search">Поисковая строка</param>
+            <returns>Запрос с примененным поиском</returns>
+        </member>
+        <member name="M:back.Controllers.UsersController.MapToDto(back.Models.User)">
+            <summary>
+            Преобразует сущность пользователя в DTO
+            </summary>
+            <param name="entity">Сущность пользователя</param>
+            <returns>DTO пользователя</returns>
+        </member>
+        <member name="M:back.Controllers.UsersController.MapToEntityAsync(back.DTOs.RegisterDto)">
+            <summary>
+            Создает сущность пользователя из DTO для создания
+            </summary>
+            <param name="createDto">DTO для создания пользователя</param>
+            <returns>Сущность пользователя</returns>
+        </member>
+        <member name="M:back.Controllers.UsersController.ApplyUpdateAsync(back.Models.User,back.DTOs.UpdateUserDto)">
+            <summary>
+            Применяет обновления к сущности пользователя
+            </summary>
+            <param name="entity">Сущность пользователя</param>
+            <param name="updateDto">DTO для обновления</param>
+        </member>
+        <member name="M:back.Controllers.UsersController.GetEntityId(back.Models.User)">
+            <summary>
+            Получает идентификатор сущности пользователя
+            </summary>
+            <param name="entity">Сущность пользователя</param>
+            <returns>Идентификатор пользователя</returns>
+        </member>
+        <member name="M:back.Controllers.UsersController.ValidateEntity(back.Models.User,System.Boolean)">
+            <summary>
+            Валидирует сущность пользователя
+            </summary>
+            <param name="entity">Сущность пользователя</param>
+            <param name="isUpdate">Флаг обновления</param>
         </member>
         <member name="T:back.DTOs.LoginDto">
             <summary>
@@ -259,6 +341,41 @@
         <member name="P:back.DTOs.UserDto.Roles">
             <summary>
             Список ролей пользователя
+            </summary>
+        </member>
+        <member name="T:back.DTOs.UpdateUserDto">
+            <summary>
+            DTO для обновления пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.UpdateUserDto.Email">
+            <summary>
+            Email пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.UpdateUserDto.FirstName">
+            <summary>
+            Имя пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.UpdateUserDto.LastName">
+            <summary>
+            Фамилия пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.UpdateUserDto.Patronymic">
+            <summary>
+            Отчество пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.UpdateUserDto.PhoneNumber">
+            <summary>
+            Номер телефона пользователя
+            </summary>
+        </member>
+        <member name="P:back.DTOs.UpdateUserDto.RoleIds">
+            <summary>
+            Список идентификаторов ролей для назначения пользователю
             </summary>
         </member>
         <member name="T:back.DTOs.SavedFilterDto">
