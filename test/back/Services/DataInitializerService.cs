@@ -388,7 +388,7 @@ public class DataInitializerService(ApplicationDbContext context, ILogger<DataIn
                     LastName = "Системы",
                     Patronymic = "",
                     PhoneNumber = "+375000000000",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!")
+                    PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword("Admin123!")
                 };
 
                 _context.Users.Add(adminUser);

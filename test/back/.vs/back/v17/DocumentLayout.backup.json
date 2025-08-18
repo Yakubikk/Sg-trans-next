@@ -1,0 +1,172 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Git-repo\\Sg-trans-next\\test\\back\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{C9494C44-D29B-452F-8B41-EDCB292758D8}|back.csproj|d:\\git-repo\\sg-trans-next\\test\\back\\controllers\\affiliationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C9494C44-D29B-452F-8B41-EDCB292758D8}|back.csproj|solutionrelative:controllers\\affiliationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C9494C44-D29B-452F-8B41-EDCB292758D8}|back.csproj|d:\\git-repo\\sg-trans-next\\test\\back\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C9494C44-D29B-452F-8B41-EDCB292758D8}|back.csproj|solutionrelative:services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C9494C44-D29B-452F-8B41-EDCB292758D8}|back.csproj|d:\\git-repo\\sg-trans-next\\test\\back\\services\\datainitializerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C9494C44-D29B-452F-8B41-EDCB292758D8}|back.csproj|solutionrelative:services\\datainitializerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C9494C44-D29B-452F-8B41-EDCB292758D8}|back.csproj|d:\\git-repo\\sg-trans-next\\test\\back\\controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C9494C44-D29B-452F-8B41-EDCB292758D8}|back.csproj|solutionrelative:controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C9494C44-D29B-452F-8B41-EDCB292758D8}|back.csproj|d:\\git-repo\\sg-trans-next\\test\\back\\back.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{C9494C44-D29B-452F-8B41-EDCB292758D8}|back.csproj|solutionrelative:back.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C9494C44-D29B-452F-8B41-EDCB292758D8}|back.csproj|d:\\git-repo\\sg-trans-next\\test\\back\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C9494C44-D29B-452F-8B41-EDCB292758D8}|back.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C9494C44-D29B-452F-8B41-EDCB292758D8}|back.csproj|d:\\git-repo\\sg-trans-next\\test\\back\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{C9494C44-D29B-452F-8B41-EDCB292758D8}|back.csproj|solutionrelative:properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C9494C44-D29B-452F-8B41-EDCB292758D8}|back.csproj|d:\\git-repo\\sg-trans-next\\test\\back\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{C9494C44-D29B-452F-8B41-EDCB292758D8}|back.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{0174dea2-fdbe-4ef1-8f99-c0beae78880f}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AffiliationsController.cs",
+              "DocumentMoniker": "D:\\Git-repo\\Sg-trans-next\\test\\back\\Controllers\\AffiliationsController.cs",
+              "RelativeDocumentMoniker": "Controllers\\AffiliationsController.cs",
+              "ToolTip": "D:\\Git-repo\\Sg-trans-next\\test\\back\\Controllers\\AffiliationsController.cs",
+              "RelativeToolTip": "Controllers\\AffiliationsController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T09:42:02.713Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "UsersController.cs",
+              "DocumentMoniker": "D:\\Git-repo\\Sg-trans-next\\test\\back\\Controllers\\UsersController.cs",
+              "RelativeDocumentMoniker": "Controllers\\UsersController.cs",
+              "ToolTip": "D:\\Git-repo\\Sg-trans-next\\test\\back\\Controllers\\UsersController.cs",
+              "RelativeToolTip": "Controllers\\UsersController.cs",
+              "ViewState": "AgIAAEsAAAAAAAAAAAAewFMAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T09:38:00.825Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "back",
+              "DocumentMoniker": "D:\\Git-repo\\Sg-trans-next\\test\\back\\back.csproj",
+              "RelativeDocumentMoniker": "back.csproj",
+              "ToolTip": "D:\\Git-repo\\Sg-trans-next\\test\\back\\back.csproj",
+              "RelativeToolTip": "back.csproj",
+              "ViewState": "AgIAAA0AAAAAAAAAAAArwBcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-08-14T09:37:58.653Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "D:\\Git-repo\\Sg-trans-next\\test\\back\\Properties\\launchSettings.json",
+              "RelativeDocumentMoniker": "Properties\\launchSettings.json",
+              "ToolTip": "D:\\Git-repo\\Sg-trans-next\\test\\back\\Properties\\launchSettings.json",
+              "RelativeToolTip": "Properties\\launchSettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-08-14T09:28:09.319Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\Git-repo\\Sg-trans-next\\test\\back\\appsettings.json",
+              "RelativeDocumentMoniker": "appsettings.json",
+              "ToolTip": "D:\\Git-repo\\Sg-trans-next\\test\\back\\appsettings.json",
+              "RelativeToolTip": "appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-08-14T09:24:06.378Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Git-repo\\Sg-trans-next\\test\\back\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "D:\\Git-repo\\Sg-trans-next\\test\\back\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAI4AAACgNjMzM3MvwEUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T09:18:02.403Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "DataInitializerService.cs",
+              "DocumentMoniker": "D:\\Git-repo\\Sg-trans-next\\test\\back\\Services\\DataInitializerService.cs",
+              "RelativeDocumentMoniker": "Services\\DataInitializerService.cs",
+              "ToolTip": "D:\\Git-repo\\Sg-trans-next\\test\\back\\Services\\DataInitializerService.cs",
+              "RelativeToolTip": "Services\\DataInitializerService.cs",
+              "ViewState": "AgIAAJkBAAAAAJuZmZnRv4YBAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T09:16:56.409Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "AuthService.cs",
+              "DocumentMoniker": "D:\\Git-repo\\Sg-trans-next\\test\\back\\Services\\AuthService.cs",
+              "RelativeDocumentMoniker": "Services\\AuthService.cs",
+              "ToolTip": "D:\\Git-repo\\Sg-trans-next\\test\\back\\Services\\AuthService.cs",
+              "RelativeToolTip": "Services\\AuthService.cs",
+              "ViewState": "AgIAABEAAAAAAAAAAAAWwBYAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T09:16:16.899Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

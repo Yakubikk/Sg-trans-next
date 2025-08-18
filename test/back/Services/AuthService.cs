@@ -23,7 +23,7 @@ public class AuthService(ApplicationDbContext context, IJwtService jwtService) :
             .ThenInclude(r => r.Permissions)
             .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
 
-        if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
+        if (user == null || !BCrypt.Net.BCrypt.EnhancedVerify(loginDto.Password, user.PasswordHash))
         {
             return null;
         }
@@ -63,7 +63,7 @@ public class AuthService(ApplicationDbContext context, IJwtService jwtService) :
             LastName = registerDto.LastName,
             Patronymic = registerDto.Patronymic,
             PhoneNumber = registerDto.PhoneNumber,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password)
+            PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(registerDto.Password)
         };
 
         _context.Users.Add(user);

@@ -82,7 +82,7 @@ public class UsersController(ApplicationDbContext context) : BaseCrudController<
     protected override async Task<User> MapToEntityAsync(RegisterDto createDto)
     {
         // Хэширование пароля
-        var passwordHash = BCrypt.Net.BCrypt.HashPassword(createDto.Password);
+        var passwordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(createDto.Password);
         
         var user = new User
         {
