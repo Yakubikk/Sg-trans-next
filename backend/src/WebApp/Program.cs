@@ -90,21 +90,5 @@ app.UseAuthorization();
 
 app.AddMappedEndpoints();
 
-// using (var scope = app.Services.CreateScope())
-// {
-//     var scopeServiceProvider = scope.ServiceProvider;
-//     try
-//     {
-//         var context = scopeServiceProvider.GetRequiredService<ApplicationDbContext>();
-//         var passwordHasher = scopeServiceProvider.GetRequiredService<IPasswordHasher>();
-//
-//         await DbInitializer.Initialize(context, passwordHasher);
-//     }
-//     catch (Exception ex)
-//     {
-//         var logger = scopeServiceProvider.GetRequiredService<ILogger<Program>>();
-//         logger.LogError(ex, "Произошла ошибка при заполнении базы данных.");
-//     }
-// }
 
 app.Run();

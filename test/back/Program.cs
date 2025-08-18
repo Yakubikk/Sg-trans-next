@@ -110,13 +110,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Инициализация данных при запуске
-using (var scope = app.Services.CreateScope())
-{
-    var dataInitializer = scope.ServiceProvider.GetRequiredService<IDataInitializerService>();
-    await dataInitializer.InitializeAsync();
-}
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
