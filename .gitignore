@@ -57,3 +57,4 @@ nunit-*.xml
 /backend/src/WebApp/Properties/PublishProfiles
 /backend/src/WebApp/WebApp.csproj.user
 /backend/src/.vs/ProjectEvaluation
+/backend/src/WebApp/appsettings.json

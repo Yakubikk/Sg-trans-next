@@ -17,9 +17,11 @@ public static class ApiExtensions
     {
         app.MapUsersEndpoints();
 
+        app.MapSavedFilterEndpoints();
+        app.MapFilterTypeEndpoints();
+
         // Railway cisterns endpoints
         app.MapRailwayCisternEndpoints();
-        app.MapSavedFilterEndpoints();
         app.MapRepairTypeEndpoints();
         app.MapManufacturerEndpoints();
         app.MapWagonModelEndpoints();
