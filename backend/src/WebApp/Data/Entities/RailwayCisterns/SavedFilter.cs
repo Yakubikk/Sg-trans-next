@@ -9,6 +9,7 @@ public class SavedFilter
     public string Name { get; set; }
     public string FilterJson { get; set; }
     public string SortFieldsJson { get; set; }
+    public string SelectedColumnsJson { get; set; } // Добавлен
     public Guid UserId { get; set; }
     public User User { get; set; }
     public Guid FilterTypeId { get; set; }

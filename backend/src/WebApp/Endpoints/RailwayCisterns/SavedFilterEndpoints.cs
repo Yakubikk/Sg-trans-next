@@ -33,6 +33,7 @@ public static class SavedFilterEndpoints
                         f.Name,
                         f.FilterJson,
                         f.SortFieldsJson,
+                        f.SelectedColumnsJson,
                         f.UserId,
                         f.FilterTypeId,
                         FilterType = new { f.FilterType.Id, f.FilterType.Name },
@@ -47,6 +48,7 @@ public static class SavedFilterEndpoints
                     Name = f.Name,
                     Filter = JsonSerializer.Deserialize<FilterCriteria>(f.FilterJson),
                     SortFields = JsonSerializer.Deserialize<List<SortCriteria>>(f.SortFieldsJson),
+                    SelectedColumns = JsonSerializer.Deserialize<List<string>>(f.SelectedColumnsJson),
                     UserId = f.UserId,
                     FilterTypeId = f.FilterTypeId,
                     FilterType = new FilterTypeDTO 
@@ -80,6 +82,7 @@ public static class SavedFilterEndpoints
                         f.Name,
                         f.FilterJson,
                         f.SortFieldsJson,
+                        f.SelectedColumnsJson,
                         f.UserId,
                         f.FilterTypeId,
                         FilterType = new { f.FilterType.Id, f.FilterType.Name },
@@ -97,6 +100,7 @@ public static class SavedFilterEndpoints
                     Name = filter.Name,
                     Filter = JsonSerializer.Deserialize<FilterCriteria>(filter.FilterJson),
                     SortFields = JsonSerializer.Deserialize<List<SortCriteria>>(filter.SortFieldsJson),
+                    SelectedColumns = JsonSerializer.Deserialize<List<string>>(filter.SelectedColumnsJson),
                     UserId = filter.UserId,
                     FilterTypeId = filter.FilterTypeId,
                     FilterType = new FilterTypeDTO 
@@ -135,6 +139,7 @@ public static class SavedFilterEndpoints
                     Name = dto.Name,
                     FilterJson = JsonSerializer.Serialize(dto.Filter),
                     SortFieldsJson = JsonSerializer.Serialize(dto.SortFields),
+                    SelectedColumnsJson = JsonSerializer.Serialize(dto.SelectedColumns),
                     UserId = userId,
                     FilterTypeId = dto.FilterTypeId,
                     CreatedAt = DateTimeOffset.UtcNow,
@@ -150,6 +155,7 @@ public static class SavedFilterEndpoints
                     Name = filter.Name,
                     Filter = dto.Filter,
                     SortFields = dto.SortFields,
+                    SelectedColumns = dto.SelectedColumns,
                     UserId = filter.UserId,
                     FilterTypeId = filter.FilterTypeId,
                     FilterType = new FilterTypeDTO 
@@ -192,6 +198,7 @@ public static class SavedFilterEndpoints
                 filter.Name = dto.Name;
                 filter.FilterJson = JsonSerializer.Serialize(dto.Filter);
                 filter.SortFieldsJson = JsonSerializer.Serialize(dto.SortFields);
+                filter.SelectedColumnsJson = JsonSerializer.Serialize(dto.SelectedColumns);
                 filter.FilterTypeId = dto.FilterTypeId;
                 filter.UpdatedAt = DateTimeOffset.UtcNow;
 
@@ -220,6 +227,7 @@ public static class SavedFilterEndpoints
                         f.Name,
                         f.FilterJson,
                         f.SortFieldsJson,
+                        f.SelectedColumnsJson,
                         f.UserId,
                         f.FilterTypeId,
                         FilterType = new { f.FilterType.Id, f.FilterType.Name },
@@ -234,6 +242,7 @@ public static class SavedFilterEndpoints
                     Name = f.Name,
                     Filter = JsonSerializer.Deserialize<FilterCriteria>(f.FilterJson),
                     SortFields = JsonSerializer.Deserialize<List<SortCriteria>>(f.SortFieldsJson),
+                    SelectedColumns = JsonSerializer.Deserialize<List<string>>(f.SelectedColumnsJson),
                     UserId = f.UserId,
                     FilterTypeId = f.FilterTypeId,
                     FilterType = new FilterTypeDTO 

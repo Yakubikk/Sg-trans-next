@@ -423,6 +423,7 @@ public class ApplicationDbContext(
             entity.Property(e => e.Name).IsRequired().HasColumnType("text");
             entity.Property(e => e.FilterJson).IsRequired().HasColumnType("text");
             entity.Property(e => e.SortFieldsJson).IsRequired().HasColumnType("text");
+            entity.Property(e => e.SelectedColumnsJson).IsRequired().HasColumnType("text"); // Добавлено
             entity.Property(e => e.UserId).IsRequired();
             entity.Property(e => e.FilterTypeId).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired().HasColumnType("timestamp with time zone");

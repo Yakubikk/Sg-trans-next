@@ -11,6 +11,7 @@ public class SavedFilterDTO
     public FilterTypeDTO FilterType { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
+    public List<string> SelectedColumns { get; set; }
 }
 
 public class CreateSavedFilterDTO
@@ -19,6 +20,7 @@ public class CreateSavedFilterDTO
     public FilterCriteria Filter { get; set; }
     public List<SortCriteria> SortFields { get; set; }
     public Guid FilterTypeId { get; set; }
+    public List<string> SelectedColumns { get; set; }
 }
 
 public class UpdateSavedFilterDTO
@@ -27,4 +29,5 @@ public class UpdateSavedFilterDTO
     public FilterCriteria Filter { get; set; }
     public List<SortCriteria> SortFields { get; set; }
     public Guid FilterTypeId { get; set; }
+    public List<string> SelectedColumns { get; set; }
 }
