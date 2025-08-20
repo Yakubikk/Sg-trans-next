@@ -30,6 +30,7 @@ public static class ApiExtensions
         app.MapMilageCisternEndpoints();
         app.MapLocationEndpoints();
         app.MapDepotEndpoints();
+        app.MapRailwayCisternFilterEndpoints();
         
         // Part related endpoints
         app.MapPartStatusEndpoints();

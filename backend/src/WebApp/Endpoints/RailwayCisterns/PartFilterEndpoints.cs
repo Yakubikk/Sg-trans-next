@@ -25,7 +25,6 @@ public static class PartFilterEndpoints
         {
             var query = BuildFilterQuery(context, request.Filters);
 
-            // Применяем сортировку
             if (request.SortFields != null && request.SortFields.Any())
             {
                 var firstSort = request.SortFields.First();
@@ -40,7 +39,6 @@ public static class PartFilterEndpoints
             }
             else
             {
-                // Сортировка по умолчанию по UpdatedAt по убыванию
                 query = query.OrderByDescending(p => p.UpdatedAt);
             }
 
@@ -50,64 +48,14 @@ public static class PartFilterEndpoints
             var parts = await query
                 .Skip((request.Page - 1) * request.PageSize)
                 .Take(request.PageSize)
-                .Select(p => new PartDTO
-                {
-                    Id = p.Id,
-                    PartType = new PartTypeDTO
-                    {
-                        Id = p.PartType.Id,
-                        Name = p.PartType.Name,
-                        Code = p.PartType.Code
-                    },
-                    DepotId = p.DepotId,
-                    StampNumber = new StampNumberDTO
-                    {
-                        Id = p.StampNumber.Id,
-                        Value = p.StampNumber.Value
-                    },
-                    SerialNumber = p.SerialNumber,
-                    ManufactureYear = p.ManufactureYear,
-                    CurrentLocation = p.CurrentLocation,
-                    Status = new PartStatusDTO
-                    {
-                        Id = p.Status.Id,
-                        Name = p.Status.Name,
-                        Code = p.Status.Code
-                    },
-                    Notes = p.Notes,
-                    CreatedAt = p.CreatedAt,
-                    UpdatedAt = p.UpdatedAt,
-                    WheelPair = p.WheelPair != null ? new WheelPairDTO
-                    {
-                        ThicknessLeft = p.WheelPair.ThicknessLeft,
-                        ThicknessRight = p.WheelPair.ThicknessRight,
-                        WheelType = p.WheelPair.WheelType
-                    } : null,
-                    SideFrame = p.SideFrame != null ? new SideFrameDTO
-                    {
-                        ServiceLifeYears = p.SideFrame.ServiceLifeYears,
-                        ExtendedUntil = p.SideFrame.ExtendedUntil
-                    } : null,
-                    Bolster = p.Bolster != null ? new BolsterDTO
-                    {
-                        ServiceLifeYears = p.Bolster.ServiceLifeYears,
-                        ExtendedUntil = p.Bolster.ExtendedUntil
-                    } : null,
-                    Coupler = p.Coupler != null ? new CouplerDTO() : null,
-                    ShockAbsorber = p.ShockAbsorber != null ? new ShockAbsorberDTO
-                    {
-                        Model = p.ShockAbsorber.Model,
-                        ManufacturerCode = p.ShockAbsorber.ManufacturerCode,
-                        NextRepairDate = p.ShockAbsorber.NextRepairDate,
-                        ServiceLifeYears = p.ShockAbsorber.ServiceLifeYears
-                    } : null
-                })
+                .Select(p => SelectPartColumns(p, request.SelectedColumns))
                 .ToListAsync();
 
-            var result = new PaginatedList<PartDTO>
+            var result = new PaginatedList<object>
             {
                 Items = parts,
                 PageNumber = request.Page,
+                PageSize = request.PageSize,
                 TotalPages = totalPages,
                 TotalCount = totalCount
             };
@@ -115,7 +63,7 @@ public static class PartFilterEndpoints
             return Results.Ok(result);
         })
         .WithName("FilterParts")
-        .Produces<PaginatedList<PartDTO>>(StatusCodes.Status200OK)
+        .Produces<PaginatedList<object>>(StatusCodes.Status200OK)
         .RequirePermissions(Permission.Read);
 
         // Фильтрация без пагинации
@@ -125,7 +73,6 @@ public static class PartFilterEndpoints
         {
             var query = BuildFilterQuery(context, request.Filters);
 
-            // Применяем сортировку
             if (request.SortFields != null && request.SortFields.Any())
             {
                 var firstSort = request.SortFields.First();
@@ -140,69 +87,17 @@ public static class PartFilterEndpoints
             }
             else
             {
-                // Сортировка по умолчанию по UpdatedAt по убыванию
                 query = query.OrderByDescending(p => p.UpdatedAt);
             }
 
             var parts = await query
-                .Select(p => new PartDTO
-                {
-                    Id = p.Id,
-                    PartType = new PartTypeDTO
-                    {
-                        Id = p.PartType.Id,
-                        Name = p.PartType.Name,
-                        Code = p.PartType.Code
-                    },
-                    DepotId = p.DepotId,
-                    StampNumber = new StampNumberDTO
-                    {
-                        Id = p.StampNumber.Id,
-                        Value = p.StampNumber.Value
-                    },
-                    SerialNumber = p.SerialNumber,
-                    ManufactureYear = p.ManufactureYear,
-                    CurrentLocation = p.CurrentLocation,
-                    Status = new PartStatusDTO
-                    {
-                        Id = p.Status.Id,
-                        Name = p.Status.Name,
-                        Code = p.Status.Code
-                    },
-                    Notes = p.Notes,
-                    CreatedAt = p.CreatedAt,
-                    UpdatedAt = p.UpdatedAt,
-                    WheelPair = p.WheelPair != null ? new WheelPairDTO
-                    {
-                        ThicknessLeft = p.WheelPair.ThicknessLeft,
-                        ThicknessRight = p.WheelPair.ThicknessRight,
-                        WheelType = p.WheelPair.WheelType
-                    } : null,
-                    SideFrame = p.SideFrame != null ? new SideFrameDTO
-                    {
-                        ServiceLifeYears = p.SideFrame.ServiceLifeYears,
-                        ExtendedUntil = p.SideFrame.ExtendedUntil
-                    } : null,
-                    Bolster = p.Bolster != null ? new BolsterDTO
-                    {
-                        ServiceLifeYears = p.Bolster.ServiceLifeYears,
-                        ExtendedUntil = p.Bolster.ExtendedUntil
-                    } : null,
-                    Coupler = p.Coupler != null ? new CouplerDTO() : null,
-                    ShockAbsorber = p.ShockAbsorber != null ? new ShockAbsorberDTO
-                    {
-                        Model = p.ShockAbsorber.Model,
-                        ManufacturerCode = p.ShockAbsorber.ManufacturerCode,
-                        NextRepairDate = p.ShockAbsorber.NextRepairDate,
-                        ServiceLifeYears = p.ShockAbsorber.ServiceLifeYears
-                    } : null
-                })
+                .Select(p => SelectPartColumns(p, request.SelectedColumns))
                 .ToListAsync();
 
             return Results.Ok(parts);
         })
         .WithName("FilterAllParts")
-        .Produces<List<PartDTO>>(StatusCodes.Status200OK)
+        .Produces<List<object>>(StatusCodes.Status200OK)
         .RequirePermissions(Permission.Read);
 
         // Поиск по сохраненному фильтру
@@ -220,10 +115,12 @@ public static class PartFilterEndpoints
 
             var filterCriteria = System.Text.Json.JsonSerializer.Deserialize<PartFilterCriteria>(savedFilter.FilterJson);
             var sortFields = System.Text.Json.JsonSerializer.Deserialize<List<SortCriteria>>(savedFilter.SortFieldsJson);
+            var selectedColumns = savedFilter.SelectedColumnsJson != null 
+                ? System.Text.Json.JsonSerializer.Deserialize<List<string>>(savedFilter.SelectedColumnsJson)
+                : null;
 
             var query = BuildFilterQuery(context, filterCriteria);
 
-            // Применяем сортировку
             if (sortFields != null && sortFields.Any())
             {
                 var firstSort = sortFields.First();
@@ -242,66 +139,246 @@ public static class PartFilterEndpoints
             }
 
             var parts = await query
-                .Select(p => new PartDTO
-                {
-                    Id = p.Id,
-                    PartType = new PartTypeDTO
-                    {
-                        Id = p.PartType.Id,
-                        Name = p.PartType.Name,
-                        Code = p.PartType.Code
-                    },
-                    DepotId = p.DepotId,
-                    StampNumber = new StampNumberDTO
-                    {
-                        Id = p.StampNumber.Id,
-                        Value = p.StampNumber.Value
-                    },
-                    SerialNumber = p.SerialNumber,
-                    ManufactureYear = p.ManufactureYear,
-                    CurrentLocation = p.CurrentLocation,
-                    Status = new PartStatusDTO
-                    {
-                        Id = p.Status.Id,
-                        Name = p.Status.Name,
-                        Code = p.Status.Code
-                    },
-                    Notes = p.Notes,
-                    CreatedAt = p.CreatedAt,
-                    UpdatedAt = p.UpdatedAt,
-                    WheelPair = p.WheelPair != null ? new WheelPairDTO
-                    {
-                        ThicknessLeft = p.WheelPair.ThicknessLeft,
-                        ThicknessRight = p.WheelPair.ThicknessRight,
-                        WheelType = p.WheelPair.WheelType
-                    } : null,
-                    SideFrame = p.SideFrame != null ? new SideFrameDTO
-                    {
-                        ServiceLifeYears = p.SideFrame.ServiceLifeYears,
-                        ExtendedUntil = p.SideFrame.ExtendedUntil
-                    } : null,
-                    Bolster = p.Bolster != null ? new BolsterDTO
-                    {
-                        ServiceLifeYears = p.Bolster.ServiceLifeYears,
-                        ExtendedUntil = p.Bolster.ExtendedUntil
-                    } : null,
-                    Coupler = p.Coupler != null ? new CouplerDTO() : null,
-                    ShockAbsorber = p.ShockAbsorber != null ? new ShockAbsorberDTO
-                    {
-                        Model = p.ShockAbsorber.Model,
-                        ManufacturerCode = p.ShockAbsorber.ManufacturerCode,
-                        NextRepairDate = p.ShockAbsorber.NextRepairDate,
-                        ServiceLifeYears = p.ShockAbsorber.ServiceLifeYears
-                    } : null
-                })
+                .Select(p => SelectPartColumns(p, selectedColumns))
                 .ToListAsync();
 
             return Results.Ok(parts);
         })
         .WithName("GetPartsBySavedFilter")
-        .Produces<List<PartDTO>>(StatusCodes.Status200OK)
+        .Produces<List<object>>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status404NotFound)
         .RequirePermissions(Permission.Read);
+    }
+
+    private static dynamic SelectPartColumns(Part p, List<string>? selectedColumns)
+    {
+        if (selectedColumns == null || !selectedColumns.Any())
+        {
+            return new
+            {
+                p.Id,
+                PartType = new { p.PartType.Id, p.PartType.Name, p.PartType.Code },
+                Depot = p.Depot != null ? new { p.Depot.Id, p.Depot.Name, p.Depot.Code, p.Depot.Location } : null,
+                StampNumber = new { p.StampNumber.Id, p.StampNumber.Value },
+                p.SerialNumber,
+                p.ManufactureYear,
+                p.CurrentLocation,
+                Status = new { p.Status.Id, p.Status.Name, p.Status.Code },
+                p.Notes,
+                p.CreatedAt,
+                p.UpdatedAt,
+                WheelPair = p.WheelPair != null ? new
+                {
+                    p.WheelPair.ThicknessLeft,
+                    p.WheelPair.ThicknessRight,
+                    p.WheelPair.WheelType
+                } : null,
+                SideFrame = p.SideFrame != null ? new
+                {
+                    p.SideFrame.ServiceLifeYears,
+                    p.SideFrame.ExtendedUntil
+                } : null,
+                Bolster = p.Bolster != null ? new
+                {
+                    p.Bolster.ServiceLifeYears,
+                    p.Bolster.ExtendedUntil
+                } : null,
+                ShockAbsorber = p.ShockAbsorber != null ? new
+                {
+                    p.ShockAbsorber.Model,
+                    p.ShockAbsorber.ManufacturerCode,
+                    p.ShockAbsorber.NextRepairDate,
+                    p.ShockAbsorber.ServiceLifeYears
+                } : null
+            };
+        }
+
+        var selectedProperties = new System.Dynamic.ExpandoObject() as IDictionary<string, object>;
+        foreach (var column in selectedColumns)
+        {
+            var normalizedColumn = column.ToLower();
+            switch (normalizedColumn)
+            {
+                // Основные поля
+                case "id":
+                    selectedProperties["id"] = p.Id;
+                    break;
+
+                // PartType
+                case "parttype.id":
+                    selectedProperties["partTypeId"] = p.PartType.Id;
+                    break;
+                case "parttype.name":
+                    selectedProperties["partTypeName"] = p.PartType.Name;
+                    break;
+                case "parttype.code":
+                    selectedProperties["partTypeCode"] = p.PartType.Code;
+                    break;
+                // case "parttype":
+                //     selectedProperties["partType"] = new { p.PartType.Id, p.PartType.Name, p.PartType.Code };
+                //     break;
+
+                // StampNumber
+                case "stampnumber.id":
+                    selectedProperties["stampNumberId"] = p.StampNumber.Id;
+                    break;
+                case "stampnumber.value":
+                    selectedProperties["stampNumberValue"] = p.StampNumber.Value;
+                    break;
+                // case "stampnumber":
+                //     selectedProperties["stampNumber"] = new { p.StampNumber.Id, p.StampNumber.Value };
+                //     break;
+
+                // Status
+                case "status.id":
+                    selectedProperties["statusId"] = p.Status.Id;
+                    break;
+                case "status.name":
+                    selectedProperties["statusName"] = p.Status.Name;
+                    break;
+                case "status.code":
+                    selectedProperties["statusCode"] = p.Status.Code;
+                    break;
+                // case "status":
+                //     selectedProperties["status"] = new { p.Status.Id, p.Status.Name, p.Status.Code };
+                //     break;
+
+                // WheelPair
+                case "wheelpair.thicknessleft":
+                    selectedProperties["wheelPairThicknessLeft"] = p.WheelPair?.ThicknessLeft;
+                    break;
+                case "wheelpair.thicknessright":
+                    selectedProperties["wheelPairThicknessRight"] = p.WheelPair?.ThicknessRight;
+                    break;
+                case "wheelpair.wheeltype":
+                    selectedProperties["wheelPairWheelType"] = p.WheelPair?.WheelType;
+                    break;
+                // case "wheelpair":
+                //     if (p.WheelPair != null)
+                //     {
+                //         selectedProperties["wheelPair"] = new
+                //         {
+                //             p.WheelPair.ThicknessLeft,
+                //             p.WheelPair.ThicknessRight,
+                //             p.WheelPair.WheelType
+                //         };
+                //     }
+                //     break;
+
+                // SideFrame
+                case "sideframe.servicelifeyears":
+                    selectedProperties["sideFrameServiceLifeYears"] = p.SideFrame?.ServiceLifeYears;
+                    break;
+                case "sideframe.extendeduntil":
+                    selectedProperties["sideFrameExtendedUntil"] = p.SideFrame?.ExtendedUntil;
+                    break;
+                // case "sideframe":
+                //     if (p.SideFrame != null)
+                //     {
+                //         selectedProperties["sideFrame"] = new
+                //         {
+                //             p.SideFrame.ServiceLifeYears,
+                //             p.SideFrame.ExtendedUntil
+                //         };
+                //     }
+                //     break;
+
+                // Bolster
+                case "bolster.servicelifeyears":
+                    selectedProperties["bolsterServiceLifeYears"] = p.Bolster?.ServiceLifeYears;
+                    break;
+                case "bolster.extendeduntil":
+                    selectedProperties["bolsterExtendedUntil"] = p.Bolster?.ExtendedUntil;
+                    break;
+                // case "bolster":
+                //     if (p.Bolster != null)
+                //     {
+                //         selectedProperties["bolster"] = new
+                //         {
+                //             p.Bolster.ServiceLifeYears,
+                //             p.Bolster.ExtendedUntil
+                //         };
+                //     }
+                //     break;
+
+                // ShockAbsorber
+                case "shockabsorber.model":
+                    selectedProperties["shockAbsorberModel"] = p.ShockAbsorber?.Model;
+                    break;
+                case "shockabsorber.manufacturercode":
+                    selectedProperties["shockAbsorberManufacturerCode"] = p.ShockAbsorber?.ManufacturerCode;
+                    break;
+                case "shockabsorber.nextrepairdate":
+                    selectedProperties["shockAbsorberNextRepairDate"] = p.ShockAbsorber?.NextRepairDate;
+                    break;
+                case "shockabsorber.servicelifeyears":
+                    selectedProperties["shockAbsorberServiceLifeYears"] = p.ShockAbsorber?.ServiceLifeYears;
+                    break;
+                // case "shockabsorber":
+                //     if (p.ShockAbsorber != null)
+                //     {
+                //         selectedProperties["shockAbsorber"] = new
+                //         {
+                //             p.ShockAbsorber.Model,
+                //             p.ShockAbsorber.ManufacturerCode,
+                //             p.ShockAbsorber.NextRepairDate,
+                //             p.ShockAbsorber.ServiceLifeYears
+                //         };
+                //     }
+                //     break;
+
+                // Depot
+                case "depot.id":
+                    selectedProperties["depotId"] = p.Depot?.Id;
+                    break;
+                case "depot.name":
+                    selectedProperties["depotName"] = p.Depot?.Name;
+                    break;
+                case "depot.code":
+                    selectedProperties["depotCode"] = p.Depot?.Code;
+                    break;
+                case "depot.location":
+                    selectedProperties["depotLocation"] = p.Depot?.Location;
+                    break;
+                case "depot":
+                    if (p.Depot != null)
+                    {
+                        selectedProperties["depot"] = new
+                        {
+                            p.Depot.Id,
+                            p.Depot.Name,
+                            p.Depot.Code,
+                            p.Depot.Location
+                        };
+                    }
+                    break;
+
+                // Базовые поля
+                case "depotid":
+                    selectedProperties["depotId"] = p.DepotId;
+                    break;
+                case "serialnumber":
+                    selectedProperties["serialNumber"] = p.SerialNumber;
+                    break;
+                case "manufactureyear":
+                    selectedProperties["manufactureYear"] = p.ManufactureYear;
+                    break;
+                case "currentlocation":
+                    selectedProperties["currentLocation"] = p.CurrentLocation;
+                    break;
+                case "notes":
+                    selectedProperties["notes"] = p.Notes;
+                    break;
+                case "createdat":
+                    selectedProperties["createdAt"] = p.CreatedAt;
+                    break;
+                case "updatedat":
+                    selectedProperties["updatedAt"] = p.UpdatedAt;
+                    break;
+            }
+        }
+
+        return selectedProperties;
     }
 
     private static IQueryable<Part> BuildFilterQuery(ApplicationDbContext context, PartFilterCriteria? filters)
@@ -315,6 +392,7 @@ public static class PartFilterEndpoints
             .Include(p => p.Bolster)
             .Include(p => p.Coupler)
             .Include(p => p.ShockAbsorber)
+            .Include(p => p.Depot)
             .AsQueryable();
 
         if (filters == null)
@@ -332,10 +410,13 @@ public static class PartFilterEndpoints
         if (filters.SerialNumbers != null && filters.SerialNumbers.Any())
             query = query.Where(p => p.SerialNumber != null && filters.SerialNumbers.Contains(p.SerialNumber));
 
-        if (filters.ManufactureYearFrom.HasValue)
-            query = query.Where(p => p.ManufactureYear >= filters.ManufactureYearFrom);
-        if (filters.ManufactureYearTo.HasValue)
-            query = query.Where(p => p.ManufactureYear <= filters.ManufactureYearTo);
+        if (filters.ManufactureYear != null)
+        {
+            if (filters.ManufactureYear.From.HasValue)
+                query = query.Where(p => p.ManufactureYear >= filters.ManufactureYear.From);
+            if (filters.ManufactureYear.To.HasValue)
+                query = query.Where(p => p.ManufactureYear <= filters.ManufactureYear.To);
+        }
 
         if (filters.Locations != null && filters.Locations.Any())
             query = query.Where(p => p.CurrentLocation != null && filters.Locations.Contains(p.CurrentLocation));
@@ -343,58 +424,86 @@ public static class PartFilterEndpoints
         if (filters.StatusIds != null && filters.StatusIds.Any())
             query = query.Where(p => filters.StatusIds.Contains(p.StatusId));
 
-        if (filters.CreatedAtFrom.HasValue)
-            query = query.Where(p => p.CreatedAt >= filters.CreatedAtFrom.Value.DateTime);
-        if (filters.CreatedAtTo.HasValue)
-            query = query.Where(p => p.CreatedAt <= filters.CreatedAtTo.Value.DateTime);
+        if (filters.CreatedAt != null)
+        {
+            if (filters.CreatedAt.From.HasValue)
+                query = query.Where(p => p.CreatedAt >= filters.CreatedAt.From);
+            if (filters.CreatedAt.To.HasValue)
+                query = query.Where(p => p.CreatedAt <= filters.CreatedAt.To);
+        }
 
-        if (filters.UpdatedAtFrom.HasValue)
-            query = query.Where(p => p.UpdatedAt >= filters.UpdatedAtFrom.Value.DateTime);
-        if (filters.UpdatedAtTo.HasValue)
-            query = query.Where(p => p.UpdatedAt <= filters.UpdatedAtTo.Value.DateTime);
+        if (filters.UpdatedAt != null)
+        {
+            if (filters.UpdatedAt.From.HasValue)
+                query = query.Where(p => p.UpdatedAt >= filters.UpdatedAt.From);
+            if (filters.UpdatedAt.To.HasValue)
+                query = query.Where(p => p.UpdatedAt <= filters.UpdatedAt.To);
+        }
 
         // Специфичные фильтры для колесных пар
-        if (filters.ThicknessLeftFrom.HasValue)
-            query = query.Where(p => p.WheelPair != null && p.WheelPair.ThicknessLeft >= filters.ThicknessLeftFrom);
-        if (filters.ThicknessLeftTo.HasValue)
-            query = query.Where(p => p.WheelPair != null && p.WheelPair.ThicknessLeft <= filters.ThicknessLeftTo);
-        if (filters.ThicknessRightFrom.HasValue)
-            query = query.Where(p => p.WheelPair != null && p.WheelPair.ThicknessRight >= filters.ThicknessRightFrom);
-        if (filters.ThicknessRightTo.HasValue)
-            query = query.Where(p => p.WheelPair != null && p.WheelPair.ThicknessRight <= filters.ThicknessRightTo);
+        if (filters.ThicknessLeft != null)
+        {
+            if (filters.ThicknessLeft.From.HasValue)
+                query = query.Where(p => p.WheelPair != null && p.WheelPair.ThicknessLeft >= filters.ThicknessLeft.From);
+            if (filters.ThicknessLeft.To.HasValue)
+                query = query.Where(p => p.WheelPair != null && p.WheelPair.ThicknessLeft <= filters.ThicknessLeft.To);
+        }
+
+        if (filters.ThicknessRight != null)
+        {
+            if (filters.ThicknessRight.From.HasValue)
+                query = query.Where(p => p.WheelPair != null && p.WheelPair.ThicknessRight >= filters.ThicknessRight.From);
+            if (filters.ThicknessRight.To.HasValue)
+                query = query.Where(p => p.WheelPair != null && p.WheelPair.ThicknessRight <= filters.ThicknessRight.To);
+        }
+
         if (filters.WheelTypes != null && filters.WheelTypes.Any())
             query = query.Where(p => p.WheelPair != null && p.WheelPair.WheelType != null && 
                                    filters.WheelTypes.Contains(p.WheelPair.WheelType));
 
         // Специфичные фильтры для боковых рам и надрессорных балок
-        if (filters.ServiceLifeYearsFrom.HasValue)
-            query = query.Where(p => 
-                (p.SideFrame != null && p.SideFrame.ServiceLifeYears >= filters.ServiceLifeYearsFrom) ||
-                (p.Bolster != null && p.Bolster.ServiceLifeYears >= filters.ServiceLifeYearsFrom));
-        if (filters.ServiceLifeYearsTo.HasValue)
-            query = query.Where(p => 
-                (p.SideFrame != null && p.SideFrame.ServiceLifeYears <= filters.ServiceLifeYearsTo) ||
-                (p.Bolster != null && p.Bolster.ServiceLifeYears <= filters.ServiceLifeYearsTo));
-        if (filters.ExtendedUntilFrom.HasValue)
-            query = query.Where(p => 
-                (p.SideFrame != null && p.SideFrame.ExtendedUntil >= filters.ExtendedUntilFrom) ||
-                (p.Bolster != null && p.Bolster.ExtendedUntil >= filters.ExtendedUntilFrom));
-        if (filters.ExtendedUntilTo.HasValue)
-            query = query.Where(p => 
-                (p.SideFrame != null && p.SideFrame.ExtendedUntil <= filters.ExtendedUntilTo) ||
-                (p.Bolster != null && p.Bolster.ExtendedUntil <= filters.ExtendedUntilTo));
+        if (filters.ServiceLifeYears != null)
+        {
+            if (filters.ServiceLifeYears.From.HasValue)
+                query = query.Where(p => 
+                    (p.SideFrame != null && p.SideFrame.ServiceLifeYears >= filters.ServiceLifeYears.From) ||
+                    (p.Bolster != null && p.Bolster.ServiceLifeYears >= filters.ServiceLifeYears.From));
+            if (filters.ServiceLifeYears.To.HasValue)
+                query = query.Where(p => 
+                    (p.SideFrame != null && p.SideFrame.ServiceLifeYears <= filters.ServiceLifeYears.To) ||
+                    (p.Bolster != null && p.Bolster.ServiceLifeYears <= filters.ServiceLifeYears.To));
+        }
+
+        if (filters.ExtendedUntil != null)
+        {
+            if (filters.ExtendedUntil.From.HasValue)
+                query = query.Where(p => 
+                    (p.SideFrame != null && p.SideFrame.ExtendedUntil >= filters.ExtendedUntil.From) ||
+                    (p.Bolster != null && p.Bolster.ExtendedUntil >= filters.ExtendedUntil.From));
+            if (filters.ExtendedUntil.To.HasValue)
+                query = query.Where(p => 
+                    (p.SideFrame != null && p.SideFrame.ExtendedUntil <= filters.ExtendedUntil.To) ||
+                    (p.Bolster != null && p.Bolster.ExtendedUntil <= filters.ExtendedUntil.To));
+        }
 
         // Специфичные фильтры для поглощающих аппаратов
         if (filters.Models != null && filters.Models.Any())
             query = query.Where(p => p.ShockAbsorber != null && p.ShockAbsorber.Model != null && 
                                    filters.Models.Contains(p.ShockAbsorber.Model));
+
         if (filters.ManufacturerCodes != null && filters.ManufacturerCodes.Any())
             query = query.Where(p => p.ShockAbsorber != null && p.ShockAbsorber.ManufacturerCode != null && 
                                    filters.ManufacturerCodes.Contains(p.ShockAbsorber.ManufacturerCode));
-        if (filters.NextRepairDateFrom.HasValue)
-            query = query.Where(p => p.ShockAbsorber != null && p.ShockAbsorber.NextRepairDate >= filters.NextRepairDateFrom);
-        if (filters.NextRepairDateTo.HasValue)
-            query = query.Where(p => p.ShockAbsorber != null && p.ShockAbsorber.NextRepairDate <= filters.NextRepairDateTo);
+
+        if (filters.NextRepairDate != null)
+        {
+            if (filters.NextRepairDate.From.HasValue)
+                query = query.Where(p => p.ShockAbsorber != null && 
+                                       p.ShockAbsorber.NextRepairDate >= filters.NextRepairDate.From);
+            if (filters.NextRepairDate.To.HasValue)
+                query = query.Where(p => p.ShockAbsorber != null && 
+                                       p.ShockAbsorber.NextRepairDate <= filters.NextRepairDate.To);
+        }
 
         return query;
     }

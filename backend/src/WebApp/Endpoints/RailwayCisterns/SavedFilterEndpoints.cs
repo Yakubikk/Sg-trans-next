@@ -46,7 +46,7 @@ public static class SavedFilterEndpoints
                 {
                     Id = f.Id,
                     Name = f.Name,
-                    Filter = JsonSerializer.Deserialize<FilterCriteria>(f.FilterJson),
+                    Filters = JsonSerializer.Deserialize<FilterCriteria>(f.FilterJson),
                     SortFields = JsonSerializer.Deserialize<List<SortCriteria>>(f.SortFieldsJson),
                     SelectedColumns = JsonSerializer.Deserialize<List<string>>(f.SelectedColumnsJson),
                     UserId = f.UserId,
@@ -98,7 +98,7 @@ public static class SavedFilterEndpoints
                 {
                     Id = filter.Id,
                     Name = filter.Name,
-                    Filter = JsonSerializer.Deserialize<FilterCriteria>(filter.FilterJson),
+                    Filters = JsonSerializer.Deserialize<FilterCriteria>(filter.FilterJson),
                     SortFields = JsonSerializer.Deserialize<List<SortCriteria>>(filter.SortFieldsJson),
                     SelectedColumns = JsonSerializer.Deserialize<List<string>>(filter.SelectedColumnsJson),
                     UserId = filter.UserId,
@@ -137,7 +137,7 @@ public static class SavedFilterEndpoints
                 {
                     Id = Guid.NewGuid(),
                     Name = dto.Name,
-                    FilterJson = JsonSerializer.Serialize(dto.Filter),
+                    FilterJson = JsonSerializer.Serialize(dto.Filters),
                     SortFieldsJson = JsonSerializer.Serialize(dto.SortFields),
                     SelectedColumnsJson = JsonSerializer.Serialize(dto.SelectedColumns),
                     UserId = userId,
@@ -153,7 +153,7 @@ public static class SavedFilterEndpoints
                 {
                     Id = filter.Id,
                     Name = filter.Name,
-                    Filter = dto.Filter,
+                    Filters = dto.Filters,
                     SortFields = dto.SortFields,
                     SelectedColumns = dto.SelectedColumns,
                     UserId = filter.UserId,
@@ -196,7 +196,7 @@ public static class SavedFilterEndpoints
                     return Results.NotFound("Filter type not found");
 
                 filter.Name = dto.Name;
-                filter.FilterJson = JsonSerializer.Serialize(dto.Filter);
+                filter.FilterJson = JsonSerializer.Serialize(dto.Filters);
                 filter.SortFieldsJson = JsonSerializer.Serialize(dto.SortFields);
                 filter.SelectedColumnsJson = JsonSerializer.Serialize(dto.SelectedColumns);
                 filter.FilterTypeId = dto.FilterTypeId;
@@ -240,7 +240,7 @@ public static class SavedFilterEndpoints
                 {
                     Id = f.Id,
                     Name = f.Name,
-                    Filter = JsonSerializer.Deserialize<FilterCriteria>(f.FilterJson),
+                    Filters = JsonSerializer.Deserialize<FilterCriteria>(f.FilterJson),
                     SortFields = JsonSerializer.Deserialize<List<SortCriteria>>(f.SortFieldsJson),
                     SelectedColumns = JsonSerializer.Deserialize<List<string>>(f.SelectedColumnsJson),
                     UserId = f.UserId,

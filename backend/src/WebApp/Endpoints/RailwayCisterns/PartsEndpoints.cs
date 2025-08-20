@@ -36,6 +36,7 @@ public static class PartsEndpoints
                 .Include(p => p.PartType)
                 .Include(p => p.Status)
                 .Include(p => p.StampNumber)
+                .Include(p => p.Depot)
                 .Include(p => p.WheelPair)
                 .Include(p => p.SideFrame)
                 .Include(p => p.Bolster)
@@ -63,7 +64,12 @@ public static class PartsEndpoints
                         Name = p.PartType.Name,
                         Code = p.PartType.Code
                     },
-                    DepotId = p.DepotId,
+                    Depot = p.Depot != null ? new DepotDTO
+                    {
+                        Id = p.Depot.Id,
+                        Name = p.Depot.Name,
+                        Code = p.Depot.Code
+                    } : null,
                     StampNumber = new StampNumberDTO
                     {
                         Id = p.StampNumber.Id,
@@ -136,6 +142,7 @@ public static class PartsEndpoints
                 .Include(p => p.PartType)
                 .Include(p => p.Status)
                 .Include(p => p.StampNumber)
+                .Include(p => p.Depot)
                 .Include(p => p.WheelPair)
                 .Include(p => p.SideFrame)
                 .Include(p => p.Bolster)
@@ -151,7 +158,12 @@ public static class PartsEndpoints
                         Name = p.PartType.Name,
                         Code = p.PartType.Code
                     },
-                    DepotId = p.DepotId,
+                    Depot = p.Depot != null ? new DepotDTO
+                    {
+                        Id = p.Depot.Id,
+                        Name = p.Depot.Name,
+                        Code = p.Depot.Code
+                    } : null,
                     StampNumber = new StampNumberDTO
                     {
                         Id = p.StampNumber.Id,

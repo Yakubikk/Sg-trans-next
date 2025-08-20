@@ -6,7 +6,7 @@ namespace WebApp.DTO.Common;
 [BindProperties]
 public class PaginationParameters
 {
-    private const int MaxPageSize = 100;
+    private const int MaxPageSize = 1000;
     private int _pageSize = 10;
     
     [DefaultValue(1)]
@@ -26,6 +26,7 @@ public class PaginatedList<T>
     public int PageNumber { get; set; }
     public int TotalPages { get; set; }
     public int TotalCount { get; set; }
+    public int PageSize { get; set; }
     public bool HasPreviousPage => PageNumber > 1;
     public bool HasNextPage => PageNumber < TotalPages;
 }

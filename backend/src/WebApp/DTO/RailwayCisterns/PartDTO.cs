@@ -4,7 +4,7 @@ public class PartDTO
 {
     public Guid Id { get; set; }
     public PartTypeDTO PartType { get; set; }
-    public Guid? DepotId { get; set; }
+    public DepotDTO? Depot { get; set; }
     public StampNumberDTO StampNumber { get; set; }
     public string? SerialNumber { get; set; }
     public DateOnly? ManufactureYear { get; set; }
