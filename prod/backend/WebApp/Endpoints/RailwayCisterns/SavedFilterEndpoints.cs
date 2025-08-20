@@ -42,22 +42,36 @@ public static class SavedFilterEndpoints
                     })
                     .ToListAsync();
 
-                var result = filters.Select(f => new SavedFilterDTO
+                var result = filters.Select(f =>
                 {
-                    Id = f.Id,
-                    Name = f.Name,
-                    Filters = JsonSerializer.Deserialize<FilterCriteria>(f.FilterJson),
-                    SortFields = JsonSerializer.Deserialize<List<SortCriteria>>(f.SortFieldsJson),
-                    SelectedColumns = JsonSerializer.Deserialize<List<string>>(f.SelectedColumnsJson),
-                    UserId = f.UserId,
-                    FilterTypeId = f.FilterTypeId,
-                    FilterType = new FilterTypeDTO 
-                    { 
-                        Id = f.FilterType.Id, 
-                        Name = f.FilterType.Name 
-                    },
-                    CreatedAt = f.CreatedAt,
-                    UpdatedAt = f.UpdatedAt
+                    var dto = new SavedFilterDTO
+                    {
+                        Id = f.Id,
+                        Name = f.Name,
+                        SortFields = JsonSerializer.Deserialize<List<SortCriteria>>(f.SortFieldsJson),
+                        SelectedColumns = JsonSerializer.Deserialize<List<string>>(f.SelectedColumnsJson),
+                        UserId = f.UserId,
+                        FilterTypeId = f.FilterTypeId,
+                        FilterType = new FilterTypeDTO 
+                        { 
+                            Id = f.FilterType.Id, 
+                            Name = f.FilterType.Name 
+                        },
+                        CreatedAt = f.CreatedAt,
+                        UpdatedAt = f.UpdatedAt
+                    };
+
+                    // Десериализуем фильтры в зависимости от типа
+                    if (IsRailwayCisternFilterType(f.FilterTypeId))
+                    {
+                        dto.Filters = JsonSerializer.Deserialize<FilterCriteria>(f.FilterJson);
+                    }
+                    else
+                    {
+                        dto.Filters = JsonSerializer.Deserialize<PartFilterCriteria>(f.FilterJson);
+                    }
+
+                    return dto;
                 }).ToList();
 
                 return Results.Ok(result);
@@ -98,7 +112,6 @@ public static class SavedFilterEndpoints
                 {
                     Id = filter.Id,
                     Name = filter.Name,
-                    Filters = JsonSerializer.Deserialize<FilterCriteria>(filter.FilterJson),
                     SortFields = JsonSerializer.Deserialize<List<SortCriteria>>(filter.SortFieldsJson),
                     SelectedColumns = JsonSerializer.Deserialize<List<string>>(filter.SelectedColumnsJson),
                     UserId = filter.UserId,
@@ -111,6 +124,16 @@ public static class SavedFilterEndpoints
                     CreatedAt = filter.CreatedAt,
                     UpdatedAt = filter.UpdatedAt
                 };
+
+                // Десериализуем фильтры в зависимости от типа
+                if (IsRailwayCisternFilterType(filter.FilterTypeId))
+                {
+                    result.Filters = JsonSerializer.Deserialize<FilterCriteria>(filter.FilterJson);
+                }
+                else
+                {
+                    result.Filters = JsonSerializer.Deserialize<PartFilterCriteria>(filter.FilterJson);
+                }
 
                 return Results.Ok(result);
             })
@@ -236,22 +259,36 @@ public static class SavedFilterEndpoints
                     })
                     .ToListAsync();
 
-                var result = filters.Select(f => new SavedFilterDTO
+                var result = filters.Select(f =>
                 {
-                    Id = f.Id,
-                    Name = f.Name,
-                    Filters = JsonSerializer.Deserialize<FilterCriteria>(f.FilterJson),
-                    SortFields = JsonSerializer.Deserialize<List<SortCriteria>>(f.SortFieldsJson),
-                    SelectedColumns = JsonSerializer.Deserialize<List<string>>(f.SelectedColumnsJson),
-                    UserId = f.UserId,
-                    FilterTypeId = f.FilterTypeId,
-                    FilterType = new FilterTypeDTO 
-                    { 
-                        Id = f.FilterType.Id, 
-                        Name = f.FilterType.Name 
-                    },
-                    CreatedAt = f.CreatedAt,
-                    UpdatedAt = f.UpdatedAt
+                    var dto = new SavedFilterDTO
+                    {
+                        Id = f.Id,
+                        Name = f.Name,
+                        SortFields = JsonSerializer.Deserialize<List<SortCriteria>>(f.SortFieldsJson),
+                        SelectedColumns = JsonSerializer.Deserialize<List<string>>(f.SelectedColumnsJson),
+                        UserId = f.UserId,
+                        FilterTypeId = f.FilterTypeId,
+                        FilterType = new FilterTypeDTO 
+                        { 
+                            Id = f.FilterType.Id, 
+                            Name = f.FilterType.Name 
+                        },
+                        CreatedAt = f.CreatedAt,
+                        UpdatedAt = f.UpdatedAt
+                    };
+
+                    // Десериализуем фильтры в зависимости от типа
+                    if (IsRailwayCisternFilterType(f.FilterTypeId))
+                    {
+                        dto.Filters = JsonSerializer.Deserialize<FilterCriteria>(f.FilterJson);
+                    }
+                    else
+                    {
+                        dto.Filters = JsonSerializer.Deserialize<PartFilterCriteria>(f.FilterJson);
+                    }
+
+                    return dto;
                 }).ToList();
 
                 return Results.Ok(result);
@@ -281,5 +318,21 @@ public static class SavedFilterEndpoints
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .RequirePermissions(Permission.Delete);
+    }
+
+    private static bool IsRailwayCisternFilterType(Guid filterTypeId)
+    {
+        // TODO: Реализовать кэширование типов фильтров для оптимизации
+        using var scope = new ServiceCollection()
+            .AddDbContext<ApplicationDbContext>()
+            .BuildServiceProvider()
+            .CreateScope();
+            
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var filterType = context.Set<FilterType>()
+            .AsNoTracking()
+            .FirstOrDefault(ft => ft.Id == filterTypeId);
+            
+        return filterType?.Name == "RailwayCisterns";
     }
 }

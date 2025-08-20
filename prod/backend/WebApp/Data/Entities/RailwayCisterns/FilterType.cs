@@ -7,3 +7,4 @@ public class FilterType
     
     public ICollection<SavedFilter> SavedFilters { get; set; } = new List<SavedFilter>();
 }
+
