@@ -42,7 +42,7 @@ public static class SavedFilterEndpoints
                     })
                     .ToListAsync();
 
-                var result = filters.Select(f =>
+                var result = await Task.WhenAll(filters.Select(async f =>
                 {
                     var dto = new SavedFilterDTO
                     {
@@ -62,7 +62,7 @@ public static class SavedFilterEndpoints
                     };
 
                     // Десериализуем фильтры в зависимости от типа
-                    if (IsRailwayCisternFilterType(f.FilterTypeId))
+                    if (await IsRailwayCisternFilterType(f.FilterTypeId, context))
                     {
                         dto.Filters = JsonSerializer.Deserialize<FilterCriteria>(f.FilterJson);
                     }
@@ -72,7 +72,7 @@ public static class SavedFilterEndpoints
                     }
 
                     return dto;
-                }).ToList();
+                }));
 
                 return Results.Ok(result);
             })
@@ -126,7 +126,7 @@ public static class SavedFilterEndpoints
                 };
 
                 // Десериализуем фильтры в зависимости от типа
-                if (IsRailwayCisternFilterType(filter.FilterTypeId))
+                if (await IsRailwayCisternFilterType(filter.FilterTypeId, context))
                 {
                     result.Filters = JsonSerializer.Deserialize<FilterCriteria>(filter.FilterJson);
                 }
@@ -259,7 +259,7 @@ public static class SavedFilterEndpoints
                     })
                     .ToListAsync();
 
-                var result = filters.Select(f =>
+                var result = await Task.WhenAll(filters.Select(async f =>
                 {
                     var dto = new SavedFilterDTO
                     {
@@ -279,7 +279,7 @@ public static class SavedFilterEndpoints
                     };
 
                     // Десериализуем фильтры в зависимости от типа
-                    if (IsRailwayCisternFilterType(f.FilterTypeId))
+                    if (await IsRailwayCisternFilterType(f.FilterTypeId, context))
                     {
                         dto.Filters = JsonSerializer.Deserialize<FilterCriteria>(f.FilterJson);
                     }
@@ -289,7 +289,7 @@ public static class SavedFilterEndpoints
                     }
 
                     return dto;
-                }).ToList();
+                }));
 
                 return Results.Ok(result);
             })
@@ -320,18 +320,11 @@ public static class SavedFilterEndpoints
             .RequirePermissions(Permission.Delete);
     }
 
-    private static bool IsRailwayCisternFilterType(Guid filterTypeId)
+    private static async Task<bool> IsRailwayCisternFilterType(Guid filterTypeId, ApplicationDbContext context)
     {
-        // TODO: Реализовать кэширование типов фильтров для оптимизации
-        using var scope = new ServiceCollection()
-            .AddDbContext<ApplicationDbContext>()
-            .BuildServiceProvider()
-            .CreateScope();
-            
-        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var filterType = context.Set<FilterType>()
+        var filterType = await context.Set<FilterType>()
             .AsNoTracking()
-            .FirstOrDefault(ft => ft.Id == filterTypeId);
+            .FirstOrDefaultAsync(ft => ft.Id == filterTypeId);
             
         return filterType?.Name == "RailwayCisterns";
     }
