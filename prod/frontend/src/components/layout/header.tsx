@@ -39,10 +39,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
         <Menu className="h-5 w-5" />
       </Button>
 
-      {/* Logo/Title for desktop */}
-      <div className="hidden lg:block">
-        <h1 className="text-xl font-semibold text-gray-900 dark:text-white">СГ-Транс</h1>
-      </div>
+      <div />
 
       {/* User menu */}
       {user && (

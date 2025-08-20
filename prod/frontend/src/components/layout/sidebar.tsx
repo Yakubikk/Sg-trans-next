@@ -16,7 +16,6 @@ import {
   User,
   Train,
   MapPin,
-  Filter,
   Wrench,
   Activity,
   RotateCcw,
@@ -66,11 +65,6 @@ const directoryItems: SidebarItem[] = [
     icon: MapPin,
   },
   {
-    title: "Типы фильтров",
-    href: "/directories/filter-types",
-    icon: Filter,
-  },
-  {
     title: "Типы деталей",
     href: "/directories/part-types",
     icon: Wrench,
@@ -104,7 +98,7 @@ const sidebarItems: SidebarItem[] = [
     icon: Activity,
   },
   {
-    title: "Цистерны",
+    title: "Вагоны",
     href: "/cisterns",
     icon: Train,
   },
@@ -222,7 +216,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
       >
         {/* Header */}
         <div className="flex h-16 items-center justify-between border-b px-4">
-          <Link href='/dashboard' className="text-lg font-semibold text-gray-900 dark:text-white">SG Transport</Link>
+          <Link href='/dashboard' className="text-lg font-semibold text-gray-900 dark:text-white">СГ-Транс</Link>
           <button onClick={onToggle} className="rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-800 lg:hidden">
             <X className="h-5 w-5" />
           </button>

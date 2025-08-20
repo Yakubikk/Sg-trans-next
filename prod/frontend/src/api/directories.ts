@@ -36,6 +36,9 @@ import type {
   WagonModelDTO,
   CreateWagonModelDTO,
   UpdateWagonModelDTO,
+  StampNumberDTO,
+  CreateStampNumberDTO,
+  UpdateStampNumberDTO,
 } from '@/types/directories';
 
 // Generic CRUD operations for directories
@@ -149,6 +152,13 @@ export const wagonModelsApi = createDirectoryApi<
   UpdateWagonModelDTO
 >('wagon-models');
 
+// StampNumbers API
+export const stampNumbersApi = createDirectoryApi<
+  StampNumberDTO,
+  CreateStampNumberDTO,
+  UpdateStampNumberDTO
+>('stamp-numbers');
+
 // Helper functions to convert DTOs to SelectOptions
 export const convertToSelectOptions = {
   manufacturers: (manufacturers: ManufacturerDTO[]) =>
@@ -168,4 +178,7 @@ export const convertToSelectOptions = {
 
   registrars: (registrars: RegistrarDTO[]) =>
     registrars.map(r => ({ value: r.id, label: r.name })),
+
+  stampNumbers: (stampNumbers: StampNumberDTO[]) =>
+    stampNumbers.map(s => ({ value: s.id, label: s.number })),
 };

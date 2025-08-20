@@ -52,4 +52,13 @@ export const cisternsApi = {
   delete: async (id: string): Promise<void> => {
     await api.delete(`${CISTERNS_ENDPOINT}/${id}`);
   },
+
+  // Search cisterns by number prefix
+  search: async (prefix: string): Promise<RailwayCisternDetailDTO[]> => {
+    if (!prefix.trim()) {
+      return [];
+    }
+    const response = await api.get<RailwayCisternDetailDTO[]>(`${CISTERNS_ENDPOINT}/detailed/search?prefix=${encodeURIComponent(prefix)}`);
+    return response.data;
+  },
 };

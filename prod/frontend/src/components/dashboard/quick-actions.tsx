@@ -11,7 +11,7 @@ const QuickActions = () => {
 
   const quickActions = [
     {
-      title: "Цистерны",
+      title: "Вагоны",
       description: "Управление цистернами",
       icon: Train,
       href: "/cisterns",

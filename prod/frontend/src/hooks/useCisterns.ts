@@ -1,9 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { cisternsApi } from '@/api/cisterns';
-import type {
+import type { 
   CisternsFilter,
+  RailwayCisternDetailDTO,
   CreateRailwayCisternDTO,
-  UpdateRailwayCisternDTO,
+  UpdateRailwayCisternDTO 
 } from '@/types/cisterns';
 
 // Query keys
@@ -13,6 +14,8 @@ export const cisternsKeys = {
   list: (filter?: CisternsFilter) => [...cisternsKeys.lists(), filter] as const,
   details: () => [...cisternsKeys.all, 'detail'] as const,
   detail: (id: string) => [...cisternsKeys.details(), id] as const,
+  search: () => [...cisternsKeys.all, 'search'] as const,
+  searchResults: (prefix: string) => [...cisternsKeys.search(), prefix] as const,
 };
 
 // Get paginated cisterns
@@ -73,5 +76,15 @@ export const useDeleteCistern = () => {
       // Invalidate and refetch cisterns list
       queryClient.invalidateQueries({ queryKey: cisternsKeys.lists() });
     },
+  });
+};
+
+// Search cisterns by number prefix
+export const useSearchCisterns = (prefix: string, enabled: boolean = true) => {
+  return useQuery<RailwayCisternDetailDTO[]>({
+    queryKey: ['cisterns', 'search', prefix],
+    queryFn: () => cisternsApi.search(prefix),
+    enabled: enabled && prefix.length > 0,
+    staleTime: 30000, // 30 seconds
   });
 };

@@ -12,6 +12,7 @@ import {
   repairTypesApi,
   registrarsApi,
   wagonModelsApi,
+  stampNumbersApi,
 } from '@/api/directories';
 
 // Query keys for directories
@@ -29,6 +30,7 @@ export const directoryKeys = {
   repairTypes: () => [...directoryKeys.all, 'repairTypes'] as const,
   registrars: () => [...directoryKeys.all, 'registrars'] as const,
   wagonModels: () => [...directoryKeys.all, 'wagonModels'] as const,
+  stampNumbers: () => [...directoryKeys.all, 'stampNumbers'] as const,
 };
 
 // Generic hooks factory
@@ -265,6 +267,20 @@ export const {
   useDelete: useDeleteWagonModel,
 } = wagonModelsHooks;
 
+// StampNumbers hooks
+export const stampNumbersHooks = createDirectoryHooks(
+  directoryKeys.stampNumbers(),
+  stampNumbersApi
+);
+
+export const {
+  useGetAll: useStampNumbers,
+  useGetById: useStampNumber,
+  useCreate: useCreateStampNumber,
+  useUpdate: useUpdateStampNumber,
+  useDelete: useDeleteStampNumber,
+} = stampNumbersHooks;
+
 // Helper hooks for select options
 import { convertToSelectOptions } from '@/api/directories';
 import type { SelectOption } from '@/types/directories';
@@ -318,6 +334,15 @@ export const useRegistrarOptions = (): { data: SelectOption[] | undefined; isLoa
   const { data, isLoading, error } = useRegistrars();
   return {
     data: data ? convertToSelectOptions.registrars(data) : undefined,
+    isLoading,
+    error,
+  };
+};
+
+export const useStampNumberOptions = (): { data: SelectOption[] | undefined; isLoading: boolean; error: Error | null } => {
+  const { data, isLoading, error } = useStampNumbers();
+  return {
+    data: data ? convertToSelectOptions.stampNumbers(data) : undefined,
     isLoading,
     error,
   };

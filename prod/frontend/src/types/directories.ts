@@ -215,6 +215,22 @@ export interface UpdateWagonModelDTO {
   manufacturerId: string;
 }
 
+// StampNumber (Номер клейма)
+export interface StampNumberDTO extends BaseEntity {
+  number: string;
+  description?: string;
+}
+
+export interface CreateStampNumberDTO {
+  number: string;
+  description?: string;
+}
+
+export interface UpdateStampNumberDTO {
+  number: string;
+  description?: string;
+}
+
 // Simple option type for selects
 export interface SelectOption {
   value: string;
