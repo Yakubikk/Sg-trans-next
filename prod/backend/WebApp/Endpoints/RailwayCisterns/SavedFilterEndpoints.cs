@@ -7,6 +7,7 @@ using WebApp.Data.Entities.RailwayCisterns;
 using WebApp.Data.Enums;
 using WebApp.DTO.RailwayCisterns;
 using WebApp.Extensions;
+using System.Text.Json.Serialization;
 
 namespace WebApp.Endpoints.RailwayCisterns;
 
@@ -14,7 +15,8 @@ public static class SavedFilterEndpoints
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        PropertyNameCaseInsensitive = true
     };
 
     public static void MapSavedFilterEndpoints(this IEndpointRouteBuilder app)
@@ -41,8 +43,6 @@ public static class SavedFilterEndpoints
                     {
                         Id = f.Id,
                         Name = f.Name,
-                        SortFields = JsonSerializer.Deserialize<List<SortCriteria>>(f.SortFieldsJson),
-                        SelectedColumns = JsonSerializer.Deserialize<List<string>>(f.SelectedColumnsJson),
                         UserId = f.UserId,
                         FilterTypeId = f.FilterTypeId,
                         FilterType = new FilterTypeDTO 
@@ -54,13 +54,26 @@ public static class SavedFilterEndpoints
                         UpdatedAt = f.UpdatedAt
                     };
 
-                    if (f.FilterType.Name == "RailwayCisterns")
+                    if (!string.IsNullOrEmpty(f.FilterJson))
                     {
-                        dto.Filters = JsonSerializer.Deserialize<FilterCriteria>(f.FilterJson, JsonOptions);
+                        if (f.FilterType.Name == "RailwayCisterns")
+                        {
+                            dto.Filters = JsonSerializer.Deserialize<Dictionary<string, object>>(f.FilterJson, JsonOptions);
+                        }
+                        else
+                        {
+                            dto.Filters = JsonSerializer.Deserialize<Dictionary<string, object>>(f.FilterJson, JsonOptions);
+                        }
                     }
-                    else
+
+                    if (!string.IsNullOrEmpty(f.SortFieldsJson))
                     {
-                        dto.Filters = JsonSerializer.Deserialize<PartFilterCriteria>(f.FilterJson, JsonOptions);
+                        dto.SortFields = JsonSerializer.Deserialize<List<SortCriteria>>(f.SortFieldsJson, JsonOptions);
+                    }
+
+                    if (!string.IsNullOrEmpty(f.SelectedColumnsJson))
+                    {
+                        dto.SelectedColumns = JsonSerializer.Deserialize<List<string>>(f.SelectedColumnsJson, JsonOptions);
                     }
 
                     result.Add(dto);
@@ -90,8 +103,6 @@ public static class SavedFilterEndpoints
                 {
                     Id = filter.Id,
                     Name = filter.Name,
-                    SortFields = JsonSerializer.Deserialize<List<SortCriteria>>(filter.SortFieldsJson),
-                    SelectedColumns = JsonSerializer.Deserialize<List<string>>(filter.SelectedColumnsJson),
                     UserId = filter.UserId,
                     FilterTypeId = filter.FilterTypeId,
                     FilterType = new FilterTypeDTO 
@@ -103,13 +114,26 @@ public static class SavedFilterEndpoints
                     UpdatedAt = filter.UpdatedAt
                 };
 
-                if (filter.FilterType.Name == "RailwayCisterns")
+                if (!string.IsNullOrEmpty(filter.FilterJson))
                 {
-                    result.Filters = JsonSerializer.Deserialize<FilterCriteria>(filter.FilterJson, JsonOptions);
+                    if (filter.FilterType.Name == "RailwayCisterns")
+                    {
+                        result.Filters = JsonSerializer.Deserialize<Dictionary<string, object>>(filter.FilterJson, JsonOptions);
+                    }
+                    else
+                    {
+                        result.Filters = JsonSerializer.Deserialize<Dictionary<string, object>>(filter.FilterJson, JsonOptions);
+                    }
                 }
-                else
+
+                if (!string.IsNullOrEmpty(filter.SortFieldsJson))
                 {
-                    result.Filters = JsonSerializer.Deserialize<PartFilterCriteria>(filter.FilterJson, JsonOptions);
+                    result.SortFields = JsonSerializer.Deserialize<List<SortCriteria>>(filter.SortFieldsJson, JsonOptions);
+                }
+
+                if (!string.IsNullOrEmpty(filter.SelectedColumnsJson))
+                {
+                    result.SelectedColumns = JsonSerializer.Deserialize<List<string>>(filter.SelectedColumnsJson, JsonOptions);
                 }
 
                 return Results.Ok(result);
@@ -230,8 +254,6 @@ public static class SavedFilterEndpoints
                     {
                         Id = f.Id,
                         Name = f.Name,
-                        SortFields = JsonSerializer.Deserialize<List<SortCriteria>>(f.SortFieldsJson),
-                        SelectedColumns = JsonSerializer.Deserialize<List<string>>(f.SelectedColumnsJson),
                         UserId = f.UserId,
                         FilterTypeId = f.FilterTypeId,
                         FilterType = new FilterTypeDTO 
@@ -243,13 +265,26 @@ public static class SavedFilterEndpoints
                         UpdatedAt = f.UpdatedAt
                     };
 
-                    if (f.FilterType.Name == "RailwayCisterns")
+                    if (!string.IsNullOrEmpty(f.FilterJson))
                     {
-                        dto.Filters = JsonSerializer.Deserialize<FilterCriteria>(f.FilterJson, JsonOptions);
+                        if (f.FilterType.Name == "RailwayCisterns")
+                        {
+                            dto.Filters = JsonSerializer.Deserialize<Dictionary<string, object>>(f.FilterJson, JsonOptions);
+                        }
+                        else
+                        {
+                            dto.Filters = JsonSerializer.Deserialize<Dictionary<string, object>>(f.FilterJson, JsonOptions);
+                        }
                     }
-                    else
+
+                    if (!string.IsNullOrEmpty(f.SortFieldsJson))
                     {
-                        dto.Filters = JsonSerializer.Deserialize<PartFilterCriteria>(f.FilterJson, JsonOptions);
+                        dto.SortFields = JsonSerializer.Deserialize<List<SortCriteria>>(f.SortFieldsJson, JsonOptions);
+                    }
+
+                    if (!string.IsNullOrEmpty(f.SelectedColumnsJson))
+                    {
+                        dto.SelectedColumns = JsonSerializer.Deserialize<List<string>>(f.SelectedColumnsJson, JsonOptions);
                     }
 
                     result.Add(dto);
