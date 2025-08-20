@@ -12,6 +12,11 @@ namespace WebApp.Endpoints.RailwayCisterns;
 
 public static class SavedFilterEndpoints
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+    };
+
     public static void MapSavedFilterEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/saved-filters")
@@ -27,22 +32,10 @@ public static class SavedFilterEndpoints
                 var filters = await context.Set<SavedFilter>()
                     .Include(f => f.FilterType)
                     .Where(f => f.UserId == userId)
-                    .Select(f => new
-                    {
-                        f.Id,
-                        f.Name,
-                        f.FilterJson,
-                        f.SortFieldsJson,
-                        f.SelectedColumnsJson,
-                        f.UserId,
-                        f.FilterTypeId,
-                        FilterType = new { f.FilterType.Id, f.FilterType.Name },
-                        f.CreatedAt,
-                        f.UpdatedAt
-                    })
                     .ToListAsync();
 
-                var result = await Task.WhenAll(filters.Select(async f =>
+                var result = new List<SavedFilterDTO>();
+                foreach (var f in filters)
                 {
                     var dto = new SavedFilterDTO
                     {
@@ -61,18 +54,17 @@ public static class SavedFilterEndpoints
                         UpdatedAt = f.UpdatedAt
                     };
 
-                    // Десериализуем фильтры в зависимости от типа
-                    if (await IsRailwayCisternFilterType(f.FilterTypeId, context))
+                    if (f.FilterType.Name == "RailwayCisterns")
                     {
-                        dto.Filters = JsonSerializer.Deserialize<FilterCriteria>(f.FilterJson);
+                        dto.Filters = JsonSerializer.Deserialize<FilterCriteria>(f.FilterJson, JsonOptions);
                     }
                     else
                     {
-                        dto.Filters = JsonSerializer.Deserialize<PartFilterCriteria>(f.FilterJson);
+                        dto.Filters = JsonSerializer.Deserialize<PartFilterCriteria>(f.FilterJson, JsonOptions);
                     }
 
-                    return dto;
-                }));
+                    result.Add(dto);
+                }
 
                 return Results.Ok(result);
             })
@@ -89,21 +81,7 @@ public static class SavedFilterEndpoints
                 var userId = Guid.Parse(httpContext.User.FindFirstValue("userId")!);
                 var filter = await context.Set<SavedFilter>()
                     .Include(f => f.FilterType)
-                    .Where(f => f.Id == id && f.UserId == userId)
-                    .Select(f => new
-                    {
-                        f.Id,
-                        f.Name,
-                        f.FilterJson,
-                        f.SortFieldsJson,
-                        f.SelectedColumnsJson,
-                        f.UserId,
-                        f.FilterTypeId,
-                        FilterType = new { f.FilterType.Id, f.FilterType.Name },
-                        f.CreatedAt,
-                        f.UpdatedAt
-                    })
-                    .FirstOrDefaultAsync();
+                    .FirstOrDefaultAsync(f => f.Id == id && f.UserId == userId);
 
                 if (filter == null)
                     return Results.NotFound();
@@ -125,14 +103,13 @@ public static class SavedFilterEndpoints
                     UpdatedAt = filter.UpdatedAt
                 };
 
-                // Десериализуем фильтры в зависимости от типа
-                if (await IsRailwayCisternFilterType(filter.FilterTypeId, context))
+                if (filter.FilterType.Name == "RailwayCisterns")
                 {
-                    result.Filters = JsonSerializer.Deserialize<FilterCriteria>(filter.FilterJson);
+                    result.Filters = JsonSerializer.Deserialize<FilterCriteria>(filter.FilterJson, JsonOptions);
                 }
                 else
                 {
-                    result.Filters = JsonSerializer.Deserialize<PartFilterCriteria>(filter.FilterJson);
+                    result.Filters = JsonSerializer.Deserialize<PartFilterCriteria>(filter.FilterJson, JsonOptions);
                 }
 
                 return Results.Ok(result);
@@ -244,22 +221,10 @@ public static class SavedFilterEndpoints
                 var filters = await context.Set<SavedFilter>()
                     .Include(f => f.FilterType)
                     .Where(f => f.UserId == userId && f.FilterTypeId == typeId)
-                    .Select(f => new
-                    {
-                        f.Id,
-                        f.Name,
-                        f.FilterJson,
-                        f.SortFieldsJson,
-                        f.SelectedColumnsJson,
-                        f.UserId,
-                        f.FilterTypeId,
-                        FilterType = new { f.FilterType.Id, f.FilterType.Name },
-                        f.CreatedAt,
-                        f.UpdatedAt
-                    })
                     .ToListAsync();
 
-                var result = await Task.WhenAll(filters.Select(async f =>
+                var result = new List<SavedFilterDTO>();
+                foreach (var f in filters)
                 {
                     var dto = new SavedFilterDTO
                     {
@@ -278,18 +243,17 @@ public static class SavedFilterEndpoints
                         UpdatedAt = f.UpdatedAt
                     };
 
-                    // Десериализуем фильтры в зависимости от типа
-                    if (await IsRailwayCisternFilterType(f.FilterTypeId, context))
+                    if (f.FilterType.Name == "RailwayCisterns")
                     {
-                        dto.Filters = JsonSerializer.Deserialize<FilterCriteria>(f.FilterJson);
+                        dto.Filters = JsonSerializer.Deserialize<FilterCriteria>(f.FilterJson, JsonOptions);
                     }
                     else
                     {
-                        dto.Filters = JsonSerializer.Deserialize<PartFilterCriteria>(f.FilterJson);
+                        dto.Filters = JsonSerializer.Deserialize<PartFilterCriteria>(f.FilterJson, JsonOptions);
                     }
 
-                    return dto;
-                }));
+                    result.Add(dto);
+                }
 
                 return Results.Ok(result);
             })
