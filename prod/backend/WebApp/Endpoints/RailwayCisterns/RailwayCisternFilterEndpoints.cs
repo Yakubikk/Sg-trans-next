@@ -425,7 +425,196 @@ public static class RailwayCisternFilterEndpoints
                 query = query.Where(rc => rc.TareWeight <= filters.TareWeight.To);
         }
 
-        // Аналогично для остальных фильтров с диапазонами...
+        if (filters.LoadCapacity != null)
+        {
+            if (filters.LoadCapacity.From.HasValue)
+                query = query.Where(rc => rc.LoadCapacity >= filters.LoadCapacity.From);
+            if (filters.LoadCapacity.To.HasValue)
+                query = query.Where(rc => rc.LoadCapacity <= filters.LoadCapacity.To);
+        }
+
+        if (filters.Length != null)
+        {
+            if (filters.Length.From.HasValue)
+                query = query.Where(rc => rc.Length >= filters.Length.From);
+            if (filters.Length.To.HasValue)
+                query = query.Where(rc => rc.Length <= filters.Length.To);
+        }
+
+        if (filters.AxleCounts != null && filters.AxleCounts.Any())
+            query = query.Where(rc => filters.AxleCounts.Contains(rc.AxleCount));
+
+        if (filters.Volume != null)
+        {
+            if (filters.Volume.From.HasValue)
+                query = query.Where(rc => rc.Volume >= filters.Volume.From);
+            if (filters.Volume.To.HasValue)
+                query = query.Where(rc => rc.Volume <= filters.Volume.To);
+        }
+
+        if (filters.FillingVolume != null)
+        {
+            if (filters.FillingVolume.From.HasValue)
+                query = query.Where(rc => rc.FillingVolume >= filters.FillingVolume.From);
+            if (filters.FillingVolume.To.HasValue)
+                query = query.Where(rc => rc.FillingVolume <= filters.FillingVolume.To);
+        }
+
+        if (filters.InitialTareWeight != null)
+        {
+            if (filters.InitialTareWeight.From.HasValue)
+                query = query.Where(rc => rc.InitialTareWeight >= filters.InitialTareWeight.From);
+            if (filters.InitialTareWeight.To.HasValue)
+                query = query.Where(rc => rc.InitialTareWeight <= filters.InitialTareWeight.To);
+        }
+
+        if (filters.TypeIds != null && filters.TypeIds.Any())
+            query = query.Where(rc => filters.TypeIds.Contains(rc.TypeId));
+
+        if (filters.ModelIds != null && filters.ModelIds.Any())
+            query = query.Where(rc => rc.ModelId != null && filters.ModelIds.Contains(rc.ModelId.Value));
+
+        if (filters.CommissioningDate != null)
+        {
+            if (filters.CommissioningDate.From.HasValue)
+                query = query.Where(rc => rc.CommissioningDate >= filters.CommissioningDate.From);
+            if (filters.CommissioningDate.To.HasValue)
+                query = query.Where(rc => rc.CommissioningDate <= filters.CommissioningDate.To);
+        }
+
+        if (filters.SerialNumbers != null && filters.SerialNumbers.Any())
+            query = query.Where(rc => filters.SerialNumbers.Contains(rc.SerialNumber));
+
+        if (filters.RegistrationNumbers != null && filters.RegistrationNumbers.Any())
+            query = query.Where(rc => filters.RegistrationNumbers.Contains(rc.RegistrationNumber));
+
+        if (filters.RegistrationDate != null)
+        {
+            if (filters.RegistrationDate.From.HasValue)
+                query = query.Where(rc => rc.RegistrationDate >= filters.RegistrationDate.From);
+            if (filters.RegistrationDate.To.HasValue)
+                query = query.Where(rc => rc.RegistrationDate <= filters.RegistrationDate.To);
+        }
+
+        if (filters.RegistrarIds != null && filters.RegistrarIds.Any())
+            query = query.Where(rc => rc.RegistrarId != null && filters.RegistrarIds.Contains(rc.RegistrarId.Value));
+
+        if (filters.OwnerIds != null && filters.OwnerIds.Any())
+            query = query.Where(rc => rc.OwnerId != null && filters.OwnerIds.Contains(rc.OwnerId.Value));
+
+        if (filters.TechConditions != null && filters.TechConditions.Any())
+            query = query.Where(rc => rc.TechConditions != null && filters.TechConditions.Contains(rc.TechConditions));
+
+        if (filters.Prispiski != null && filters.Prispiski.Any())
+            query = query.Where(rc => rc.Pripiska != null && filters.Prispiski.Contains(rc.Pripiska));
+
+        if (filters.ReRegistrationDate != null)
+        {
+            if (filters.ReRegistrationDate.From.HasValue)
+                query = query.Where(rc => rc.ReRegistrationDate >= filters.ReRegistrationDate.From);
+            if (filters.ReRegistrationDate.To.HasValue)
+                query = query.Where(rc => rc.ReRegistrationDate <= filters.ReRegistrationDate.To);
+        }
+
+        if (filters.Pressure != null)
+        {
+            if (filters.Pressure.From.HasValue)
+                query = query.Where(rc => rc.Pressure >= filters.Pressure.From);
+            if (filters.Pressure.To.HasValue)
+                query = query.Where(rc => rc.Pressure <= filters.Pressure.To);
+        }
+
+        if (filters.TestPressure != null)
+        {
+            if (filters.TestPressure.From.HasValue)
+                query = query.Where(rc => rc.TestPressure >= filters.TestPressure.From);
+            if (filters.TestPressure.To.HasValue)
+                query = query.Where(rc => rc.TestPressure <= filters.TestPressure.To);
+        }
+
+        if (filters.Rents != null && filters.Rents.Any())
+            query = query.Where(rc => rc.Rent != null && filters.Rents.Contains(rc.Rent));
+
+        if (filters.AffiliationIds != null && filters.AffiliationIds.Any())
+            query = query.Where(rc => filters.AffiliationIds.Contains(rc.AffiliationId));
+
+        if (filters.ServiceLifeYears != null)
+        {
+            if (filters.ServiceLifeYears.From.HasValue)
+                query = query.Where(rc => rc.ServiceLifeYears >= filters.ServiceLifeYears.From);
+            if (filters.ServiceLifeYears.To.HasValue)
+                query = query.Where(rc => rc.ServiceLifeYears <= filters.ServiceLifeYears.To);
+        }
+
+        if (filters.PeriodMajorRepair != null)
+        {
+            if (filters.PeriodMajorRepair.From.HasValue)
+                query = query.Where(rc => rc.PeriodMajorRepair >= filters.PeriodMajorRepair.From);
+            if (filters.PeriodMajorRepair.To.HasValue)
+                query = query.Where(rc => rc.PeriodMajorRepair <= filters.PeriodMajorRepair.To);
+        }
+
+        if (filters.PeriodPeriodicTest != null)
+        {
+            if (filters.PeriodPeriodicTest.From.HasValue)
+                query = query.Where(rc => rc.PeriodPeriodicTest >= filters.PeriodPeriodicTest.From);
+            if (filters.PeriodPeriodicTest.To.HasValue)
+                query = query.Where(rc => rc.PeriodPeriodicTest <= filters.PeriodPeriodicTest.To);
+        }
+
+        if (filters.PeriodIntermediateTest != null)
+        {
+            if (filters.PeriodIntermediateTest.From.HasValue)
+                query = query.Where(rc => rc.PeriodIntermediateTest >= filters.PeriodIntermediateTest.From);
+            if (filters.PeriodIntermediateTest.To.HasValue)
+                query = query.Where(rc => rc.PeriodIntermediateTest <= filters.PeriodIntermediateTest.To);
+        }
+
+        if (filters.PeriodDepotRepair != null)
+        {
+            if (filters.PeriodDepotRepair.From.HasValue)
+                query = query.Where(rc => rc.PeriodDepotRepair >= filters.PeriodDepotRepair.From);
+            if (filters.PeriodDepotRepair.To.HasValue)
+                query = query.Where(rc => rc.PeriodDepotRepair <= filters.PeriodDepotRepair.To);
+        }
+
+        if (filters.DangerClasses != null && filters.DangerClasses.Any())
+            query = query.Where(rc => filters.DangerClasses.Contains(rc.DangerClass));
+
+        if (filters.Substances != null && filters.Substances.Any())
+            query = query.Where(rc => filters.Substances.Contains(rc.Substance));
+
+        if (filters.TareWeight2 != null)
+        {
+            if (filters.TareWeight2.From.HasValue)
+                query = query.Where(rc => rc.TareWeight2 >= filters.TareWeight2.From);
+            if (filters.TareWeight2.To.HasValue)
+                query = query.Where(rc => rc.TareWeight2 <= filters.TareWeight2.To);
+        }
+
+        if (filters.TareWeight3 != null)
+        {
+            if (filters.TareWeight3.From.HasValue)
+                query = query.Where(rc => rc.TareWeight3 >= filters.TareWeight3.From);
+            if (filters.TareWeight3.To.HasValue)
+                query = query.Where(rc => rc.TareWeight3 <= filters.TareWeight3.To);
+        }
+
+        if (filters.CreatedAt != null)
+        {
+            if (filters.CreatedAt.From.HasValue)
+                query = query.Where(rc => rc.CreatedAt >= filters.CreatedAt.From);
+            if (filters.CreatedAt.To.HasValue)
+                query = query.Where(rc => rc.CreatedAt <= filters.CreatedAt.To);
+        }
+
+        if (filters.UpdatedAt != null)
+        {
+            if (filters.UpdatedAt.From.HasValue)
+                query = query.Where(rc => rc.UpdatedAt >= filters.UpdatedAt.From);
+            if (filters.UpdatedAt.To.HasValue)
+                query = query.Where(rc => rc.UpdatedAt <= filters.UpdatedAt.To);
+        }
 
         return query;
     }
