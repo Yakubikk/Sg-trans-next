@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -19,8 +18,9 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
-import { useCisterns, useDeleteCistern, useSearchCisterns } from "@/hooks/useCisterns";
+import { useCisterns, useDeleteCistern, useSearchCisterns, useCisternNumbers } from "@/hooks/useCisterns";
 import { useDebounce } from "@/hooks/useDebounce";
+import { AutocompleteInput } from "@/components/ui/autocomplete-input";
 import type { CisternsFilter } from "@/types/cisterns";
 
 export default function CisternsPage() {
@@ -43,6 +43,33 @@ export default function CisternsPage() {
     debouncedSearchTerm,
     isSearchMode
   );
+  
+  // Autocomplete for cistern numbers (only when typing)
+  const { data: allCisternNumbers = [], isLoading: isLoadingNumbers } = useCisternNumbers();
+  
+  // Отсортированные и отфильтрованные предложения номеров
+  const sortedNumberSuggestions = useMemo(() => {
+    if (!searchTerm.trim()) {
+      // Если нет поискового запроса, возвращаем первые 10 номеров отсортированные по алфавиту
+      return allCisternNumbers
+        .slice()
+        .sort((a, b) => a.localeCompare(b, 'ru', { numeric: true }))
+        .slice(0, 10);
+    }
+    
+    const searchLower = searchTerm.toLowerCase();
+    
+    // Фильтруем только номера, которые НАЧИНАЮТСЯ с введенного текста
+    const filtered = allCisternNumbers.filter(number => 
+      number.toLowerCase().startsWith(searchLower)
+    );
+    
+    // Сортируем по алфавиту (с учетом числовых значений)
+    return filtered
+      .sort((a, b) => a.localeCompare(b, 'ru', { numeric: true }))
+      .slice(0, 15); // Ограничиваем количество предложений
+  }, [allCisternNumbers, searchTerm]);
+  
   const deleteMutation = useDeleteCistern();
 
   // Switch between search and normal mode based on search term
@@ -70,7 +97,7 @@ export default function CisternsPage() {
   const currentPage = isSearchMode ? searchPage : (cisternsData?.currentPage || 1);
   const totalPages = isSearchMode ? searchTotalPages : (cisternsData?.totalPages || 1);
   const pageSize = isSearchMode ? searchPageSize : (cisternsData?.pageSize || 10);
-  const handleSearch = (value: string) => {
+  const handleSearch = useCallback((value: string) => {
     setSearchTerm(value);
     // Reset pagination when searching
     if (!value.trim()) {
@@ -78,7 +105,7 @@ export default function CisternsPage() {
     } else {
       setSearchPage(1);
     }
-  };
+  }, []);
 
   const handlePageChange = (page: number) => {
     if (isSearchMode) {
@@ -256,12 +283,14 @@ export default function CisternsPage() {
       {/* Controls */}
       <div className="flex justify-between items-center gap-4">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <Input
-            placeholder="Поиск по номеру цистерны..."
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 z-10" />
+          <AutocompleteInput
             value={searchTerm}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={handleSearch}
+            suggestions={sortedNumberSuggestions}
+            placeholder="Поиск по номеру цистерны..."
             className="pl-10"
+            isLoading={isLoadingNumbers}
           />
         </div>
 

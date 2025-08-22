@@ -16,6 +16,9 @@ export const cisternsKeys = {
   detail: (id: string) => [...cisternsKeys.details(), id] as const,
   search: () => [...cisternsKeys.all, 'search'] as const,
   searchResults: (prefix: string) => [...cisternsKeys.search(), prefix] as const,
+  numbers: () => [...cisternsKeys.all, 'numbers'] as const,
+  allNumbers: () => [...cisternsKeys.numbers(), 'all'] as const,
+  numberSearch: (prefix: string) => [...cisternsKeys.numbers(), 'search', prefix] as const,
 };
 
 // Get paginated cisterns
@@ -86,5 +89,15 @@ export const useSearchCisterns = (prefix: string, enabled: boolean = true) => {
     queryFn: () => cisternsApi.search(prefix),
     enabled: enabled && prefix.length > 0,
     staleTime: 30000, // 30 seconds
+  });
+};
+
+// Get all cistern numbers for autocomplete
+export const useCisternNumbers = () => {
+  return useQuery<string[]>({
+    queryKey: cisternsKeys.allNumbers(),
+    queryFn: () => cisternsApi.getAllNumbers(),
+    staleTime: 10 * 60 * 1000, // 10 minutes - numbers don't change often
+    gcTime: 15 * 60 * 1000, // 15 minutes
   });
 };

@@ -61,4 +61,10 @@ export const cisternsApi = {
     const response = await api.get<RailwayCisternDetailDTO[]>(`${CISTERNS_ENDPOINT}/detailed/search?prefix=${encodeURIComponent(prefix)}`);
     return response.data;
   },
+
+  // Get all cistern numbers
+  getAllNumbers: async (): Promise<string[]> => {
+    const response = await api.get<string[]>(`${CISTERNS_ENDPOINT}/numbers`);
+    return response.data;
+  },
 };
