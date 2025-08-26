@@ -340,18 +340,22 @@ public static class PartFilterEndpoints
                 case "depot.location":
                     selectedProperties["depotLocation"] = p.Depot?.Location;
                     break;
-                case "depot":
-                    if (p.Depot != null)
-                    {
-                        selectedProperties["depot"] = new
-                        {
-                            p.Depot.Id,
-                            p.Depot.Name,
-                            p.Depot.Code,
-                            p.Depot.Location
-                        };
-                    }
+                case "depot.shortname":
+                    selectedProperties["depotShortName"] = p.Depot?.ShortName;
                     break;
+                // case "depot":
+                //     if (p.Depot != null)
+                //     {
+                //         selectedProperties["depot"] = new
+                //         {
+                //             p.Depot.Id,
+                //             p.Depot.Name,
+                //             p.Depot.Code,
+                //             p.Depot.ShortName,
+                //             p.Depot.Location
+                //         };
+                //     }
+                //     break;
 
                 // Базовые поля
                 case "depotid":

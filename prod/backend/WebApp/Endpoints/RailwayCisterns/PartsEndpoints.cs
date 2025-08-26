@@ -68,7 +68,9 @@ public static class PartsEndpoints
                     {
                         Id = p.Depot.Id,
                         Name = p.Depot.Name,
-                        Code = p.Depot.Code
+                        Code = p.Depot.Code,
+                        ShortName = p.Depot.ShortName,
+                        Location = p.Depot.Location
                     } : null,
                     StampNumber = new StampNumberDTO
                     {
@@ -162,7 +164,9 @@ public static class PartsEndpoints
                     {
                         Id = p.Depot.Id,
                         Name = p.Depot.Name,
-                        Code = p.Depot.Code
+                        Code = p.Depot.Code,
+                        ShortName = p.Depot.ShortName,
+                        Location = p.Depot.Location
                     } : null,
                     StampNumber = new StampNumberDTO
                     {

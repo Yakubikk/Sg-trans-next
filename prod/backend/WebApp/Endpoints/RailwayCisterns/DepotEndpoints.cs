@@ -26,6 +26,7 @@ public static class DepotEndpoints
                     Name = d.Name,
                     Code = d.Code,
                     Location = d.Location,
+                    ShortName = d.ShortName,
                     CreatedAt = d.CreatedAt
                 })
                 .ToListAsync();
@@ -45,6 +46,7 @@ public static class DepotEndpoints
                     Name = d.Name,
                     Code = d.Code,
                     Location = d.Location,
+                    ShortName = d.ShortName,
                     CreatedAt = d.CreatedAt
                 })
                 .FirstOrDefaultAsync();
@@ -62,8 +64,9 @@ public static class DepotEndpoints
                 Name = dto.Name,
                 Code = dto.Code,
                 Location = dto.Location,
+                ShortName = dto.ShortName,
                 CreatedAt = DateTime.UtcNow,
-                CreatorId = httpContext.User.FindFirstValue("userId")
+                CreatorId = Guid.Parse(httpContext.User.FindFirstValue("userId"))
             };
 
             context.Add(depot);
@@ -75,6 +78,7 @@ public static class DepotEndpoints
                 Name = depot.Name,
                 Code = depot.Code,
                 Location = depot.Location,
+                ShortName = depot.ShortName,
                 CreatedAt = depot.CreatedAt
             });
         })
@@ -92,6 +96,7 @@ public static class DepotEndpoints
             depot.Name = dto.Name;
             depot.Code = dto.Code;
             depot.Location = dto.Location;
+            depot.ShortName = dto.ShortName;
 
             await context.SaveChangesAsync();
             return Results.NoContent();

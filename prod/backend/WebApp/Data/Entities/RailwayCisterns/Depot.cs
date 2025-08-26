@@ -6,8 +6,9 @@ public class Depot
     public string Name { get; set; } = null!;
     public string Code { get; set; } = null!;
     public string? Location { get; set; }
+    public string? ShortName { get; set; }
     public DateTime CreatedAt { get; set; }
-    public string CreatorId { get; set; } = null!;
+    public Guid CreatorId { get; set; }
     
     public ICollection<Part> Parts { get; set; } = new List<Part>();
     public ICollection<Repair> Repairs { get; set; } = new List<Repair>();
