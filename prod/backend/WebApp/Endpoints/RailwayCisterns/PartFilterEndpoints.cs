@@ -158,7 +158,7 @@ public static class PartFilterEndpoints
             {
                 p.Id,
                 PartType = new { p.PartType.Id, p.PartType.Name, p.PartType.Code },
-                Depot = p.Depot != null ? new { p.Depot.Id, p.Depot.Name, p.Depot.Code, p.Depot.Location } : null,
+                Depot = p.Depot != null ? new { p.Depot.Id, p.Depot.Name, p.Depot.Code, p.Depot.ShortName, p.Depot.Location } : null,
                 StampNumber = new { p.StampNumber.Id, p.StampNumber.Value },
                 p.SerialNumber,
                 p.ManufactureYear,
@@ -167,23 +167,24 @@ public static class PartFilterEndpoints
                 p.Notes,
                 p.CreatedAt,
                 p.UpdatedAt,
-                WheelPair = p.WheelPair != null ? new
+                WheelPair = p.PartType.Code == 1 ? new
                 {
                     p.WheelPair.ThicknessLeft,
                     p.WheelPair.ThicknessRight,
                     p.WheelPair.WheelType
                 } : null,
-                SideFrame = p.SideFrame != null ? new
+                SideFrame = p.PartType.Code == 3 ? new
                 {
                     p.SideFrame.ServiceLifeYears,
                     p.SideFrame.ExtendedUntil
                 } : null,
-                Bolster = p.Bolster != null ? new
+                Bolster = p.PartType.Code == 2 ? new
                 {
                     p.Bolster.ServiceLifeYears,
                     p.Bolster.ExtendedUntil
                 } : null,
-                ShockAbsorber = p.ShockAbsorber != null ? new
+                Coupler = p.PartType.Code == 4 ? new { } : null,
+                ShockAbsorber = p.PartType.Code == 10 ? new
                 {
                     p.ShockAbsorber.Model,
                     p.ShockAbsorber.ManufacturerCode,

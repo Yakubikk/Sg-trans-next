@@ -38,6 +38,8 @@ public class ApplicationDbContext(
     public DbSet<PartType> PartTypes { get; set; }
     public DbSet<FilterType> FilterTypes { get; set; }
     public DbSet<StampNumber> StampNumbers { get; set; }
+    public DbSet<EquipmentType> EquipmentTypes { get; set; }
+    public DbSet<PartEquipment> PartEquipments { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -446,6 +448,63 @@ public class ApplicationDbContext(
             entity.ToTable("FilterTypes");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).IsRequired().HasColumnType("text");
+        });
+
+        // EquipmentType конфигурация
+        modelBuilder.Entity<EquipmentType>(entity =>
+        {
+            entity.ToTable("EquipmentType");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasColumnType("text");
+            entity.Property(e => e.Code).IsRequired().HasDefaultValue(0);
+            
+            entity.HasOne(e => e.PartType)
+                .WithMany()
+                .HasForeignKey(e => e.PartTypeId)
+                .OnDelete(DeleteBehavior.NoAction);
+        });
+
+        // PartEquipments конфигурация
+        modelBuilder.Entity<PartEquipment>(entity =>
+        {
+            entity.ToTable("PartEquipments");
+            entity.HasKey(e => e.Id);
+            
+            entity.Property(e => e.Operation).IsRequired().HasDefaultValue(0);
+            entity.Property(e => e.DefectsId).IsRequired().HasDefaultValue("0").HasColumnType("text");
+            entity.Property(e => e.AdminOwnerId).HasColumnType("text");
+            entity.Property(e => e.JobDate).HasColumnType("text");
+            entity.Property(e => e.JobTypeId).IsRequired().HasDefaultValue("0").HasColumnType("text");
+            entity.Property(e => e.ThicknessLeft).IsRequired().HasDefaultValue(0);
+            entity.Property(e => e.ThicknessRight).IsRequired().HasDefaultValue(0);
+            entity.Property(e => e.Notes).HasColumnType("text");
+            entity.Property(e => e.DocumetnsId).IsRequired().HasDefaultValue(0);
+            entity.Property(e => e.DocumetnDate).IsRequired().HasColumnType("date");
+            
+            entity.HasOne(pe => pe.RailwayCistern)
+                .WithMany()
+                .HasForeignKey(pe => pe.RailwayCisternsId)
+                .OnDelete(DeleteBehavior.NoAction);
+                
+            entity.HasOne(pe => pe.EquipmentType)
+                .WithMany(et => et.PartEquipments)
+                .HasForeignKey(pe => pe.EquipmentTypeId)
+                .OnDelete(DeleteBehavior.NoAction);
+                
+            entity.HasOne(pe => pe.JobDepot)
+                .WithMany()
+                .HasForeignKey(pe => pe.JobDepotsId)
+                .OnDelete(DeleteBehavior.NoAction);
+                
+            entity.HasOne(pe => pe.Depot)
+                .WithMany()
+                .HasForeignKey(pe => pe.DepotsId)
+                .OnDelete(DeleteBehavior.NoAction);
+                
+            entity.HasOne(pe => pe.RepairType)
+                .WithMany()
+                .HasForeignKey(pe => pe.RepairTypesId)
+                .OnDelete(DeleteBehavior.NoAction);
         });
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);

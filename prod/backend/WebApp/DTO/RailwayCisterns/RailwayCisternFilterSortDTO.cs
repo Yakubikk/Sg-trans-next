@@ -20,6 +20,7 @@ public class RailwayCisternFilterSortWithoutPaginationDTO
 
 public class FilterCriteria
 {
+    public string? NumberPrefix { get; set; }
     public List<string>? Numbers { get; set; }
     public List<Guid>? ManufacturerIds { get; set; }
     public DateRange? BuildDate { get; set; }

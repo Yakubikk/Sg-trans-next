@@ -403,8 +403,13 @@ public static class RailwayCisternFilterEndpoints
         if (filters == null)
             return query;
 
+        // Фильтр по точному совпадению номеров
         if (filters.Numbers != null && filters.Numbers.Any())
             query = query.Where(rc => filters.Numbers.Contains(rc.Number));
+
+        // Фильтр по префиксу номера
+        if (!string.IsNullOrEmpty(filters.NumberPrefix))
+            query = query.Where(rc => rc.Number.StartsWith(filters.NumberPrefix));
 
         if (filters.ManufacturerIds != null && filters.ManufacturerIds.Any())
             query = query.Where(rc => filters.ManufacturerIds.Contains(rc.ManufacturerId));
@@ -623,52 +628,18 @@ public static class RailwayCisternFilterEndpoints
     {
         if (selectedColumns == null || !selectedColumns.Any())
         {
-            // Default selection remains the same
             return new
             {
                 rc.Id,
                 rc.Number,
                 ManufacturerName = rc.Manufacturer.Name,
                 rc.BuildDate,
-                rc.TareWeight,
-                rc.LoadCapacity,
-                rc.Length,
-                rc.AxleCount,
-                rc.Volume,
-                rc.FillingVolume,
-                rc.InitialTareWeight,
                 TypeName = rc.Type.Name,
                 ModelName = rc.Model != null ? rc.Model.Name : null,
-                rc.CommissioningDate,
-                rc.SerialNumber,
+                OwnerName = rc.Owner != null ? rc.Owner.Name : null,
                 rc.RegistrationNumber,
                 rc.RegistrationDate,
-                RegistrarName = rc.Registrar != null ? rc.Registrar.Name : null,
-                OwnerName = rc.Owner != null ? rc.Owner.Name : null,
-                rc.TechConditions,
-                rc.Pripiska,
-                rc.ReRegistrationDate,
-                rc.Pressure,
-                rc.TestPressure,
-                rc.Rent,
-                AffiliationValue = rc.Affiliation.Value,
-                rc.ServiceLifeYears,
-                rc.PeriodMajorRepair,
-                rc.PeriodPeriodicTest,
-                rc.PeriodIntermediateTest,
-                rc.PeriodDepotRepair,
-                rc.DangerClass,
-                rc.Substance,
-                rc.TareWeight2,
-                rc.TareWeight3,
-                rc.CreatedAt,
-                rc.UpdatedAt,
-                ManufacturerId = rc.ManufacturerId,
-                ModelId = rc.ModelId,
-                TypeId = rc.TypeId,
-                OwnerId = rc.OwnerId,
-                RegistrarId = rc.RegistrarId,
-                AffiliationId = rc.AffiliationId
+                AffiliationValue = rc.Affiliation.Value
             };
         }
 
@@ -852,3 +823,4 @@ public static class RailwayCisternFilterEndpoints
         return selectedProperties;
     }
 }
+
