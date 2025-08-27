@@ -1,10 +1,18 @@
 import { api } from '@/lib/api';
 import type {
   RailwayCisternDetailDTO,
+  RailwayCisternListDTO,
   CreateRailwayCisternDTO,
   UpdateRailwayCisternDTO,
   CisternsFilter,
   PaginatedCisternsResponse,
+  FilteredCisternsResponse,
+  RailwayCisternFilterSortDTO,
+  RailwayCisternFilterSortWithoutPaginationDTO,
+  SavedFilter,
+  CreateSavedFilterDTO,
+  UpdateSavedFilterDTO,
+  FilteredCisternsApiResponse,
 } from '@/types/cisterns';
 
 const CISTERNS_ENDPOINT = '/api/railway-cisterns';
@@ -66,5 +74,65 @@ export const cisternsApi = {
   getAllNumbers: async (): Promise<string[]> => {
     const response = await api.get<string[]>(`${CISTERNS_ENDPOINT}/numbers`);
     return response.data;
+  },
+
+  // Advanced filter with pagination
+  filterWithPagination: async (filterData: RailwayCisternFilterSortDTO): Promise<FilteredCisternsResponse> => {
+    const response = await api.post<FilteredCisternsApiResponse>(`${CISTERNS_ENDPOINT}/filter`, filterData);
+    const apiData = response.data;
+
+    console.log('API Filter Response:', apiData);
+    
+    // Transform API response to match expected format
+    return {
+      railwayCisterns: apiData.items,
+      totalCount: apiData.totalCount,
+      currentPage: apiData.pageNumber,
+      pageSize: apiData.pageSize,
+      totalPages: apiData.totalPages,
+    };
+  },
+
+  // Filter by saved filter
+  filterBySaved: async (filterId: string): Promise<RailwayCisternListDTO[]> => {
+    const response = await api.get<RailwayCisternListDTO[]>(`${CISTERNS_ENDPOINT}/filter/saved/${filterId}`);
+    return response.data;
+  },
+};
+
+// Saved filters API
+export const savedFiltersApi = {
+  // Get all saved filters for current user
+  getAll: async (): Promise<SavedFilter[]> => {
+    const response = await api.get<SavedFilter[]>('/api/saved-filters');
+    return response.data;
+  },
+
+  // Get saved filter by ID
+  getById: async (id: string): Promise<SavedFilter> => {
+    const response = await api.get<SavedFilter>(`/api/saved-filters/${id}`);
+    return response.data;
+  },
+
+  // Get filters by type
+  getByType: async (typeId: string): Promise<SavedFilter[]> => {
+    const response = await api.get<SavedFilter[]>(`/api/saved-filters/by-type/${typeId}`);
+    return response.data;
+  },
+
+  // Create new saved filter
+  create: async (data: CreateSavedFilterDTO): Promise<SavedFilter> => {
+    const response = await api.post<SavedFilter>('/api/saved-filters', data);
+    return response.data;
+  },
+
+  // Update saved filter
+  update: async (id: string, data: UpdateSavedFilterDTO): Promise<void> => {
+    await api.put(`/api/saved-filters/${id}`, data);
+  },
+
+  // Delete saved filter
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/api/saved-filters/${id}`);
   },
 };
