@@ -733,6 +733,9 @@ public static class RailwayCisternFilterEndpoints
                 case "builddate":
                     selectedProperties["buildDate"] = rc.BuildDate;
                     break;
+                case "notes":
+                    selectedProperties["notes"] = rc.Notes??"";
+                    break;
                 case "tareweight":
                     selectedProperties["tareWeight"] = rc.TareWeight;
                     break;
