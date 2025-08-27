@@ -47,10 +47,11 @@ interface AutocompleteInputProps {
   className?: string;
   disabled?: boolean;
   isLoading?: boolean;
+  onSelect?: (suggestion: string) => void; // Новый callback для выбора элемента
 }
 
 export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteInputProps>(
-  ({ value, onChange, suggestions, placeholder, className, disabled, isLoading }, ref) => {
+  ({ value, onChange, suggestions, placeholder, className, disabled, isLoading, onSelect }, ref) => {
     const [isOpen, setIsOpen] = useState(false);
     const [highlightedIndex, setHighlightedIndex] = useState(-1);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -101,9 +102,12 @@ export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteInputP
         case "Enter":
           event.preventDefault();
           if (highlightedIndex >= 0 && highlightedIndex < filteredSuggestions.length) {
-            onChange(filteredSuggestions[highlightedIndex]);
+            const selectedSuggestion = filteredSuggestions[highlightedIndex];
+            onChange(selectedSuggestion);
             setIsOpen(false);
             setHighlightedIndex(-1);
+            // Вызываем callback для выбора элемента
+            onSelect?.(selectedSuggestion);
           }
           break;
         case "Escape":
@@ -111,7 +115,7 @@ export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteInputP
           setHighlightedIndex(-1);
           break;
       }
-    }, [isOpen, filteredSuggestions, highlightedIndex, onChange, value]);
+    }, [isOpen, filteredSuggestions, highlightedIndex, onChange, value, onSelect]);
 
     // Scroll highlighted item into view
     useEffect(() => {
@@ -143,11 +147,13 @@ export const AutocompleteInput = forwardRef<HTMLInputElement, AutocompleteInputP
       onChange(suggestion);
       setIsOpen(false);
       setHighlightedIndex(-1);
+      // Вызываем callback для выбора элемента
+      onSelect?.(suggestion);
       // Restore focus to input after selection
       setTimeout(() => {
         inputRef.current?.focus();
       }, 0);
-    }, [onChange]);
+    }, [onChange, onSelect]);
 
     const handleInputFocus = useCallback(() => {
       // Показываем dropdown только если есть введенный текст и есть предложения
