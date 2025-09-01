@@ -669,6 +669,8 @@ export default function CisternsPage() {
                           ? "Дата обновления"
                           : column === "servicelifeyears"
                           ? "Срок службы (лет)"
+                          : column === "notes"
+                          ? "Заметки"
                           : column}
                       </TableHead>
                     ))}
