@@ -65,10 +65,10 @@ export default function NotFound() {
               </Link>
               <span>•</span>
               <Link 
-                href="/dashboard/directories" 
+                href="/settings" 
                 className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
               >
-                Справочники
+                Настройки
               </Link>
             </div>
           </div>

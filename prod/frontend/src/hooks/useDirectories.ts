@@ -1,4 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { 
+  UpdateWheelPairDTO, 
+  UpdateSideFrameDTO, 
+  UpdateBolsterDTO, 
+  UpdateCouplerDTO, 
+  UpdateShockAbsorberDTO 
+} from '@/types/directories';
 import {
   affiliationsApi,
   depotsApi,
@@ -13,6 +20,8 @@ import {
   registrarsApi,
   wagonModelsApi,
   stampNumbersApi,
+  partsApi,
+  partEquipmentApi,
 } from '@/api/directories';
 
 // Query keys for directories
@@ -31,6 +40,8 @@ export const directoryKeys = {
   registrars: () => [...directoryKeys.all, 'registrars'] as const,
   wagonModels: () => [...directoryKeys.all, 'wagonModels'] as const,
   stampNumbers: () => [...directoryKeys.all, 'stampNumbers'] as const,
+  parts: () => [...directoryKeys.all, 'parts'] as const,
+  partEquipments: () => [...directoryKeys.all, 'part-equipments'] as const,
 };
 
 // Generic hooks factory
@@ -346,4 +357,185 @@ export const useStampNumberOptions = (): { data: SelectOption[] | undefined; isL
     isLoading,
     error,
   };
+};
+
+export const usePartTypeOptions = (): { data: SelectOption[] | undefined; isLoading: boolean; error: Error | null } => {
+  const { data, isLoading, error } = usePartTypes();
+  return {
+    data: data ? convertToSelectOptions.partTypes(data) : undefined,
+    isLoading,
+    error,
+  };
+};
+
+export const usePartStatusOptions = (): { data: SelectOption[] | undefined; isLoading: boolean; error: Error | null } => {
+  const { data, isLoading, error } = usePartStatuses();
+  return {
+    data: data ? convertToSelectOptions.partStatuses(data) : undefined,
+    isLoading,
+    error,
+  };
+};
+
+// Parts hooks - специальные хуки для деталей
+export const useParts = (pageNumber = 1, pageSize = 10, typeId?: string) => {
+  return useQuery({
+    queryKey: [...directoryKeys.parts(), { pageNumber, pageSize, typeId }],
+    queryFn: () => partsApi.getAll(pageNumber, pageSize, typeId),
+  });
+};
+
+export const usePartById = (id: string) => {
+  return useQuery({
+    queryKey: [...directoryKeys.parts(), id],
+    queryFn: () => partsApi.getById(id),
+    enabled: !!id,
+  });
+};
+
+export const useCreateWheelPair = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: partsApi.createWheelPair,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: directoryKeys.parts() });
+    },
+  });
+};
+
+export const useCreateSideFrame = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: partsApi.createSideFrame,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: directoryKeys.parts() });
+    },
+  });
+};
+
+export const useCreateBolster = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: partsApi.createBolster,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: directoryKeys.parts() });
+    },
+  });
+};
+
+export const useCreateCoupler = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: partsApi.createCoupler,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: directoryKeys.parts() });
+    },
+  });
+};
+
+export const useCreateShockAbsorber = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: partsApi.createShockAbsorber,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: directoryKeys.parts() });
+    },
+  });
+};
+
+export const useUpdateWheelPair = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateWheelPairDTO }) =>
+      partsApi.updateWheelPair(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: directoryKeys.parts() });
+    },
+  });
+};
+
+export const useUpdateSideFrame = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateSideFrameDTO }) =>
+      partsApi.updateSideFrame(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: directoryKeys.parts() });
+    },
+  });
+};
+
+export const useUpdateBolster = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateBolsterDTO }) =>
+      partsApi.updateBolster(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: directoryKeys.parts() });
+    },
+  });
+};
+
+export const useUpdateCoupler = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateCouplerDTO }) =>
+      partsApi.updateCoupler(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: directoryKeys.parts() });
+    },
+  });
+};
+
+export const useUpdateShockAbsorber = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateShockAbsorberDTO }) =>
+      partsApi.updateShockAbsorber(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: directoryKeys.parts() });
+    },
+  });
+};
+
+export const useDeletePart = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: partsApi.delete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: directoryKeys.parts() });
+    },
+  });
+};
+
+// Part Equipment hooks
+export const usePartEquipments = (pageNumber = 1, pageSize = 10, cisternId?: string) => {
+  return useQuery({
+    queryKey: [...directoryKeys.partEquipments(), { pageNumber, pageSize, cisternId }],
+    queryFn: () => partEquipmentApi.getAll(pageNumber, pageSize, cisternId),
+  });
+};
+
+export const usePartEquipmentById = (id: string) => {
+  return useQuery({
+    queryKey: [...directoryKeys.partEquipments(), id],
+    queryFn: () => partEquipmentApi.getById(id),
+    enabled: !!id,
+  });
+};
+
+export const usePartEquipmentsByCistern = (cisternId: string) => {
+  return useQuery({
+    queryKey: [...directoryKeys.partEquipments(), 'by-cistern', cisternId],
+    queryFn: () => partEquipmentApi.getByCistern(cisternId),
+    enabled: !!cisternId,
+  });
+};
+
+export const useLastPartEquipmentsByCistern = (cisternId: string) => {
+  return useQuery({
+    queryKey: [...directoryKeys.partEquipments(), 'last-by-cistern', cisternId],
+    queryFn: () => partEquipmentApi.getLastByCistern(cisternId),
+    enabled: !!cisternId,
+  });
 };

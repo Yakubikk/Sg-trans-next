@@ -39,6 +39,21 @@ import type {
   StampNumberDTO,
   CreateStampNumberDTO,
   UpdateStampNumberDTO,
+  PartDTO,
+  PaginatedPartsResponse,
+  CreateWheelPairDTO,
+  CreateSideFrameDTO,
+  CreateBolsterDTO,
+  CreateCouplerDTO,
+  CreateShockAbsorberDTO,
+  UpdateWheelPairDTO,
+  UpdateSideFrameDTO,
+  UpdateBolsterDTO,
+  UpdateCouplerDTO,
+  UpdateShockAbsorberDTO,
+  PartEquipmentDTO,
+  LastEquipmentDTO,
+  PaginatedPartEquipmentResponse,
 } from '@/types/directories';
 
 // Generic CRUD operations for directories
@@ -180,5 +195,110 @@ export const convertToSelectOptions = {
     registrars.map(r => ({ value: r.id, label: r.name })),
 
   stampNumbers: (stampNumbers: StampNumberDTO[]) =>
-    stampNumbers.map(s => ({ value: s.id, label: s.number })),
+    stampNumbers.map(s => ({ value: s.id, label: s.value })),
+
+  partTypes: (partTypes: PartTypeDTO[]) =>
+    partTypes.map(pt => ({ value: pt.id, label: pt.name })),
+
+  partStatuses: (partStatuses: PartStatusDTO[]) =>
+    partStatuses.map(ps => ({ value: ps.id, label: ps.name })),
+};
+
+// Parts API
+export const partsApi = {
+  getAll: async (pageNumber = 1, pageSize = 10, typeId?: string): Promise<PaginatedPartsResponse> => {
+    const params = new URLSearchParams({
+      pageNumber: pageNumber.toString(),
+      pageSize: pageSize.toString(),
+    });
+    if (typeId) {
+      params.append('typeId', typeId);
+    }
+    const response = await api.get(`/api/parts?${params.toString()}`);
+    return response.data;
+  },
+
+  getById: async (id: string): Promise<PartDTO> => {
+    const response = await api.get(`/api/parts/${id}`);
+    return response.data;
+  },
+
+  createWheelPair: async (data: CreateWheelPairDTO): Promise<string> => {
+    const response = await api.post('/api/parts/wheel-pairs', data);
+    return response.data;
+  },
+
+  createSideFrame: async (data: CreateSideFrameDTO): Promise<string> => {
+    const response = await api.post('/api/parts/side-frames', data);
+    return response.data;
+  },
+
+  createBolster: async (data: CreateBolsterDTO): Promise<string> => {
+    const response = await api.post('/api/parts/bolsters', data);
+    return response.data;
+  },
+
+  createCoupler: async (data: CreateCouplerDTO): Promise<string> => {
+    const response = await api.post('/api/parts/couplers', data);
+    return response.data;
+  },
+
+  createShockAbsorber: async (data: CreateShockAbsorberDTO): Promise<string> => {
+    const response = await api.post('/api/parts/shock-absorbers', data);
+    return response.data;
+  },
+
+  updateWheelPair: async (id: string, data: UpdateWheelPairDTO): Promise<void> => {
+    await api.put(`/api/parts/wheel-pairs/${id}`, data);
+  },
+
+  updateSideFrame: async (id: string, data: UpdateSideFrameDTO): Promise<void> => {
+    await api.put(`/api/parts/side-frames/${id}`, data);
+  },
+
+  updateBolster: async (id: string, data: UpdateBolsterDTO): Promise<void> => {
+    await api.put(`/api/parts/bolsters/${id}`, data);
+  },
+
+  updateCoupler: async (id: string, data: UpdateCouplerDTO): Promise<void> => {
+    await api.put(`/api/parts/couplers/${id}`, data);
+  },
+
+  updateShockAbsorber: async (id: string, data: UpdateShockAbsorberDTO): Promise<void> => {
+    await api.put(`/api/parts/shock-absorbers/${id}`, data);
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/api/parts/${id}`);
+  },
+};
+
+// Part Equipment API
+export const partEquipmentApi = {
+  getAll: async (pageNumber = 1, pageSize = 10, cisternId?: string): Promise<PaginatedPartEquipmentResponse> => {
+    const params = new URLSearchParams({
+      pageNumber: pageNumber.toString(),
+      pageSize: pageSize.toString(),
+    });
+    if (cisternId) {
+      params.append('cisternId', cisternId);
+    }
+    const response = await api.get(`/api/part-equipments?${params.toString()}`);
+    return response.data;
+  },
+
+  getById: async (id: string): Promise<PartEquipmentDTO> => {
+    const response = await api.get(`/api/part-equipments/${id}`);
+    return response.data;
+  },
+
+  getByCistern: async (cisternId: string): Promise<PartEquipmentDTO[]> => {
+    const response = await api.get(`/api/part-equipments/by-cistern/${cisternId}`);
+    return response.data;
+  },
+
+  getLastByCistern: async (cisternId: string): Promise<LastEquipmentDTO[]> => {
+    const response = await api.get(`/api/part-equipments/last-by-cistern/${cisternId}`);
+    return response.data;
+  },
 };
