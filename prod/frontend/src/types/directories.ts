@@ -416,6 +416,19 @@ export interface PaginatedPartsResponse {
   totalCount: number;
 }
 
+// Информация о клейме
+export interface StampInfoDTO {
+  value: string;
+}
+
+// Информация о детали
+export interface PartInfoDTO {
+  partId: string;
+  serialNumber?: string;
+  manufactureYear?: number;
+  stampInfo?: StampInfoDTO;
+}
+
 // PartEquipment (Оборудование деталей)
 export interface PartEquipmentDTO {
   id: string;
@@ -466,6 +479,7 @@ export interface PartEquipmentDTO {
     code: string;
     description: string;
   };
+  part?: PartInfoDTO;
 }
 
 export interface LastEquipmentDTO {

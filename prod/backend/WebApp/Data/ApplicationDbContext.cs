@@ -505,6 +505,11 @@ public class ApplicationDbContext(
                 .WithMany()
                 .HasForeignKey(pe => pe.RepairTypesId)
                 .OnDelete(DeleteBehavior.NoAction);
+            
+            entity.HasOne(pe => pe.Part)
+                .WithMany()
+                .HasForeignKey(pe => pe.PartsId)
+                .OnDelete(DeleteBehavior.NoAction);
         });
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
