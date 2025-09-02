@@ -19,10 +19,236 @@ import {
   MapPin,
 } from "lucide-react";
 import { usePartEquipmentsByCistern, useLastPartEquipmentsByCistern } from "@/hooks/useDirectories";
+import { LastEquipmentDTO } from "@/types/directories";
 
 interface PartEquipmentListProps {
   cisternId: string;
 }
+
+// Функция для определения категории оборудования
+const getEquipmentCategory = (partTypeName?: string): 'wheels' | 'trucks' | 'couplers' | 'other' => {
+  if (!partTypeName) return 'other';
+  
+  const name = partTypeName.toLowerCase();
+  
+  // Колесные пары
+  if (name.includes('колес') || name.includes('пар') || name.includes('wheel')) {
+    return 'wheels';
+  }
+  
+  // Детали тележек
+  if (name.includes('тележ') || name.includes('рам') || name.includes('балк') || 
+      name.includes('truck') || name.includes('frame') || name.includes('bolster')) {
+    return 'trucks';
+  }
+  
+  // Автосцепное оборудование
+  if (name.includes('автосцеп') || name.includes('сцеп') || name.includes('поглощ') || 
+      name.includes('хомут') || name.includes('coupler') || name.includes('absorber')) {
+    return 'couplers';
+  }
+  
+  return 'other';
+};
+
+// Компонент таблицы для колесных пар
+const WheelPairsTable = ({ equipments }: { equipments: LastEquipmentDTO[] }) => {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "—";
+    const date = new Date(dateString);
+    return `${String(date.getMonth() + 1).padStart(2, '0')}.${date.getFullYear()}`;
+  };
+
+  return (
+    <Card className="mb-6">
+      <CardHeader>
+        <CardTitle>Учёт колесных пар</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Наименование показателя</TableHead>
+              <TableHead>Код детали</TableHead>
+              <TableHead>Код неисправности детали</TableHead>
+              <TableHead>Код ЖД администрации</TableHead>
+              <TableHead>Код предприятия-изготовителя</TableHead>
+              <TableHead>Номер детали</TableHead>
+              <TableHead>Год изготовления</TableHead>
+              <TableHead>Год работы с деталью</TableHead>
+              <TableHead>Код вида работы</TableHead>
+              <TableHead>Дата работы</TableHead>
+              <TableHead>Код вида работы</TableHead>
+              <TableHead>Толщина обода (Л/П)</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {equipments.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={12} className="text-center py-8">
+                  Колесные пары не установлены
+                </TableCell>
+              </TableRow>
+            ) : (
+              equipments.map((equipment) => (
+                <TableRow key={equipment.equipmentTypeId}>
+                  <TableCell>{equipment.equipmentTypeName}</TableCell>
+                  <TableCell>{equipment.lastEquipment.equipmentType?.code || "—"}</TableCell>
+                  <TableCell>{equipment.lastEquipment.defectsId || "—"}</TableCell>
+                  <TableCell>{equipment.lastEquipment.adminOwnerId || "—"}</TableCell>
+                  <TableCell>{equipment.lastEquipment.jobDepot?.code || "—"}</TableCell>
+                  <TableCell>
+                    {equipment.lastEquipment.part?.stampInfo?.value || 
+                     equipment.lastEquipment.part?.serialNumber || "—"}
+                  </TableCell>
+                  <TableCell>{equipment.lastEquipment.part?.manufactureYear || "—"}</TableCell>
+                  <TableCell>{equipment.lastEquipment.jobDate ? new Date(equipment.lastEquipment.jobDate).getFullYear() : "—"}</TableCell>
+                  <TableCell>{equipment.lastEquipment.jobTypeId || "—"}</TableCell>
+                  <TableCell>{formatDate(equipment.lastEquipment.documetnDate)}</TableCell>
+                  <TableCell>{equipment.lastEquipment.repairType?.code || "—"}</TableCell>
+                  <TableCell>
+                    {equipment.lastEquipment.thicknessLeft && equipment.lastEquipment.thicknessRight
+                      ? `${equipment.lastEquipment.thicknessLeft}/${equipment.lastEquipment.thicknessRight}`
+                      : "—"
+                    }
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+};
+
+// Компонент таблицы для деталей тележек
+const TruckPartsTable = ({ equipments }: { equipments: LastEquipmentDTO[] }) => {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "—";
+    const date = new Date(dateString);
+    return `${String(date.getMonth() + 1).padStart(2, '0')}.${date.getFullYear()}`;
+  };
+
+  return (
+    <Card className="mb-6">
+      <CardHeader>
+        <CardTitle>Детали тележек</CardTitle>
+        <CardDescription>Надрессорные балки, боковые рамы</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Наименование показателя</TableHead>
+              <TableHead>Код детали</TableHead>
+              <TableHead>Код неисправности детали</TableHead>
+              <TableHead>Код ЖД администрации</TableHead>
+              <TableHead>Код предприятия-изготовителя</TableHead>
+              <TableHead>Номер детали (клейма)</TableHead>
+              <TableHead>Год изготовления</TableHead>
+              <TableHead>Код вида работы</TableHead>
+              <TableHead>Дата работы</TableHead>
+              <TableHead>Код вида тележки</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {equipments.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={10} className="text-center py-8">
+                  Детали тележек не установлены
+                </TableCell>
+              </TableRow>
+            ) : (
+              equipments.map((equipment) => (
+                <TableRow key={equipment.equipmentTypeId}>
+                  <TableCell>{equipment.equipmentTypeName}</TableCell>
+                  <TableCell>{equipment.lastEquipment.equipmentType?.code || "—"}</TableCell>
+                  <TableCell>{equipment.lastEquipment.defectsId || "—"}</TableCell>
+                  <TableCell>{equipment.lastEquipment.adminOwnerId || "—"}</TableCell>
+                  <TableCell>{equipment.lastEquipment.jobDepot?.code || "—"}</TableCell>
+                  <TableCell>
+                    {equipment.lastEquipment.part?.stampInfo?.value || 
+                     equipment.lastEquipment.part?.serialNumber || "—"}
+                  </TableCell>
+                  <TableCell>{equipment.lastEquipment.part?.manufactureYear || "—"}</TableCell>
+                  <TableCell>{equipment.lastEquipment.jobTypeId || "—"}</TableCell>
+                  <TableCell>{formatDate(equipment.lastEquipment.documetnDate)}</TableCell>
+                  <TableCell>{equipment.lastEquipment.truckType || "—"}</TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+};
+
+// Компонент таблицы для автосцепного оборудования
+const CouplerEquipmentTable = ({ equipments }: { equipments: LastEquipmentDTO[] }) => {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "—";
+    const date = new Date(dateString);
+    return `${String(date.getMonth() + 1).padStart(2, '0')}.${date.getFullYear()}`;
+  };
+
+  return (
+    <Card className="mb-6">
+      <CardHeader>
+        <CardTitle>Автосцепное оборудование</CardTitle>
+        <CardDescription>Автосцепка, поглощающие аппараты, тяговые хомуты</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Наименование показателя</TableHead>
+              <TableHead>Код детали</TableHead>
+              <TableHead>Код неисправности детали</TableHead>
+              <TableHead>Код ЖД администрации</TableHead>
+              <TableHead>Код предприятия-изготовителя</TableHead>
+              <TableHead>Номер детали (клейма)</TableHead>
+              <TableHead>Год изготовления</TableHead>
+              <TableHead>Код вида работы</TableHead>
+              <TableHead>Дата работы</TableHead>
+              <TableHead>Код вида работ</TableHead>
+              <TableHead>Примечание</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {equipments.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={11} className="text-center py-8">
+                  Автосцепное оборудование не установлено
+                </TableCell>
+              </TableRow>
+            ) : (
+              equipments.map((equipment) => (
+                <TableRow key={equipment.equipmentTypeId}>
+                  <TableCell>{equipment.equipmentTypeName}</TableCell>
+                  <TableCell>{equipment.lastEquipment.equipmentType?.code || "—"}</TableCell>
+                  <TableCell>{equipment.lastEquipment.defectsId || "—"}</TableCell>
+                  <TableCell>{equipment.lastEquipment.adminOwnerId || "—"}</TableCell>
+                  <TableCell>{equipment.lastEquipment.jobDepot?.code || "—"}</TableCell>
+                  <TableCell>
+                    {equipment.lastEquipment.part?.stampInfo?.value || 
+                     equipment.lastEquipment.part?.serialNumber || "—"}
+                  </TableCell>
+                  <TableCell>{equipment.lastEquipment.part?.manufactureYear || "—"}</TableCell>
+                  <TableCell>{equipment.lastEquipment.jobTypeId || "—"}</TableCell>
+                  <TableCell>{formatDate(equipment.lastEquipment.documetnDate)}</TableCell>
+                  <TableCell>{equipment.lastEquipment.repairType?.code || "—"}</TableCell>
+                  <TableCell className="max-w-xs truncate">{equipment.lastEquipment.notes || "—"}</TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+};
 
 export function PartEquipmentList({ cisternId }: PartEquipmentListProps) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -56,6 +282,13 @@ export function PartEquipmentList({ cisternId }: PartEquipmentListProps) {
     return new Date(dateString).toLocaleDateString('ru-RU');
   };
 
+  // Группировка оборудования по категориям
+  const groupedEquipments = {
+    wheels: lastEquipments?.filter(eq => getEquipmentCategory(eq.lastEquipment.equipmentType?.partTypeName) === 'wheels') || [],
+    trucks: lastEquipments?.filter(eq => getEquipmentCategory(eq.lastEquipment.equipmentType?.partTypeName) === 'trucks') || [],
+    couplers: lastEquipments?.filter(eq => getEquipmentCategory(eq.lastEquipment.equipmentType?.partTypeName) === 'couplers') || [],
+  };
+
   const filteredAllEquipments = allEquipments?.filter((equipment) => {
     if (!searchTerm) return true;
     const search = searchTerm.toLowerCase();
@@ -65,17 +298,6 @@ export function PartEquipmentList({ cisternId }: PartEquipmentListProps) {
       equipment.depot?.name?.toLowerCase().includes(search) ||
       equipment.repairType?.name?.toLowerCase().includes(search) ||
       equipment.notes?.toLowerCase().includes(search)
-    );
-  }) || [];
-
-  const filteredLastEquipments = lastEquipments?.filter((equipment) => {
-    if (!searchTerm) return true;
-    const search = searchTerm.toLowerCase();
-    return (
-      equipment.equipmentTypeName?.toLowerCase().includes(search) ||
-      equipment.lastEquipment.jobDepot?.name?.toLowerCase().includes(search) ||
-      equipment.lastEquipment.depot?.name?.toLowerCase().includes(search) ||
-      equipment.lastEquipment.repairType?.name?.toLowerCase().includes(search)
     );
   }) || [];
 
@@ -140,100 +362,19 @@ export function PartEquipmentList({ cisternId }: PartEquipmentListProps) {
 
         {/* Текущая комплектация */}
         <TabsContent value="current">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Установленное оборудование
-              </CardTitle>
-              <CardDescription>
-                Последние установленные детали по типам оборудования
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {isLoadingLast ? (
-                <div className="space-y-2">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Skeleton key={i} className="h-16 w-full" />
-                  ))}
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Тип оборудования</TableHead>
-                      <TableHead>Дата установки</TableHead>
-                      <TableHead>Рабочее депо</TableHead>
-                      <TableHead>Депо</TableHead>
-                      <TableHead>Тип ремонта</TableHead>
-                      <TableHead>Толщина колес</TableHead>
-                      <TableHead>Тип тележки</TableHead>
-                      <TableHead>Примечания</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredLastEquipments.map((equipment) => (
-                      <TableRow key={equipment.equipmentTypeId}>
-                        <TableCell className="font-medium">
-                          <div>
-                            <div>{equipment.equipmentTypeName}</div>
-                            {equipment.lastEquipment.equipmentType?.code && (
-                              <div className="text-xs text-gray-500">
-                                Код: {equipment.lastEquipment.equipmentType.code}
-                              </div>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-4 w-4 text-gray-400" />
-                            {formatDate(equipment.lastEquipment.documetnDate)}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            <Wrench className="h-4 w-4 text-gray-400" />
-                            {equipment.lastEquipment.jobDepot?.shortName || equipment.lastEquipment.jobDepot?.name || "—"}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            <MapPin className="h-4 w-4 text-gray-400" />
-                            {equipment.lastEquipment.depot?.shortName || equipment.lastEquipment.depot?.name || "—"}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {equipment.lastEquipment.repairType?.name || "—"}
-                        </TableCell>
-                        <TableCell>
-                          {equipment.lastEquipment.thicknessLeft && equipment.lastEquipment.thicknessRight
-                            ? `${equipment.lastEquipment.thicknessLeft}/${equipment.lastEquipment.thicknessRight} мм`
-                            : "—"
-                          }
-                        </TableCell>
-                        <TableCell>
-                          {equipment.lastEquipment.truckType ? `Тип ${equipment.lastEquipment.truckType}` : "—"}
-                        </TableCell>
-                        <TableCell className="max-w-xs truncate">
-                          {equipment.lastEquipment.notes || "—"}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                    {filteredLastEquipments.length === 0 && (
-                      <TableRow>
-                        <TableCell colSpan={8} className="text-center py-8">
-                          {lastEquipments?.length === 0 
-                            ? "Оборудование не установлено" 
-                            : "Оборудование не найдено"
-                          }
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              )}
-            </CardContent>
-          </Card>
+          {isLoadingLast ? (
+            <div className="space-y-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-16 w-full" />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <WheelPairsTable equipments={groupedEquipments.wheels} />
+              <TruckPartsTable equipments={groupedEquipments.trucks} />
+              <CouplerEquipmentTable equipments={groupedEquipments.couplers} />
+            </div>
+          )}
         </TabsContent>
 
         {/* Полная история */}
