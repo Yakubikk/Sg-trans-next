@@ -44,6 +44,8 @@ public static class PartEquipmentEndpoints
                     .ThenInclude(rc => rc.Model)
                     .Include(pe => pe.RailwayCistern)
                     .ThenInclude(rc => rc.Owner)
+                    .Include(pe => pe.Part)
+                    .ThenInclude(p => p.StampNumber)
                     .AsQueryable();
 
                 if (cisternId.HasValue)
@@ -63,7 +65,6 @@ public static class PartEquipmentEndpoints
                         Operation = pe.Operation,
                         DefectsId = pe.DefectsId,
                         AdminOwnerId = pe.AdminOwnerId,
-                        PartsId = pe.PartsId,
                         JobDate = pe.JobDate,
                         JobTypeId = pe.JobTypeId,
                         ThicknessLeft = pe.ThicknessLeft,
@@ -118,6 +119,20 @@ public static class PartEquipmentEndpoints
                                 Name = pe.RepairType.Name,
                                 Code = pe.RepairType.Code,
                                 Description = pe.RepairType.Description
+                            }
+                            : null,
+                        Part = pe.Part != null
+                            ? new PartInfoDTO
+                            {
+                                PartId = pe.Part.Id,
+                                SerialNumber = pe.Part.SerialNumber,
+                                ManufactureYear = pe.Part.ManufactureYear,
+                                StampInfo = pe.Part.StampNumber != null
+                                    ? new StampInfoDTO
+                                    {
+                                        Value = pe.Part.StampNumber.Value
+                                    }
+                                    : null
                             }
                             : null
                     })
@@ -157,6 +172,8 @@ public static class PartEquipmentEndpoints
                     .ThenInclude(rc => rc.Model)
                     .Include(pe => pe.RailwayCistern)
                     .ThenInclude(rc => rc.Owner)
+                    .Include(pe => pe.Part)
+                    .ThenInclude(p => p.StampNumber)
                     .Where(pe => pe.Id == id)
                     .Select(pe => new PartEquipmentDTO
                     {
@@ -164,7 +181,6 @@ public static class PartEquipmentEndpoints
                         Operation = pe.Operation,
                         DefectsId = pe.DefectsId,
                         AdminOwnerId = pe.AdminOwnerId,
-                        PartsId = pe.PartsId,
                         JobDate = pe.JobDate,
                         JobTypeId = pe.JobTypeId,
                         ThicknessLeft = pe.ThicknessLeft,
@@ -219,6 +235,20 @@ public static class PartEquipmentEndpoints
                                 Name = pe.RepairType.Name,
                                 Code = pe.RepairType.Code,
                                 Description = pe.RepairType.Description
+                            }
+                            : null,
+                        Part = pe.Part != null
+                            ? new PartInfoDTO
+                            {
+                                PartId = pe.Part.Id,
+                                SerialNumber = pe.Part.SerialNumber,
+                                ManufactureYear = pe.Part.ManufactureYear,
+                                StampInfo = pe.Part.StampNumber != null
+                                    ? new StampInfoDTO
+                                    {
+                                        Value = pe.Part.StampNumber.Value
+                                    }
+                                    : null
                             }
                             : null
                     })
@@ -250,6 +280,8 @@ public static class PartEquipmentEndpoints
                     .ThenInclude(rc => rc.Model)
                     .Include(pe => pe.RailwayCistern)
                     .ThenInclude(rc => rc.Owner)
+                    .Include(pe => pe.Part)
+                    .ThenInclude(p => p.StampNumber)
                     .Where(pe => pe.RailwayCisternsId == cisternId)
                     .Select(pe => new PartEquipmentDTO
                     {
@@ -257,7 +289,6 @@ public static class PartEquipmentEndpoints
                         Operation = pe.Operation,
                         DefectsId = pe.DefectsId,
                         AdminOwnerId = pe.AdminOwnerId,
-                        PartsId = pe.PartsId,
                         JobDate = pe.JobDate,
                         JobTypeId = pe.JobTypeId,
                         ThicknessLeft = pe.ThicknessLeft,
@@ -313,6 +344,20 @@ public static class PartEquipmentEndpoints
                                 Code = pe.RepairType.Code,
                                 Description = pe.RepairType.Description
                             }
+                            : null,
+                        Part = pe.Part != null
+                            ? new PartInfoDTO
+                            {
+                                PartId = pe.Part.Id,
+                                SerialNumber = pe.Part.SerialNumber,
+                                ManufactureYear = pe.Part.ManufactureYear,
+                                StampInfo = pe.Part.StampNumber != null
+                                    ? new StampInfoDTO
+                                    {
+                                        Value = pe.Part.StampNumber.Value
+                                    }
+                                    : null
+                            }
                             : null
                     })
                     .ToListAsync();
@@ -333,6 +378,8 @@ public static class PartEquipmentEndpoints
                     .Include(pe => pe.JobDepot)
                     .Include(pe => pe.Depot)
                     .Include(pe => pe.RepairType)
+                    .Include(pe => pe.Part)
+                    .ThenInclude(p => p.StampNumber)
                     .Where(pe => pe.RailwayCisternsId == cisternId &&
                                  pe.Operation == 2 &&
                                  pe.EquipmentType != null)
@@ -349,7 +396,6 @@ public static class PartEquipmentEndpoints
                                 Operation = pe.Operation,
                                 DefectsId = pe.DefectsId,
                                 AdminOwnerId = pe.AdminOwnerId,
-                                PartsId = pe.PartsId,
                                 JobDate = pe.JobDate,
                                 JobTypeId = pe.JobTypeId,
                                 ThicknessLeft = pe.ThicknessLeft,
@@ -404,6 +450,20 @@ public static class PartEquipmentEndpoints
                                         Name = pe.RepairType.Name,
                                         Code = pe.RepairType.Code,
                                         Description = pe.RepairType.Description
+                                    }
+                                    : null,
+                                Part = pe.Part != null
+                                    ? new PartInfoDTO
+                                    {
+                                        PartId = pe.Part.Id,
+                                        SerialNumber = pe.Part.SerialNumber,
+                                        ManufactureYear = pe.Part.ManufactureYear,
+                                        StampInfo = pe.Part.StampNumber != null
+                                            ? new StampInfoDTO
+                                            {
+                                                Value = pe.Part.StampNumber.Value
+                                            }
+                                            : null
                                     }
                                     : null
                             })

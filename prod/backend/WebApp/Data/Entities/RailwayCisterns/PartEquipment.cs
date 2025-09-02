@@ -27,4 +27,5 @@ public class PartEquipment
     public Depot JobDepot { get; set; } = null!;
     public Depot? Depot { get; set; }
     public RepairType RepairType { get; set; } = null!;
+    public Part Part { get; set; } = null!;
 }
