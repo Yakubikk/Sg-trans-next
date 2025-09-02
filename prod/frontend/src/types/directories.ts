@@ -135,16 +135,19 @@ export interface UpdateFilterTypeDTO {
 // PartType (Тип детали)
 export interface PartTypeDTO extends BaseEntity {
   name: string;
+  code: number;
   description?: string;
 }
 
 export interface CreatePartTypeDTO {
   name: string;
+  code: number;
   description?: string;
 }
 
 export interface UpdatePartTypeDTO {
   name: string;
+  code: number;
   description?: string;
 }
 
@@ -217,18 +220,266 @@ export interface UpdateWagonModelDTO {
 
 // StampNumber (Номер клейма)
 export interface StampNumberDTO extends BaseEntity {
-  number: string;
+  value: string;
   description?: string;
 }
 
 export interface CreateStampNumberDTO {
-  number: string;
+  value: string;
   description?: string;
 }
 
 export interface UpdateStampNumberDTO {
-  number: string;
+  value: string;
   description?: string;
+}
+
+// Parts (Детали)
+export interface PartDTO extends BaseEntity {
+  id: string;
+  partType: PartTypeDTO;
+  depot?: DepotDTO;
+  stampNumber: StampNumberDTO;
+  serialNumber?: string;
+  manufactureYear?: number;
+  currentLocation?: string;
+  status: PartStatusDTO;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+  wheelPair?: WheelPairDTO;
+  sideFrame?: SideFrameDTO;
+  bolster?: BolsterDTO;
+  coupler?: CouplerDTO;
+  shockAbsorber?: ShockAbsorberDTO;
+}
+
+export interface WheelPairDTO {
+  thicknessLeft?: number;
+  thicknessRight?: number;
+  wheelType?: string;
+}
+
+export interface SideFrameDTO {
+  serviceLifeYears?: number;
+  extendedUntil?: string;
+}
+
+export interface BolsterDTO {
+  serviceLifeYears?: number;
+  extendedUntil?: string;
+}
+
+export interface CouplerDTO {
+  type?: string; // Тип автосцепки
+}
+
+export interface ShockAbsorberDTO {
+  model?: string;
+  manufacturerCode?: string;
+  nextRepairDate?: string;
+  serviceLifeYears?: number;
+}
+
+export interface CreateWheelPairDTO {
+  partTypeId: string;
+  depotId?: string;
+  stampNumberId: string;
+  serialNumber?: string;
+  manufactureYear?: number;
+  currentLocation?: string;
+  statusId: string;
+  notes?: string;
+  thicknessLeft?: number;
+  thicknessRight?: number;
+  wheelType?: string;
+}
+
+export interface CreateSideFrameDTO {
+  partTypeId: string;
+  depotId?: string;
+  stampNumberId: string;
+  serialNumber?: string;
+  manufactureYear?: number;
+  currentLocation?: string;
+  statusId: string;
+  notes?: string;
+  serviceLifeYears?: number;
+  extendedUntil?: string;
+}
+
+export interface CreateBolsterDTO {
+  partTypeId: string;
+  depotId?: string;
+  stampNumberId: string;
+  serialNumber?: string;
+  manufactureYear?: number;
+  currentLocation?: string;
+  statusId: string;
+  notes?: string;
+  serviceLifeYears?: number;
+  extendedUntil?: string;
+}
+
+export interface CreateCouplerDTO {
+  partTypeId: string;
+  depotId?: string;
+  stampNumberId: string;
+  serialNumber?: string;
+  manufactureYear?: number;
+  currentLocation?: string;
+  statusId: string;
+  notes?: string;
+}
+
+export interface CreateShockAbsorberDTO {
+  partTypeId: string;
+  depotId?: string;
+  stampNumberId: string;
+  serialNumber?: string;
+  manufactureYear?: number;
+  currentLocation?: string;
+  statusId: string;
+  notes?: string;
+  model?: string;
+  manufacturerCode?: string;
+  nextRepairDate?: string;
+  serviceLifeYears?: number;
+}
+
+export interface UpdateWheelPairDTO {
+  depotId?: string;
+  stampNumberId: string;
+  serialNumber?: string;
+  manufactureYear?: number;
+  currentLocation?: string;
+  statusId: string;
+  notes?: string;
+  thicknessLeft?: number;
+  thicknessRight?: number;
+  wheelType?: string;
+}
+
+export interface UpdateSideFrameDTO {
+  depotId?: string;
+  stampNumberId: string;
+  serialNumber?: string;
+  manufactureYear?: number;
+  currentLocation?: string;
+  statusId: string;
+  notes?: string;
+  serviceLifeYears?: number;
+  extendedUntil?: string;
+}
+
+export interface UpdateBolsterDTO {
+  depotId?: string;
+  stampNumberId: string;
+  serialNumber?: string;
+  manufactureYear?: number;
+  currentLocation?: string;
+  statusId: string;
+  notes?: string;
+  serviceLifeYears?: number;
+  extendedUntil?: string;
+}
+
+export interface UpdateCouplerDTO {
+  depotId?: string;
+  stampNumberId: string;
+  serialNumber?: string;
+  manufactureYear?: number;
+  currentLocation?: string;
+  statusId: string;
+  notes?: string;
+}
+
+export interface UpdateShockAbsorberDTO {
+  depotId?: string;
+  stampNumberId: string;
+  serialNumber?: string;
+  manufactureYear?: number;
+  currentLocation?: string;
+  statusId: string;
+  notes?: string;
+  model?: string;
+  manufacturerCode?: string;
+  nextRepairDate?: string;
+  serviceLifeYears?: number;
+}
+
+// Пагинированный ответ для деталей
+export interface PaginatedPartsResponse {
+  items: PartDTO[];
+  pageNumber: number;
+  totalPages: number;
+  totalCount: number;
+}
+
+// PartEquipment (Оборудование деталей)
+export interface PartEquipmentDTO {
+  id: string;
+  operation: number;
+  defectsId?: string;
+  adminOwnerId?: string;
+  partsId?: string;
+  jobDate?: string;
+  jobTypeId?: string;
+  thicknessLeft?: number;
+  thicknessRight?: number;
+  truckType?: number;
+  notes?: string;
+  documetnsId?: number;
+  documetnDate?: string;
+  railwayCistern?: {
+    id: string;
+    number: string;
+    model: string;
+    owner?: unknown;
+  };
+  equipmentType?: {
+    id: string;
+    name: string;
+    code: number;
+    partTypeId: string;
+    partTypeName: string;
+  };
+  jobDepot?: {
+    id: string;
+    name: string;
+    code: string;
+    location?: string;
+    shortName: string;
+    createdAt: string;
+  };
+  depot?: {
+    id: string;
+    name: string;
+    code: string;
+    location?: string;
+    shortName: string;
+    createdAt: string;
+  };
+  repairType?: {
+    id: string;
+    name: string;
+    code: string;
+    description: string;
+  };
+}
+
+export interface LastEquipmentDTO {
+  equipmentTypeId: string;
+  equipmentTypeName: string;
+  lastEquipment: PartEquipmentDTO;
+}
+
+export interface PaginatedPartEquipmentResponse {
+  items: PartEquipmentDTO[];
+  pageNumber: number;
+  totalPages: number;
+  totalCount: number;
+  pageSize: number;
 }
 
 // Simple option type for selects

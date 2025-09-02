@@ -60,3 +60,8 @@ nunit-*.xml
 /backend/src/WebApp/appsettings.json
 
 test/back/.idea/.idea.back/.idea/
+/prod/backend/.vs/SgApi/FileContentIndex
+/prod/backend/WebApp/appsettings.json
+/prod/backend/.vs
+/prod/backend/WebApp/.config
+/prod/backend/WebApp/Properties/PublishProfiles

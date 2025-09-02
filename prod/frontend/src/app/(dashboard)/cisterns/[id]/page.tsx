@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useCistern } from '@/hooks/useCisterns';
+import { PartEquipmentList } from '@/components/part-equipment-list';
 
 export default function CisternPassportPage() {
   const params = useParams();
@@ -148,7 +149,7 @@ export default function CisternPassportPage() {
           </TabsTrigger>
           <TabsTrigger value="location" className="flex items-center gap-2">
             <MapPin className="h-4 w-4" />
-            Локализация
+            Местоположения
           </TabsTrigger>
           <TabsTrigger value="history" className="flex items-center gap-2">
             <History className="h-4 w-4" />
@@ -413,22 +414,7 @@ export default function CisternPassportPage() {
 
         {/* Components Tab */}
         <TabsContent value="components">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Лист комплектации
-              </CardTitle>
-              <CardDescription>
-                Список комплектующих деталей цистерны
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-gray-500">
-                Функция в разработке
-              </div>
-            </CardContent>
-          </Card>
+          <PartEquipmentList cisternId={cisternId} />
         </TabsContent>
 
         {/* Repairs Tab */}

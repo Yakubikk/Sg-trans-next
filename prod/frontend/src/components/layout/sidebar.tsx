@@ -21,6 +21,7 @@ import {
   RotateCcw,
   FileText,
   Car,
+  Cog,
 } from "lucide-react";
 import { useCurrentUser } from "@/hooks/useAuth";
 import { Role } from "@/types/auth";
@@ -101,6 +102,11 @@ const sidebarItems: SidebarItem[] = [
     title: "Вагоны",
     href: "/cisterns",
     icon: Train,
+  },
+  {
+    title: "Детали",
+    href: "/directories/parts",
+    icon: Cog,
   },
   {
     title: "Справочники",
