@@ -8,16 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Search,
-  FileText,
-  History,
-  RefreshCw,
-  Download,
-  Calendar,
-  Wrench,
-  MapPin,
-} from "lucide-react";
+import { Search, FileText, History, RefreshCw, Download, Calendar, Wrench, MapPin } from "lucide-react";
 import { usePartEquipmentsByCistern, useLastPartEquipmentsByCistern } from "@/hooks/useDirectories";
 import { LastEquipmentDTO } from "@/types/directories";
 
@@ -26,29 +17,41 @@ interface PartEquipmentListProps {
 }
 
 // Функция для определения категории оборудования
-const getEquipmentCategory = (partTypeName?: string): 'wheels' | 'trucks' | 'couplers' | 'other' => {
-  if (!partTypeName) return 'other';
-  
+const getEquipmentCategory = (partTypeName?: string): "wheels" | "trucks" | "couplers" | "other" => {
+  if (!partTypeName) return "other";
+
   const name = partTypeName.toLowerCase();
-  
+
   // Колесные пары
-  if (name.includes('колес') || name.includes('пар') || name.includes('wheel')) {
-    return 'wheels';
+  if (name.includes("колес") || name.includes("пар") || name.includes("wheel")) {
+    return "wheels";
   }
-  
+
   // Детали тележек
-  if (name.includes('тележ') || name.includes('рам') || name.includes('балк') || 
-      name.includes('truck') || name.includes('frame') || name.includes('bolster')) {
-    return 'trucks';
+  if (
+    name.includes("тележ") ||
+    name.includes("рам") ||
+    name.includes("балк") ||
+    name.includes("truck") ||
+    name.includes("frame") ||
+    name.includes("bolster")
+  ) {
+    return "trucks";
   }
-  
+
   // Автосцепное оборудование
-  if (name.includes('автосцеп') || name.includes('сцеп') || name.includes('поглощ') || 
-      name.includes('хомут') || name.includes('coupler') || name.includes('absorber')) {
-    return 'couplers';
+  if (
+    name.includes("автосцеп") ||
+    name.includes("сцеп") ||
+    name.includes("поглощ") ||
+    name.includes("хомут") ||
+    name.includes("coupler") ||
+    name.includes("absorber")
+  ) {
+    return "couplers";
   }
-  
-  return 'other';
+
+  return "other";
 };
 
 // Компонент таблицы для колесных пар
@@ -56,7 +59,7 @@ const WheelPairsTable = ({ equipments }: { equipments: LastEquipmentDTO[] }) => 
   const formatDate = (dateString?: string) => {
     if (!dateString) return "—";
     const date = new Date(dateString);
-    return `${String(date.getMonth() + 1).padStart(2, '0')}.${date.getFullYear()}`;
+    return `${String(date.getMonth() + 1).padStart(2, "0")}.${date.getFullYear()}`;
   };
 
   return (
@@ -68,17 +71,34 @@ const WheelPairsTable = ({ equipments }: { equipments: LastEquipmentDTO[] }) => 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Наименование показателя</TableHead>
+              <TableHead>
+                Наименование <br />
+                показателя
+              </TableHead>
               <TableHead>Код детали</TableHead>
-              <TableHead>Код неисправности детали</TableHead>
-              <TableHead>Код ЖД администрации</TableHead>
-              <TableHead>Код предприятия-изготовителя</TableHead>
+              <TableHead>
+                Код неиспр. <br />
+                детали
+              </TableHead>
+              <TableHead>
+                Код ЖД <br />
+                администр.
+              </TableHead>
+              <TableHead>Код предпр-изг.</TableHead>
               <TableHead>Номер детали</TableHead>
               <TableHead>Год изготовления</TableHead>
-              <TableHead>Год работы с деталью</TableHead>
-              <TableHead>Код вида работы</TableHead>
+              <TableHead>
+                Год работы <br />с деталью
+              </TableHead>
+              <TableHead>
+                Код вида <br />
+                работы
+              </TableHead>
               <TableHead>Дата работы</TableHead>
-              <TableHead>Код вида работы</TableHead>
+              <TableHead>
+                Код вида <br />
+                ремонта (?)
+              </TableHead>
               <TableHead>Толщина обода (Л/П)</TableHead>
             </TableRow>
           </TableHeader>
@@ -98,19 +118,21 @@ const WheelPairsTable = ({ equipments }: { equipments: LastEquipmentDTO[] }) => 
                   <TableCell>{equipment.lastEquipment.adminOwnerId || "—"}</TableCell>
                   <TableCell>{equipment.lastEquipment.jobDepot?.code || "—"}</TableCell>
                   <TableCell>
-                    {equipment.lastEquipment.part?.stampInfo?.value || 
-                     equipment.lastEquipment.part?.serialNumber || "—"}
+                    {equipment.lastEquipment.part?.stampInfo?.value ||
+                      equipment.lastEquipment.part?.serialNumber ||
+                      "—"}
                   </TableCell>
                   <TableCell>{equipment.lastEquipment.part?.manufactureYear || "—"}</TableCell>
-                  <TableCell>{equipment.lastEquipment.jobDate ? new Date(equipment.lastEquipment.jobDate).getFullYear() : "—"}</TableCell>
+                  <TableCell>
+                    {equipment.lastEquipment.jobDate ? new Date(equipment.lastEquipment.jobDate).getFullYear() : "—"}
+                  </TableCell>
                   <TableCell>{equipment.lastEquipment.jobTypeId || "—"}</TableCell>
                   <TableCell>{formatDate(equipment.lastEquipment.documetnDate)}</TableCell>
                   <TableCell>{equipment.lastEquipment.repairType?.code || "—"}</TableCell>
                   <TableCell>
                     {equipment.lastEquipment.thicknessLeft && equipment.lastEquipment.thicknessRight
                       ? `${equipment.lastEquipment.thicknessLeft}/${equipment.lastEquipment.thicknessRight}`
-                      : "—"
-                    }
+                      : "—"}
                   </TableCell>
                 </TableRow>
               ))
@@ -127,7 +149,7 @@ const TruckPartsTable = ({ equipments }: { equipments: LastEquipmentDTO[] }) => 
   const formatDate = (dateString?: string) => {
     if (!dateString) return "—";
     const date = new Date(dateString);
-    return `${String(date.getMonth() + 1).padStart(2, '0')}.${date.getFullYear()}`;
+    return `${String(date.getMonth() + 1).padStart(2, "0")}.${date.getFullYear()}`;
   };
 
   return (
@@ -140,12 +162,24 @@ const TruckPartsTable = ({ equipments }: { equipments: LastEquipmentDTO[] }) => 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Наименование показателя</TableHead>
+              <TableHead>
+                Наименование <br />
+                показателя
+              </TableHead>
               <TableHead>Код детали</TableHead>
-              <TableHead>Код неисправности детали</TableHead>
-              <TableHead>Код ЖД администрации</TableHead>
-              <TableHead>Код предприятия-изготовителя</TableHead>
-              <TableHead>Номер детали (клейма)</TableHead>
+              <TableHead>
+                Код неиспр. <br />
+                детали
+              </TableHead>
+              <TableHead>
+                Код ЖД <br />
+                администр.
+              </TableHead>
+              <TableHead>Код предпр-изг.</TableHead>
+              <TableHead>
+                Номер детали <br />
+                (клейма)
+              </TableHead>
               <TableHead>Год изготовления</TableHead>
               <TableHead>Код вида работы</TableHead>
               <TableHead>Дата работы</TableHead>
@@ -168,8 +202,9 @@ const TruckPartsTable = ({ equipments }: { equipments: LastEquipmentDTO[] }) => 
                   <TableCell>{equipment.lastEquipment.adminOwnerId || "—"}</TableCell>
                   <TableCell>{equipment.lastEquipment.jobDepot?.code || "—"}</TableCell>
                   <TableCell>
-                    {equipment.lastEquipment.part?.stampInfo?.value || 
-                     equipment.lastEquipment.part?.serialNumber || "—"}
+                    {equipment.lastEquipment.part?.stampInfo?.value ||
+                      equipment.lastEquipment.part?.serialNumber ||
+                      "—"}
                   </TableCell>
                   <TableCell>{equipment.lastEquipment.part?.manufactureYear || "—"}</TableCell>
                   <TableCell>{equipment.lastEquipment.jobTypeId || "—"}</TableCell>
@@ -190,7 +225,7 @@ const CouplerEquipmentTable = ({ equipments }: { equipments: LastEquipmentDTO[] 
   const formatDate = (dateString?: string) => {
     if (!dateString) return "—";
     const date = new Date(dateString);
-    return `${String(date.getMonth() + 1).padStart(2, '0')}.${date.getFullYear()}`;
+    return `${String(date.getMonth() + 1).padStart(2, "0")}.${date.getFullYear()}`;
   };
 
   return (
@@ -203,16 +238,34 @@ const CouplerEquipmentTable = ({ equipments }: { equipments: LastEquipmentDTO[] 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Наименование показателя</TableHead>
+              <TableHead>
+                Наименование <br />
+                показателя
+              </TableHead>
               <TableHead>Код детали</TableHead>
-              <TableHead>Код неисправности детали</TableHead>
-              <TableHead>Код ЖД администрации</TableHead>
-              <TableHead>Код предприятия-изготовителя</TableHead>
-              <TableHead>Номер детали (клейма)</TableHead>
+              <TableHead>
+                Код неиспр. <br />
+                детали
+              </TableHead>
+              <TableHead>
+                Код ЖД <br />
+                администр.
+              </TableHead>
+              <TableHead>Код предпр-изг.</TableHead>
+              <TableHead>
+                Номер детали <br />
+                (клейма)
+              </TableHead>
               <TableHead>Год изготовления</TableHead>
-              <TableHead>Код вида работы</TableHead>
+              <TableHead>
+                Код вида <br />
+                работы
+              </TableHead>
               <TableHead>Дата работы</TableHead>
-              <TableHead>Код вида работ</TableHead>
+              <TableHead>
+                Код вида <br />
+                ремонта (?)
+              </TableHead>
               <TableHead>Примечание</TableHead>
             </TableRow>
           </TableHeader>
@@ -232,8 +285,9 @@ const CouplerEquipmentTable = ({ equipments }: { equipments: LastEquipmentDTO[] 
                   <TableCell>{equipment.lastEquipment.adminOwnerId || "—"}</TableCell>
                   <TableCell>{equipment.lastEquipment.jobDepot?.code || "—"}</TableCell>
                   <TableCell>
-                    {equipment.lastEquipment.part?.stampInfo?.value || 
-                     equipment.lastEquipment.part?.serialNumber || "—"}
+                    {equipment.lastEquipment.part?.stampInfo?.value ||
+                      equipment.lastEquipment.part?.serialNumber ||
+                      "—"}
                   </TableCell>
                   <TableCell>{equipment.lastEquipment.part?.manufactureYear || "—"}</TableCell>
                   <TableCell>{equipment.lastEquipment.jobTypeId || "—"}</TableCell>
@@ -254,16 +308,12 @@ export function PartEquipmentList({ cisternId }: PartEquipmentListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("current");
 
-  const { 
-    data: allEquipments, 
-    isLoading: isLoadingAll, 
-    error: errorAll 
-  } = usePartEquipmentsByCistern(cisternId);
-  
-  const { 
-    data: lastEquipments, 
-    isLoading: isLoadingLast, 
-    error: errorLast 
+  const { data: allEquipments, isLoading: isLoadingAll, error: errorAll } = usePartEquipmentsByCistern(cisternId);
+
+  const {
+    data: lastEquipments,
+    isLoading: isLoadingLast,
+    error: errorLast,
   } = useLastPartEquipmentsByCistern(cisternId);
 
   const getOperationText = (operation: number) => {
@@ -279,27 +329,35 @@ export function PartEquipmentList({ cisternId }: PartEquipmentListProps) {
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return "—";
-    return new Date(dateString).toLocaleDateString('ru-RU');
+    return new Date(dateString).toLocaleDateString("ru-RU");
   };
 
   // Группировка оборудования по категориям
   const groupedEquipments = {
-    wheels: lastEquipments?.filter(eq => getEquipmentCategory(eq.lastEquipment.equipmentType?.partTypeName) === 'wheels') || [],
-    trucks: lastEquipments?.filter(eq => getEquipmentCategory(eq.lastEquipment.equipmentType?.partTypeName) === 'trucks') || [],
-    couplers: lastEquipments?.filter(eq => getEquipmentCategory(eq.lastEquipment.equipmentType?.partTypeName) === 'couplers') || [],
+    wheels:
+      lastEquipments?.filter((eq) => getEquipmentCategory(eq.lastEquipment.equipmentType?.partTypeName) === "wheels") ||
+      [],
+    trucks:
+      lastEquipments?.filter((eq) => getEquipmentCategory(eq.lastEquipment.equipmentType?.partTypeName) === "trucks") ||
+      [],
+    couplers:
+      lastEquipments?.filter(
+        (eq) => getEquipmentCategory(eq.lastEquipment.equipmentType?.partTypeName) === "couplers"
+      ) || [],
   };
 
-  const filteredAllEquipments = allEquipments?.filter((equipment) => {
-    if (!searchTerm) return true;
-    const search = searchTerm.toLowerCase();
-    return (
-      equipment.equipmentType?.name?.toLowerCase().includes(search) ||
-      equipment.jobDepot?.name?.toLowerCase().includes(search) ||
-      equipment.depot?.name?.toLowerCase().includes(search) ||
-      equipment.repairType?.name?.toLowerCase().includes(search) ||
-      equipment.notes?.toLowerCase().includes(search)
-    );
-  }) || [];
+  const filteredAllEquipments =
+    allEquipments?.filter((equipment) => {
+      if (!searchTerm) return true;
+      const search = searchTerm.toLowerCase();
+      return (
+        equipment.equipmentType?.name?.toLowerCase().includes(search) ||
+        equipment.jobDepot?.name?.toLowerCase().includes(search) ||
+        equipment.depot?.name?.toLowerCase().includes(search) ||
+        equipment.repairType?.name?.toLowerCase().includes(search) ||
+        equipment.notes?.toLowerCase().includes(search)
+      );
+    }) || [];
 
   if (errorAll || errorLast) {
     return (
@@ -319,9 +377,7 @@ export function PartEquipmentList({ cisternId }: PartEquipmentListProps) {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold">Лист комплектации</h3>
-          <p className="text-sm text-gray-600">
-            Информация об установленном оборудовании и истории изменений
-          </p>
+          <p className="text-sm text-gray-600">Информация об установленном оборудовании и истории изменений</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm">
@@ -385,9 +441,7 @@ export function PartEquipmentList({ cisternId }: PartEquipmentListProps) {
                 <History className="h-5 w-5" />
                 История изменений оборудования
               </CardTitle>
-              <CardDescription>
-                Полная история установки и демонтажа оборудования
-              </CardDescription>
+              <CardDescription>Полная история установки и демонтажа оборудования</CardDescription>
             </CardHeader>
             <CardContent>
               {isLoadingAll ? (
@@ -406,7 +460,7 @@ export function PartEquipmentList({ cisternId }: PartEquipmentListProps) {
                       <TableHead>Рабочее депо</TableHead>
                       <TableHead>Депо</TableHead>
                       <TableHead>Тип ремонта</TableHead>
-                      <TableHead>Толщина колес</TableHead>
+                      <TableHead>Толщина колес (мм)</TableHead>
                       <TableHead>Тип тележки</TableHead>
                       <TableHead>Примечания</TableHead>
                     </TableRow>
@@ -429,17 +483,13 @@ export function PartEquipmentList({ cisternId }: PartEquipmentListProps) {
                               </div>
                             </TableCell>
                             <TableCell>
-                              <Badge variant={operation.variant}>
-                                {operation.text}
-                              </Badge>
+                              <Badge variant={operation.variant}>{operation.text}</Badge>
                             </TableCell>
                             <TableCell className="font-medium">
                               <div>
                                 <div>{equipment.equipmentType?.name || "—"}</div>
                                 {equipment.equipmentType?.code && (
-                                  <div className="text-xs text-gray-500">
-                                    Код: {equipment.equipmentType.code}
-                                  </div>
+                                  <div className="text-xs text-gray-500">Код: {equipment.equipmentType.code}</div>
                                 )}
                               </div>
                             </TableCell>
@@ -455,31 +505,21 @@ export function PartEquipmentList({ cisternId }: PartEquipmentListProps) {
                                 {equipment.depot?.shortName || equipment.depot?.name || "—"}
                               </div>
                             </TableCell>
-                            <TableCell>
-                              {equipment.repairType?.name || "—"}
-                            </TableCell>
+                            <TableCell>{equipment.repairType?.name || "—"}</TableCell>
                             <TableCell>
                               {equipment.thicknessLeft && equipment.thicknessRight
-                                ? `${equipment.thicknessLeft}/${equipment.thicknessRight} мм`
-                                : "—"
-                              }
+                                ? `${equipment.thicknessLeft}/${equipment.thicknessRight}`
+                                : "—"}
                             </TableCell>
-                            <TableCell>
-                              {equipment.truckType ? `Тип ${equipment.truckType}` : "—"}
-                            </TableCell>
-                            <TableCell className="max-w-xs truncate">
-                              {equipment.notes || "—"}
-                            </TableCell>
+                            <TableCell>{equipment.truckType ? `Тип ${equipment.truckType}` : "—"}</TableCell>
+                            <TableCell className="max-w-xs truncate">{equipment.notes || "—"}</TableCell>
                           </TableRow>
                         );
                       })}
                     {filteredAllEquipments.length === 0 && (
                       <TableRow>
                         <TableCell colSpan={9} className="text-center py-8">
-                          {allEquipments?.length === 0 
-                            ? "История изменений пуста" 
-                            : "Записи не найдены"
-                          }
+                          {allEquipments?.length === 0 ? "История изменений пуста" : "Записи не найдены"}
                         </TableCell>
                       </TableRow>
                     )}
