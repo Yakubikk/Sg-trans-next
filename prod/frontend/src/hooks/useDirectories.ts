@@ -4,7 +4,9 @@ import type {
   UpdateSideFrameDTO, 
   UpdateBolsterDTO, 
   UpdateCouplerDTO, 
-  UpdateShockAbsorberDTO 
+  UpdateShockAbsorberDTO,
+  PartFilterSortDTO,
+  PartFilterSortWithoutPaginationDTO,
 } from '@/types/directories';
 import {
   affiliationsApi,
@@ -22,6 +24,8 @@ import {
   stampNumbersApi,
   partsApi,
   partEquipmentApi,
+  partsFilterApi,
+  convertToSelectOptions,
 } from '@/api/directories';
 
 // Query keys for directories
@@ -293,7 +297,6 @@ export const {
 } = stampNumbersHooks;
 
 // Helper hooks for select options
-import { convertToSelectOptions } from '@/api/directories';
 import type { SelectOption } from '@/types/directories';
 
 export const useManufacturerOptions = (): { data: SelectOption[] | undefined; isLoading: boolean; error: Error | null } => {
@@ -345,6 +348,15 @@ export const useRegistrarOptions = (): { data: SelectOption[] | undefined; isLoa
   const { data, isLoading, error } = useRegistrars();
   return {
     data: data ? convertToSelectOptions.registrars(data) : undefined,
+    isLoading,
+    error,
+  };
+};
+
+export const useDepotOptions = (): { data: SelectOption[] | undefined; isLoading: boolean; error: Error | null } => {
+  const { data, isLoading, error } = useDepots();
+  return {
+    data: data ? convertToSelectOptions.depots(data) : undefined,
     isLoading,
     error,
   };
@@ -537,5 +549,26 @@ export const useLastPartEquipmentsByCistern = (cisternId: string) => {
     queryKey: [...directoryKeys.partEquipments(), 'last-by-cistern', cisternId],
     queryFn: () => partEquipmentApi.getLastByCistern(cisternId),
     enabled: !!cisternId,
+  });
+};
+
+// Parts Filter Hooks
+export const useFilterParts = () => {
+  return useMutation({
+    mutationFn: (request: PartFilterSortDTO) => partsFilterApi.filter(request),
+  });
+};
+
+export const useFilterAllParts = () => {
+  return useMutation({
+    mutationFn: (request: PartFilterSortWithoutPaginationDTO) => partsFilterApi.filterAll(request),
+  });
+};
+
+export const useGetPartsBySavedFilter = (filterId: string) => {
+  return useQuery({
+    queryKey: ['parts-filter', 'saved', filterId],
+    queryFn: () => partsFilterApi.getBySavedFilter(filterId),
+    enabled: !!filterId,
   });
 };

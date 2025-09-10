@@ -501,3 +501,81 @@ export interface SelectOption {
   value: string;
   label: string;
 }
+
+// Range types for filters
+export interface DateRange {
+  from?: string;
+  to?: string;
+}
+
+export interface DateTimeRange {
+  from?: string;
+  to?: string;
+}
+
+export interface DecimalRange {
+  from?: number;
+  to?: number;
+}
+
+export interface IntRange {
+  from?: number;
+  to?: number;
+}
+
+// Sort criteria
+export interface SortCriteria {
+  fieldName: string;
+  descending: boolean;
+}
+
+// Part filter criteria
+export interface PartFilterCriteria {
+  partTypeIds?: string[];
+  depotIds?: string[];
+  stampNumbers?: string[];
+  serialNumbers?: string[];
+  manufactureYear?: DateRange;
+  locations?: string[];
+  statusIds?: string[];
+  createdAt?: DateTimeRange;
+  updatedAt?: DateTimeRange;
+  
+  // Колесные пары
+  thicknessLeft?: DecimalRange;
+  thicknessRight?: DecimalRange;
+  wheelTypes?: string[];
+  
+  // Боковая рама и надрессорная балка
+  serviceLifeYears?: IntRange;
+  extendedUntil?: DateRange;
+  
+  // Поглощающий аппарат
+  models?: string[];
+  manufacturerCodes?: string[];
+  nextRepairDate?: DateRange;
+}
+
+// Filter and sort request DTOs
+export interface PartFilterSortDTO {
+  filters?: PartFilterCriteria;
+  sortFields?: SortCriteria[];
+  selectedColumns?: string[];
+  page: number;
+  pageSize: number;
+}
+
+export interface PartFilterSortWithoutPaginationDTO {
+  filters?: PartFilterCriteria;
+  sortFields?: SortCriteria[];
+  selectedColumns?: string[];
+}
+
+// Paginated response for filtered parts
+export interface PaginatedFilteredPartsResponse {
+  items: Record<string, unknown>[];
+  pageNumber: number;
+  totalPages: number;
+  totalCount: number;
+  pageSize: number;
+}

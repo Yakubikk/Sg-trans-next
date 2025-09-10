@@ -54,6 +54,9 @@ import type {
   PartEquipmentDTO,
   LastEquipmentDTO,
   PaginatedPartEquipmentResponse,
+  PartFilterSortDTO,
+  PartFilterSortWithoutPaginationDTO,
+  PaginatedFilteredPartsResponse,
 } from '@/types/directories';
 
 // Generic CRUD operations for directories
@@ -191,6 +194,9 @@ export const convertToSelectOptions = {
   owners: (owners: OwnerDTO[]) =>
     owners.map(o => ({ value: o.id, label: o.name })),
 
+  depots: (depots: DepotDTO[]) =>
+    depots.map(d => ({ value: d.id, label: d.name })),
+
   registrars: (registrars: RegistrarDTO[]) =>
     registrars.map(r => ({ value: r.id, label: r.name })),
 
@@ -299,6 +305,24 @@ export const partEquipmentApi = {
 
   getLastByCistern: async (cisternId: string): Promise<LastEquipmentDTO[]> => {
     const response = await api.get(`/api/part-equipments/last-by-cistern/${cisternId}`);
+    return response.data;
+  },
+};
+
+// Parts Filter API
+export const partsFilterApi = {
+  filter: async (request: PartFilterSortDTO): Promise<PaginatedFilteredPartsResponse> => {
+    const response = await api.post('/api/parts/filter', request);
+    return response.data;
+  },
+
+  filterAll: async (request: PartFilterSortWithoutPaginationDTO): Promise<Record<string, unknown>[]> => {
+    const response = await api.post('/api/parts/filter/all', request);
+    return response.data;
+  },
+
+  getBySavedFilter: async (filterId: string): Promise<Record<string, unknown>[]> => {
+    const response = await api.get(`/api/parts/filter/saved/${filterId}`);
     return response.data;
   },
 };

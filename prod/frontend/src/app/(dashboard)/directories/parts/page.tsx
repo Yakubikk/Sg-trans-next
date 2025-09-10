@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Plus,
   Edit,
   Trash2,
   Search,
@@ -19,25 +18,67 @@ import {
   ChevronsRight,
   Settings,
 } from "lucide-react";
-import { useParts, useDeletePart } from "@/hooks/useDirectories";
+import { useParts, useDeletePart, useFilterParts } from "@/hooks/useDirectories";
 import { usePartTypeOptions } from "@/hooks/useDirectories";
-import type { PartDTO } from "@/types/directories";
+import { PartCreateDialog } from "@/components/parts/part-create-dialog";
+import { PartEditDialog } from "@/components/parts/part-edit-dialog";
+import type { PartDTO, PartFilterSortDTO, PartFilterCriteria } from "@/types/directories";
+import { PartsFilter } from "@/components/parts-filter";
 
 export default function PartsPage() {
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [isFiltered, setIsFiltered] = useState(false);
+  
+  // Состояние для диалогов
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingPartId, setEditingPartId] = useState<string | null>(null);
+  
+  // Состояние для фильтров
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [currentFilters, setCurrentFilters] = useState<PartFilterCriteria>({
+    partTypeIds: [],
+    depotIds: [],
+    stampNumbers: [],
+    serialNumbers: [],
+    locations: [],
+    statusIds: [],
+    wheelTypes: [],
+    models: [],
+    manufacturerCodes: []
+  });
+  const [visibleColumns, setVisibleColumns] = useState<string[]>([
+    'partType', 'stampNumber', 'serialNumber', 'manufactureYear', 
+    'currentLocation', 'status', 'depot', 'notes'
+  ]);
 
+  // Обычная загрузка деталей (без фильтров)
   const { data: partsData, isLoading, error } = useParts(
     pageNumber, 
     pageSize, 
     typeFilter && typeFilter !== "all" ? typeFilter : undefined
   );
+
+  // Мутация для фильтрации
+  const filterMutation = useFilterParts();
+  
   const { data: partTypes } = usePartTypeOptions();
   const deleteMutation = useDeletePart();
 
-  const filteredParts = partsData?.items?.filter((part) => {
+  // Выбираем источник данных в зависимости от того, используются ли фильтры
+  const currentData = isFiltered && filterMutation.data ? filterMutation.data : partsData;
+  const currentItems = currentData?.items || [];
+  const isCurrentLoading = isFiltered ? filterMutation.isPending : isLoading;
+
+  // Проверяем, являются ли элементы объектами PartDTO
+  const isPartDTO = (item: unknown): item is PartDTO => {
+    return typeof item === 'object' && item !== null && 'partType' in item;
+  };
+
+  const filteredParts = currentItems.filter((part) => {
+    if (!isPartDTO(part)) return false;
     if (!searchTerm) return true;
     const search = searchTerm.toLowerCase();
     return (
@@ -46,12 +87,38 @@ export default function PartsPage() {
       part.stampNumber.value.toLowerCase().includes(search) ||
       part.currentLocation?.toLowerCase().includes(search)
     );
-  }) || [];
+  }) as PartDTO[];
+
+  const handleFilterApply = async (filters: PartFilterCriteria) => {
+    try {
+      const filterRequest: PartFilterSortDTO = {
+        filters,
+        page: 1,
+        pageSize: 50
+      };
+      await filterMutation.mutateAsync(filterRequest);
+      setCurrentFilters(filters);
+      setIsFiltered(true);
+      setPageNumber(1);
+    } catch (error) {
+      console.error('Ошибка при применении фильтров:', error);
+    }
+  };
 
   const handleDelete = async (id: string) => {
     if (window.confirm("Вы уверены, что хотите удалить эту деталь?")) {
       await deleteMutation.mutateAsync(id);
     }
+  };
+
+  const handleEdit = (partId: string) => {
+    setEditingPartId(partId);
+    setEditDialogOpen(true);
+  };
+
+  const handleCloseEditDialog = () => {
+    setEditDialogOpen(false);
+    setEditingPartId(null);
   };
 
   const getPartTypeDisplay = (part: PartDTO) => {
@@ -125,13 +192,28 @@ export default function PartsPage() {
                 <CardTitle>Детали</CardTitle>
                 <CardDescription>
                   Справочник деталей железнодорожных цистерн
+                  {isFiltered && (
+                    <span className="ml-2 text-blue-600">
+                      (применены фильтры)
+                    </span>
+                  )}
                 </CardDescription>
               </div>
             </div>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Добавить деталь
-            </Button>
+            <div className="flex gap-2">
+              <PartsFilter 
+                open={filterOpen}
+                onOpenChange={setFilterOpen}
+                onFiltersChange={handleFilterApply}
+                onVisibleColumnsChange={setVisibleColumns}
+                filters={currentFilters}
+                visibleColumns={visibleColumns}
+                isLoading={isCurrentLoading}
+                filteredCount={filteredParts.length}
+                totalCount={currentData?.totalCount}
+              />
+              <PartCreateDialog />
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -148,23 +230,25 @@ export default function PartsPage() {
                 />
               </div>
             </div>
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-fit">
-                <SelectValue placeholder="Тип детали" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Все типы</SelectItem>
-                {partTypes?.map((type: { value: string; label: string }) => (
-                  <SelectItem key={type.value} value={type.value}>
-                    {type.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {!isFiltered && (
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="w-fit">
+                  <SelectValue placeholder="Тип детали" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Все типы</SelectItem>
+                  {partTypes?.map((type: { value: string; label: string }) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           {/* Таблица */}
-          {isLoading ? (
+          {isCurrentLoading ? (
             <div className="space-y-2">
               {Array.from({ length: 5 }).map((_, i) => (
                 <Skeleton key={i} className="h-12 w-full" />
@@ -205,7 +289,11 @@ export default function PartsPage() {
                       <TableCell>{getPartSpecificInfo(part)}</TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleEdit(part.id)}
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
                           <Button
@@ -231,10 +319,10 @@ export default function PartsPage() {
               </Table>
 
               {/* Пагинация */}
-              {partsData && partsData.totalPages > 1 && (
+              {currentData && currentData.totalPages > 1 && (
                 <div className="flex items-center justify-between mt-4">
                   <div className="text-sm text-gray-600">
-                    Показано {filteredParts.length} из {partsData.totalCount} записей
+                    Показано {filteredParts.length} из {currentData.totalCount} записей
                   </div>
                   <div className="flex items-center space-x-2">
                     <Button
@@ -254,21 +342,21 @@ export default function PartsPage() {
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
                     <span className="text-sm">
-                      Страница {pageNumber} из {partsData.totalPages}
+                      Страница {pageNumber} из {currentData.totalPages}
                     </span>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setPageNumber(pageNumber + 1)}
-                      disabled={pageNumber === partsData.totalPages}
+                      disabled={pageNumber === currentData.totalPages}
                     >
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setPageNumber(partsData.totalPages)}
-                      disabled={pageNumber === partsData.totalPages}
+                      onClick={() => setPageNumber(currentData.totalPages)}
+                      disabled={pageNumber === currentData.totalPages}
                     >
                       <ChevronsRight className="h-4 w-4" />
                     </Button>
@@ -279,6 +367,13 @@ export default function PartsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Диалог редактирования */}
+      <PartEditDialog
+        partId={editingPartId}
+        open={editDialogOpen}
+        onOpenChange={handleCloseEditDialog}
+      />
     </div>
   );
 }
