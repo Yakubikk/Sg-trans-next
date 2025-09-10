@@ -159,7 +159,7 @@ public static class PartFilterEndpoints
                 p.Id,
                 PartType = new { p.PartType.Id, p.PartType.Name, p.PartType.Code },
                 Depot = p.Depot != null ? new { p.Depot.Id, p.Depot.Name, p.Depot.Code, p.Depot.ShortName, p.Depot.Location } : null,
-                StampNumber = new { p.StampNumber.Id, p.StampNumber.Value },
+                StampNumber = p.StampNumber != null ? new { p.StampNumber.Id, p.StampNumber.Value } : null,
                 p.SerialNumber,
                 p.ManufactureYear,
                 p.CurrentLocation,
@@ -167,24 +167,24 @@ public static class PartFilterEndpoints
                 p.Notes,
                 p.CreatedAt,
                 p.UpdatedAt,
-                WheelPair = p.PartType.Code == 1 ? new
+                WheelPair = p.PartType.Code == 1 && p.WheelPair != null ? new
                 {
                     p.WheelPair.ThicknessLeft,
                     p.WheelPair.ThicknessRight,
                     p.WheelPair.WheelType
                 } : null,
-                SideFrame = p.PartType.Code == 3 ? new
+                SideFrame = p.PartType.Code == 3 && p.SideFrame != null ? new
                 {
                     p.SideFrame.ServiceLifeYears,
                     p.SideFrame.ExtendedUntil
                 } : null,
-                Bolster = p.PartType.Code == 2 ? new
+                Bolster = p.PartType.Code == 2 && p.Bolster != null ? new
                 {
                     p.Bolster.ServiceLifeYears,
                     p.Bolster.ExtendedUntil
                 } : null,
                 Coupler = p.PartType.Code == 4 ? new { } : null,
-                ShockAbsorber = p.PartType.Code == 10 ? new
+                ShockAbsorber = p.PartType.Code == 10 && p.ShockAbsorber != null ? new
                 {
                     p.ShockAbsorber.Model,
                     p.ShockAbsorber.ManufacturerCode,
@@ -221,24 +221,21 @@ public static class PartFilterEndpoints
 
                 // StampNumber
                 case "stampnumber.id":
-                    selectedProperties["stampNumberId"] = p.StampNumber.Id;
+                    selectedProperties["stampNumberId"] = p.StampNumber?.Id;
                     break;
                 case "stampnumber.value":
-                    selectedProperties["stampNumberValue"] = p.StampNumber.Value;
+                    selectedProperties["stampNumberValue"] = p.StampNumber?.Value;
                     break;
-                // case "stampnumber":
-                //     selectedProperties["stampNumber"] = new { p.StampNumber.Id, p.StampNumber.Value };
-                //     break;
 
                 // Status
                 case "status.id":
-                    selectedProperties["statusId"] = p.Status.Id;
+                    selectedProperties["statusId"] = p.Status?.Id;
                     break;
                 case "status.name":
-                    selectedProperties["statusName"] = p.Status.Name;
+                    selectedProperties["statusName"] = p.Status?.Name;
                     break;
                 case "status.code":
-                    selectedProperties["statusCode"] = p.Status.Code;
+                    selectedProperties["statusCode"] = p.Status?.Code;
                     break;
                 // case "status":
                 //     selectedProperties["status"] = new { p.Status.Id, p.Status.Name, p.Status.Code };
@@ -410,7 +407,7 @@ public static class PartFilterEndpoints
             query = query.Where(p => p.DepotId.HasValue && filters.DepotIds.Contains(p.DepotId.Value));
 
         if (filters.StampNumbers != null && filters.StampNumbers.Any())
-            query = query.Where(p => filters.StampNumbers.Contains(p.StampNumber.Value));
+            query = query.Where(p => p.StampNumber != null && filters.StampNumbers.Contains(p.StampNumber.Value));
 
         if (filters.SerialNumbers != null && filters.SerialNumbers.Any())
             query = query.Where(p => p.SerialNumber != null && filters.SerialNumbers.Contains(p.SerialNumber));
@@ -518,7 +515,8 @@ public static class PartFilterEndpoints
         return sort.FieldName.ToLower() switch
         {
             "parttypename" => sort.Descending ? query.OrderByDescending(p => p.PartType.Name) : query.OrderBy(p => p.PartType.Name),
-            "stampnumber" => sort.Descending ? query.OrderByDescending(p => p.StampNumber.Value) : query.OrderBy(p => p.StampNumber.Value),
+            "stampnumber" => sort.Descending ? query.OrderByDescending(p => p.StampNumber != null ? p.StampNumber.Value : null) 
+                : query.OrderBy(p => p.StampNumber != null ? p.StampNumber.Value : null),
             "serialnumber" => sort.Descending ? query.OrderByDescending(p => p.SerialNumber) : query.OrderBy(p => p.SerialNumber),
             "manufactureyear" => sort.Descending ? query.OrderByDescending(p => p.ManufactureYear) : query.OrderBy(p => p.ManufactureYear),
             "currentlocation" => sort.Descending ? query.OrderByDescending(p => p.CurrentLocation) : query.OrderBy(p => p.CurrentLocation),
@@ -528,9 +526,15 @@ public static class PartFilterEndpoints
             "updatedat" => sort.Descending ? query.OrderByDescending(p => p.UpdatedAt) : query.OrderBy(p => p.UpdatedAt),
             
             // Специфичные поля для колесных пар
-            "thicknessleft" => sort.Descending ? query.OrderByDescending(p => p.WheelPair.ThicknessLeft) : query.OrderBy(p => p.WheelPair.ThicknessLeft),
-            "thicknessright" => sort.Descending ? query.OrderByDescending(p => p.WheelPair.ThicknessRight) : query.OrderBy(p => p.WheelPair.ThicknessRight),
-            "wheeltype" => sort.Descending ? query.OrderByDescending(p => p.WheelPair.WheelType) : query.OrderBy(p => p.WheelPair.WheelType),
+            "thicknessleft" => sort.Descending ? 
+                query.OrderByDescending(p => p.WheelPair != null ? p.WheelPair.ThicknessLeft : null) : 
+                query.OrderBy(p => p.WheelPair != null ? p.WheelPair.ThicknessLeft : null),
+            "thicknessright" => sort.Descending ? 
+                query.OrderByDescending(p => p.WheelPair != null ? p.WheelPair.ThicknessRight : null) : 
+                query.OrderBy(p => p.WheelPair != null ? p.WheelPair.ThicknessRight : null),
+            "wheeltype" => sort.Descending ? 
+                query.OrderByDescending(p => p.WheelPair != null ? p.WheelPair.WheelType : null) : 
+                query.OrderBy(p => p.WheelPair != null ? p.WheelPair.WheelType : null),
             
             // Специфичные поля для боковых рам и надрессорных балок
             "servicelifeyears" => sort.Descending ? 
@@ -545,9 +549,15 @@ public static class PartFilterEndpoints
                     p.Bolster != null ? p.Bolster.ExtendedUntil : null),
             
             // Специфичные поля для поглощающих аппаратов
-            "model" => sort.Descending ? query.OrderByDescending(p => p.ShockAbsorber.Model) : query.OrderBy(p => p.ShockAbsorber.Model),
-            "manufacturercode" => sort.Descending ? query.OrderByDescending(p => p.ShockAbsorber.ManufacturerCode) : query.OrderBy(p => p.ShockAbsorber.ManufacturerCode),
-            "nextrepairdate" => sort.Descending ? query.OrderByDescending(p => p.ShockAbsorber.NextRepairDate) : query.OrderBy(p => p.ShockAbsorber.NextRepairDate),
+            "model" => sort.Descending ? 
+                query.OrderByDescending(p => p.ShockAbsorber != null ? p.ShockAbsorber.Model : null) : 
+                query.OrderBy(p => p.ShockAbsorber != null ? p.ShockAbsorber.Model : null),
+            "manufacturercode" => sort.Descending ? 
+                query.OrderByDescending(p => p.ShockAbsorber != null ? p.ShockAbsorber.ManufacturerCode : null) : 
+                query.OrderBy(p => p.ShockAbsorber != null ? p.ShockAbsorber.ManufacturerCode : null),
+            "nextrepairdate" => sort.Descending ? 
+                query.OrderByDescending(p => p.ShockAbsorber != null ? p.ShockAbsorber.NextRepairDate : null) : 
+                query.OrderBy(p => p.ShockAbsorber != null ? p.ShockAbsorber.NextRepairDate : null),
             
             _ => query.OrderByDescending(p => p.UpdatedAt) // сортировка по умолчанию
         };
@@ -558,7 +568,9 @@ public static class PartFilterEndpoints
         return sort.FieldName.ToLower() switch
         {
             "parttypename" => sort.Descending ? query.ThenByDescending(p => p.PartType.Name) : query.ThenBy(p => p.PartType.Name),
-            "stampnumber" => sort.Descending ? query.ThenByDescending(p => p.StampNumber.Value) : query.ThenBy(p => p.StampNumber.Value),
+            "stampnumber" => sort.Descending ? 
+                query.ThenByDescending(p => p.StampNumber != null ? p.StampNumber.Value : null) : 
+                query.ThenBy(p => p.StampNumber != null ? p.StampNumber.Value : null),
             "serialnumber" => sort.Descending ? query.ThenByDescending(p => p.SerialNumber) : query.ThenBy(p => p.SerialNumber),
             "manufactureyear" => sort.Descending ? query.ThenByDescending(p => p.ManufactureYear) : query.ThenBy(p => p.ManufactureYear),
             "currentlocation" => sort.Descending ? query.ThenByDescending(p => p.CurrentLocation) : query.ThenBy(p => p.CurrentLocation),
@@ -568,9 +580,15 @@ public static class PartFilterEndpoints
             "updatedat" => sort.Descending ? query.ThenByDescending(p => p.UpdatedAt) : query.ThenBy(p => p.UpdatedAt),
             
             // Специфичные поля для колесных пар
-            "thicknessleft" => sort.Descending ? query.ThenByDescending(p => p.WheelPair.ThicknessLeft) : query.ThenBy(p => p.WheelPair.ThicknessLeft),
-            "thicknessright" => sort.Descending ? query.ThenByDescending(p => p.WheelPair.ThicknessRight) : query.ThenBy(p => p.WheelPair.ThicknessRight),
-            "wheeltype" => sort.Descending ? query.ThenByDescending(p => p.WheelPair.WheelType) : query.ThenBy(p => p.WheelPair.WheelType),
+            "thicknessleft" => sort.Descending ? 
+                query.ThenByDescending(p => p.WheelPair != null ? p.WheelPair.ThicknessLeft : null) : 
+                query.ThenBy(p => p.WheelPair != null ? p.WheelPair.ThicknessLeft : null),
+            "thicknessright" => sort.Descending ? 
+                query.ThenByDescending(p => p.WheelPair != null ? p.WheelPair.ThicknessRight : null) : 
+                query.ThenBy(p => p.WheelPair != null ? p.WheelPair.ThicknessRight : null),
+            "wheeltype" => sort.Descending ? 
+                query.ThenByDescending(p => p.WheelPair != null ? p.WheelPair.WheelType : null) : 
+                query.ThenBy(p => p.WheelPair != null ? p.WheelPair.WheelType : null),
             
             // Специфичные поля для боковых рам и надрессорных балок
             "servicelifeyears" => sort.Descending ? 
@@ -585,9 +603,15 @@ public static class PartFilterEndpoints
                     p.Bolster != null ? p.Bolster.ExtendedUntil : null),
             
             // Специфичные поля для поглощающих аппаратов
-            "model" => sort.Descending ? query.ThenByDescending(p => p.ShockAbsorber.Model) : query.ThenBy(p => p.ShockAbsorber.Model),
-            "manufacturercode" => sort.Descending ? query.ThenByDescending(p => p.ShockAbsorber.ManufacturerCode) : query.ThenBy(p => p.ShockAbsorber.ManufacturerCode),
-            "nextrepairdate" => sort.Descending ? query.ThenByDescending(p => p.ShockAbsorber.NextRepairDate) : query.ThenBy(p => p.ShockAbsorber.NextRepairDate),
+            "model" => sort.Descending ? 
+                query.ThenByDescending(p => p.ShockAbsorber != null ? p.ShockAbsorber.Model : null) : 
+                query.ThenBy(p => p.ShockAbsorber != null ? p.ShockAbsorber.Model : null),
+            "manufacturercode" => sort.Descending ? 
+                query.ThenByDescending(p => p.ShockAbsorber != null ? p.ShockAbsorber.ManufacturerCode : null) : 
+                query.ThenBy(p => p.ShockAbsorber != null ? p.ShockAbsorber.ManufacturerCode : null),
+            "nextrepairdate" => sort.Descending ? 
+                query.ThenByDescending(p => p.ShockAbsorber != null ? p.ShockAbsorber.NextRepairDate : null) : 
+                query.ThenBy(p => p.ShockAbsorber != null ? p.ShockAbsorber.NextRepairDate : null),
             
             _ => query // если поле неизвестно, оставляем текущую сортировку
         };
