@@ -6,7 +6,7 @@ import {
   useCreateAffiliation,
   useUpdateAffiliation,
   useDeleteAffiliation,
-} from "@/hooks/useDirectories";
+} from "@/hooks";
 import type { AffiliationDTO, CreateAffiliationDTO, UpdateAffiliationDTO } from "@/types/directories";
 import type { DirectoryConfig } from "@/components/directory-manager";
 import { DirectoryConfig as BaseDirectoryConfig } from "./types";

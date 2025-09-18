@@ -2,19 +2,44 @@
 
 import { useState, useCallback } from "react";
 import { X, Filter, Save, Trash2, Search, ChevronsUpDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useCreateSavedFilter, useDeleteSavedFilter, useSavedFiltersByType } from "@/hooks/useCisterns";
+import { 
+  Button,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  Badge,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  Checkbox
+} from "@/components/ui";
 import {
   useManufacturers,
   useWagonTypes,
@@ -22,7 +47,10 @@ import {
   useRegistrars,
   useAffiliations,
   useFilterTypes,
-} from "@/hooks/useDirectories";
+  useSavedFiltersByType,
+  useCreateSavedFilter,
+  useDeleteSavedFilter,
+} from "@/hooks";
 import type { FilterCriteria, SortCriteria, SavedFilter } from "@/types/cisterns";
 import type { FilterTypeDTO } from "@/types/directories";
 import { cn } from "@/lib/utils";

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCurrentUser } from '@/hooks/useAuth';
+import { useCurrentUser } from '@/hooks';
 import { roleUtils } from '@/lib/permissions';
 import { Role } from '@/types/auth';
 

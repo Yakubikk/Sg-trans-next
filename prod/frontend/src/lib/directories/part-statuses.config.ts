@@ -6,7 +6,7 @@ import {
   useCreatePartStatus,
   useUpdatePartStatus,
   useDeletePartStatus,
-} from "@/hooks/useDirectories";
+} from "@/hooks";
 import type { PartStatusDTO, CreatePartStatusDTO, UpdatePartStatusDTO } from "@/types/directories";
 import type { DirectoryConfig } from "@/components/directory-manager";
 import { DirectoryConfig as BaseDirectoryConfig } from "./types";

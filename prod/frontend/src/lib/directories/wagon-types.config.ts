@@ -6,7 +6,7 @@ import {
   useCreateWagonType,
   useUpdateWagonType,
   useDeleteWagonType,
-} from "@/hooks/useDirectories";
+} from "@/hooks";
 import type { WagonTypeDTO, CreateWagonTypeDTO, UpdateWagonTypeDTO } from "@/types/directories";
 import type { DirectoryConfig } from "@/components/directory-manager";
 import { DirectoryConfig as BaseDirectoryConfig } from "./types";

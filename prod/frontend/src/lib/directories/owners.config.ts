@@ -6,7 +6,7 @@ import {
   useCreateOwner,
   useUpdateOwner,
   useDeleteOwner,
-} from '@/hooks/useDirectories';
+} from '@/hooks';
 import type {
   OwnerDTO,
   CreateOwnerDTO,

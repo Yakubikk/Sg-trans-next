@@ -1,6 +1,5 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, Button } from "@/components/ui";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import QuickActions from "@/components/dashboard/quick-actions";
 import UserInfoCard from "@/components/cards/user-info.card";

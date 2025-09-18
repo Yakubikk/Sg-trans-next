@@ -8,7 +8,6 @@ import type {
   PaginatedCisternsResponse,
   FilteredCisternsResponse,
   RailwayCisternFilterSortDTO,
-  RailwayCisternFilterSortWithoutPaginationDTO,
   SavedFilter,
   CreateSavedFilterDTO,
   UpdateSavedFilterDTO,

@@ -1,17 +1,18 @@
 "use client";
 
 import { Menu, LogOut } from "lucide-react";
-import { useCurrentUser, useLogout } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import {
+import { useCurrentUser, useLogout } from "@/hooks";
+import { 
+  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useRouter } from "next/dist/client/components/navigation";
+  Avatar, 
+  AvatarFallback 
+} from "@/components/ui";
+import { useRouter } from "next/navigation";
 
 interface HeaderProps {
   onToggleSidebar: () => void;

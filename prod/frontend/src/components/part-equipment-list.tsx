@@ -1,15 +1,29 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle, 
+  Button, 
+  Input, 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow, 
+  Badge, 
+  Skeleton, 
+  Tabs, 
+  TabsContent, 
+  TabsList, 
+  TabsTrigger 
+} from "@/components/ui";
 import { Search, FileText, History, RefreshCw, Download, Calendar, Wrench, MapPin } from "lucide-react";
-import { usePartEquipmentsByCistern, useLastPartEquipmentsByCistern } from "@/hooks/useDirectories";
+import { usePartEquipmentsByCistern, useLastPartEquipmentsByCistern } from "@/hooks";
 import { LastEquipmentDTO } from "@/types/directories";
 
 interface PartEquipmentListProps {

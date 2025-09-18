@@ -2,21 +2,24 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle, 
+  Button, 
+  Input, 
+  Label, 
+  Textarea, 
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  SelectValue
+} from '@/components/ui';
 import { ArrowLeft, Train, Save, X } from 'lucide-react';
 import Link from 'next/link';
-import { useCreateCistern } from '@/hooks/useCisterns';
 import {
   useManufacturerOptions,
   useWagonTypeOptions,
@@ -24,7 +27,8 @@ import {
   useAffiliationOptions,
   useOwnerOptions,
   useRegistrarOptions,
-} from '@/hooks/useDirectories';
+  useCreateCistern,
+} from '@/hooks';
 import type { CreateRailwayCisternDTO } from '@/types/cisterns';
 
 export default function CreateCisternPage() {
