@@ -223,7 +223,7 @@ export default function PartsPage() {
               <div className="relative">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Поиск по серийному номеру, типу, клейму..."
+                  placeholder="Поиск по заводскому номеру, типу, клейму..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-8"
@@ -261,7 +261,7 @@ export default function PartsPage() {
                   <TableRow>
                     <TableHead>Тип детали</TableHead>
                     <TableHead>Клеймо</TableHead>
-                    <TableHead>Серийный номер</TableHead>
+                    <TableHead>Заводской номер</TableHead>
                     <TableHead>Год производства</TableHead>
                     <TableHead>Местоположение</TableHead>
                     <TableHead>Статус</TableHead>
