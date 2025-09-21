@@ -15,6 +15,7 @@ public static class ApiExtensions
 {
     public static void AddMappedEndpoints(this IEndpointRouteBuilder app)
     {
+        app.MapVersionEndpoints();
         app.MapUsersEndpoints();
 
         app.MapSavedFilterEndpoints();
