@@ -6,7 +6,7 @@ import {
   useCreateManufacturer,
   useUpdateManufacturer,
   useDeleteManufacturer,
-} from "@/hooks/useDirectories";
+} from "@/hooks";
 import type { ManufacturerDTO, CreateManufacturerDTO, UpdateManufacturerDTO } from "@/types/directories";
 import type { DirectoryConfig } from "@/components/directory-manager";
 import { DirectoryConfig as BaseDirectoryConfig } from "./types";

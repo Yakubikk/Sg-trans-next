@@ -9,7 +9,7 @@ import {
   useCreateStampNumber,
   useUpdateStampNumber,
   useDeleteStampNumber
-} from "@/hooks/useDirectories";
+} from "@/hooks";
 
 // Базовая конфигурация полей
 export const stampNumbersBaseConfig: BaseDirectoryConfig = {

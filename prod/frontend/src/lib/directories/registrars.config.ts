@@ -6,7 +6,7 @@ import {
   useCreateRegistrar,
   useUpdateRegistrar,
   useDeleteRegistrar,
-} from "@/hooks/useDirectories";
+} from "@/hooks";
 import type { RegistrarDTO, CreateRegistrarDTO, UpdateRegistrarDTO } from "@/types/directories";
 import type { DirectoryConfig } from "@/components/directory-manager";
 import { DirectoryConfig as BaseDirectoryConfig } from "./types";

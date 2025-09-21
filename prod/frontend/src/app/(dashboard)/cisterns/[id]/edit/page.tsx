@@ -2,21 +2,25 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle, 
+  Button, 
+  Input, 
+  Label, 
+  Textarea, 
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+  Skeleton 
+} from '@/components/ui';
 import { ArrowLeft, Train, Save, X } from 'lucide-react';
 import Link from 'next/link';
-import { useCistern, useUpdateCistern } from '@/hooks/useCisterns';
 import {
   useManufacturerOptions,
   useWagonTypeOptions,
@@ -24,9 +28,10 @@ import {
   useAffiliationOptions,
   useOwnerOptions,
   useRegistrarOptions,
-} from '@/hooks/useDirectories';
+  useCistern,
+  useUpdateCistern,
+} from '@/hooks';
 import type { UpdateRailwayCisternDTO } from '@/types/cisterns';
-import { Skeleton } from '@/components/ui/skeleton';
 
 export default function EditCisternPage() {
   const params = useParams();

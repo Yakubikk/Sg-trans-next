@@ -7,7 +7,6 @@ import type {
   CreateRailwayCisternDTO,
   UpdateRailwayCisternDTO,
   RailwayCisternFilterSortDTO,
-  RailwayCisternFilterSortWithoutPaginationDTO,
   SavedFilter,
   CreateSavedFilterDTO,
   UpdateSavedFilterDTO,

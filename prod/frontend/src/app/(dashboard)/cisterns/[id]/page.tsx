@@ -2,11 +2,7 @@
 
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, Button, Tabs, TabsContent, TabsList, TabsTrigger, Badge, Skeleton } from '@/components/ui';
 import { 
   ArrowLeft, 
   Train, 
@@ -23,7 +19,7 @@ import {
   TriangleAlert,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useCistern } from '@/hooks/useCisterns';
+import { useCistern } from '@/hooks';
 import { PartEquipmentList } from '@/components/part-equipment-list';
 
 export default function CisternPassportPage() {

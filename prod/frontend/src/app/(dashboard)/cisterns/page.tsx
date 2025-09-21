@@ -3,10 +3,22 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton";
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle, 
+  Button, 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow, 
+  Skeleton,
+  AutocompleteInput
+} from "@/components/ui";
 import {
   Plus,
   Search,
@@ -25,10 +37,9 @@ import {
   useSearchCisterns,
   useCisternNumbers,
   useCisternFilterWithPagination,
-} from "@/hooks/useCisterns";
+  useDebounce,
+} from "@/hooks";
 import { cisternsApi } from "@/api/cisterns";
-import { useDebounce } from "@/hooks/useDebounce";
-import { AutocompleteInput } from "@/components/ui/autocomplete-input";
 import { CisternFilters } from "@/components/cisterns/cistern-filters";
 import type {
   CisternsFilter,

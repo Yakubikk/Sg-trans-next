@@ -6,7 +6,7 @@ import {
   useCreateDepot,
   useUpdateDepot,
   useDeleteDepot,
-} from '@/hooks/useDirectories';
+} from '@/hooks';
 import type {
   DepotDTO,
   CreateDepotDTO,

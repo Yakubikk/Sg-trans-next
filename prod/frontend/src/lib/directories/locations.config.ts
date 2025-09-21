@@ -6,7 +6,7 @@ import {
   useCreateLocation,
   useUpdateLocation,
   useDeleteLocation,
-} from "@/hooks/useDirectories";
+} from "@/hooks";
 import type { LocationDTO, CreateLocationDTO, UpdateLocationDTO } from "@/types/directories";
 import type { DirectoryConfig } from "@/components/directory-manager";
 import { DirectoryConfig as BaseDirectoryConfig } from "./types";

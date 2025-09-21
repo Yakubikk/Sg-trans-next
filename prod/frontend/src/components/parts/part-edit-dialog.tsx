@@ -11,25 +11,21 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+  Input,
+  Textarea,
+  Button
+} from "@/components/ui";
 import { 
   usePartById,
   useDepotOptions,
@@ -40,7 +36,7 @@ import {
   useUpdateBolster,
   useUpdateCoupler,
   useUpdateShockAbsorber,
-} from "@/hooks/useDirectories";
+} from "@/hooks";
 import { toast } from "sonner";
 
 // Общая схема для формы редактирования

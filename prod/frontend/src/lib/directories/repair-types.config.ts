@@ -6,7 +6,7 @@ import {
   useCreateRepairType,
   useUpdateRepairType,
   useDeleteRepairType,
-} from "@/hooks/useDirectories";
+} from "@/hooks";
 import type { RepairTypeDTO, CreateRepairTypeDTO, UpdateRepairTypeDTO } from "@/types/directories";
 import type { DirectoryConfig } from "@/components/directory-manager";
 import { DirectoryConfig as BaseDirectoryConfig } from "./types";

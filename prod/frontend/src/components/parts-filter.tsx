@@ -7,17 +7,23 @@ import {
   SheetDescription, 
   SheetHeader, 
   SheetTitle, 
-  SheetTrigger 
-} from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+  SheetTrigger,
+  Button,
+  Badge,
+  Input,
+  Label,
+  Separator,
+  ScrollArea,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Checkbox,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from '@/components/ui';
 import { Filter, RotateCcw } from 'lucide-react';
 import { PartFilterCriteria } from '@/types/directories';
 

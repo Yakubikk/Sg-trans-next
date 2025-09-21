@@ -3,8 +3,7 @@ export { authApi } from './auth';
 export * from './directories';
 
 // Hooks exports  
-export * from '@/hooks/useAuth';
-export * from '@/hooks/useDirectories';
+export * from '@/hooks';
 
 // Types exports
 export * from '@/types/auth';

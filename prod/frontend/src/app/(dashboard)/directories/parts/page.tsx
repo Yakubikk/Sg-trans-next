@@ -1,13 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle, 
+  Button, 
+  Input, 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow, 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue, 
+  Badge, 
+  Skeleton 
+} from "@/components/ui";
 import {
   Edit,
   Trash2,
@@ -18,8 +33,8 @@ import {
   ChevronsRight,
   Settings,
 } from "lucide-react";
-import { useParts, useDeletePart, useFilterParts } from "@/hooks/useDirectories";
-import { usePartTypeOptions } from "@/hooks/useDirectories";
+import { useParts, useDeletePart, useFilterParts } from "@/hooks";
+import { usePartTypeOptions } from "@/hooks";
 import { PartCreateDialog } from "@/components/parts/part-create-dialog";
 import { PartEditDialog } from "@/components/parts/part-edit-dialog";
 import type { PartDTO, PartFilterSortDTO, PartFilterCriteria } from "@/types/directories";

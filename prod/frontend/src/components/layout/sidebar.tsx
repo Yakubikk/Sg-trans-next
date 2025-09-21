@@ -23,7 +23,7 @@ import {
   Car,
   Cog,
 } from "lucide-react";
-import { useCurrentUser } from "@/hooks/useAuth";
+import { useCurrentUser } from "@/hooks";
 import { Role } from "@/types/auth";
 
 interface SidebarItem {

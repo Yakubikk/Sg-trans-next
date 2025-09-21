@@ -1,10 +1,9 @@
 'use client';
 
-import { useCurrentUser } from '@/hooks/useAuth';
+import { useCurrentUser } from '@/hooks';
 import { roleUtils } from '@/lib/permissions';
 import { Role } from '@/types/auth';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription, Button } from '@/components/ui';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
