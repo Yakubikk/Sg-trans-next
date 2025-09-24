@@ -18,12 +18,14 @@ import {
 } from "@/components/ui";
 import { Bell, Shield, Moon, Globe, Database, Save, Sun, Monitor } from "lucide-react";
 import { useTheme } from "@/providers/theme-provider";
+import { useVersion } from "@/hooks";
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
+  const { data: version } = useVersion();
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 w-full">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Настройки</h1>
@@ -227,7 +229,10 @@ export default function SettingsPage() {
       </div>
 
       {/* Save Button */}
-      <div className="flex justify-end">
+      <div className="flex w-full justify-between items-center">
+        <div className="text-xs text-gray-500 dark:text-gray-400">
+          <span>Версия:</span> {version?.frontend} (frontend), {version?.backend} (backend)
+        </div>
         <Button className="flex items-center gap-2">
           <Save className="h-4 w-4" />
           Сохранить настройки

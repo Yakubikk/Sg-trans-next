@@ -23,7 +23,7 @@ import {
   Car,
   Cog,
 } from "lucide-react";
-import { useCurrentUser } from "@/hooks";
+import { useCurrentUser, useVersion } from "@/hooks";
 import { Role } from "@/types/auth";
 
 interface SidebarItem {
@@ -134,6 +134,7 @@ interface SidebarProps {
 export function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const { data: user } = useCurrentUser();
+  const { data: version } = useVersion();
   const [mounted, setMounted] = useState(false);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
@@ -156,8 +157,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
     if (!hasPermission(item.roles)) return null;
 
     // For cisterns, check if we're on any cistern-related page
-    const isActive = item.href === pathname || 
-      (item.href === '/cisterns' && pathname.startsWith('/cisterns/'));
+    const isActive = item.href === pathname || (item.href === "/cisterns" && pathname.startsWith("/cisterns/"));
     const isExpanded = expandedItems.includes(item.title);
     const hasChildren = item.children && item.children.length > 0;
 
@@ -222,7 +222,9 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
       >
         {/* Header */}
         <div className="flex h-16 items-center justify-between border-b px-4">
-          <Link href='/dashboard' className="text-lg font-semibold text-gray-900 dark:text-white">СГ-Транс</Link>
+          <Link href="/dashboard" className="text-lg font-semibold text-gray-900 dark:text-white">
+            СГ-Транс
+          </Link>
           <button onClick={onToggle} className="rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-800 lg:hidden">
             <X className="h-5 w-5" />
           </button>

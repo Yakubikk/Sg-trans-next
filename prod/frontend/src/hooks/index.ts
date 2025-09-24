@@ -18,3 +18,5 @@ export * from './partsFilter.hook';
 export * from './auth.hook';
 export * from './cisterns.hook';
 export * from './debounce.hook';
+
+export * from './version.hook';
