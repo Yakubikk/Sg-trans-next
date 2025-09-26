@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Sidebar } from '@/components/layout/sidebar';
-import { Header } from '@/components/layout/header';
-import AuthGuard from '@/components/auth/auth-guard';
+import { useState } from "react";
+import { Sidebar } from "@/components/layout/sidebar";
+import { Header } from "@/components/layout/header";
+import AuthGuard from "@/components/auth/auth-guard";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -13,7 +13,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
+    setSidebarOpen((prev) => !prev);
   };
 
   return (
@@ -25,12 +25,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         {/* Main content */}
         <div className="flex flex-1 flex-col overflow-hidden lg:ml-0">
           <Header onToggleSidebar={toggleSidebar} />
-          
+
           {/* Page content */}
           <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-            <div className="mx-auto">
-              {children}
-            </div>
+            <div className="mx-auto">{children}</div>
           </main>
         </div>
       </div>

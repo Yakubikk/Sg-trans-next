@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui";
 import { Bell, Shield, Moon, Globe, Database, Save, Sun, Monitor } from "lucide-react";
-import { useTheme } from "@/providers/theme-provider";
+import { useTheme } from "next-themes";
 import { useVersion } from "@/hooks";
 
 export default function SettingsPage() {

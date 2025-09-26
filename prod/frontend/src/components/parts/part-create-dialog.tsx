@@ -50,7 +50,7 @@ const allFieldsSchema = z.object({
   depotId: z.string().optional(),
   stampNumberId: z.string().min(1, "Выберите номер клейма"),
   serialNumber: z.string().optional(),
-  manufactureYear: z.number().min(1900).max(new Date().getFullYear()).optional(),
+  manufactureYear: z.string().min(4).max(4).optional(),
   currentLocation: z.string().optional(),
   statusId: z.string().min(1, "Выберите статус"),
   notes: z.string().optional(),
@@ -140,7 +140,7 @@ export function PartCreateDialog({ trigger }: PartCreateDialogProps) {
         depotId: data.depotId || undefined,
         stampNumberId: data.stampNumberId,
         serialNumber: data.serialNumber || undefined,
-        manufactureYear: data.manufactureYear || undefined,
+        manufactureYear: data.manufactureYear + '-01-01' || undefined,
         currentLocation: data.currentLocation || undefined,
         statusId: data.statusId,
         notes: data.notes || undefined,
@@ -530,13 +530,13 @@ export function PartCreateDialog({ trigger }: PartCreateDialogProps) {
                     <FormLabel>Год производства</FormLabel>
                     <FormControl>
                       <Input
-                        type="number"
-                        min="1900"
-                        max={new Date().getFullYear()}
+                        type="string"
+                        minLength={4}
+                        maxLength={4}
                         placeholder="Введите год"
                         {...field}
                         value={field.value || ""}
-                        onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                        onChange={(e) => field.onChange(e.target.value ? e.target.value : undefined)}
                       />
                     </FormControl>
                     <FormMessage />
