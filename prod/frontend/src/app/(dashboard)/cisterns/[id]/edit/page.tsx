@@ -1,26 +1,26 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle, 
-  Button, 
-  Input, 
-  Label, 
-  Textarea, 
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Button,
+  Input,
+  Label,
+  Textarea,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Skeleton 
-} from '@/components/ui';
-import { ArrowLeft, Train, Save, X } from 'lucide-react';
-import Link from 'next/link';
+  Skeleton,
+} from "@/components/ui";
+import { ArrowLeft, Train, Save, X } from "lucide-react";
+import Link from "next/link";
 import {
   useManufacturerOptions,
   useWagonTypeOptions,
@@ -30,15 +30,15 @@ import {
   useRegistrarOptions,
   useCistern,
   useUpdateCistern,
-} from '@/hooks';
-import type { UpdateRailwayCisternDTO } from '@/types/cisterns';
+} from "@/hooks";
+import type { UpdateRailwayCisternDTO } from "@/types/cisterns";
 
 export default function EditCisternPage() {
   const params = useParams();
   const router = useRouter();
   const cisternId = params.id as string;
-  
-  const { data: cistern, isLoading, error } = useCistern(cisternId);
+
+  const { data: cistern, isLoading, error, refetch } = useCistern(cisternId);
   const updateMutation = useUpdateCistern();
 
   // Directory options
@@ -48,20 +48,38 @@ export default function EditCisternPage() {
   const { data: affiliationOptions = [], isLoading: loadingAffiliations } = useAffiliationOptions();
   const { data: ownerOptions = [], isLoading: loadingOwners } = useOwnerOptions();
   const { data: registrarOptions = [], isLoading: loadingRegistrars } = useRegistrarOptions();
-  
+
   const [formData, setFormData] = useState<Partial<UpdateRailwayCisternDTO>>({});
-  
+
   // Separate states for select values to handle loading properly
   const [selectValues, setSelectValues] = useState({
-    manufacturerId: '',
-    typeId: '',
-    modelId: '',
-    ownerId: '',
-    registrarId: '',
-    affiliationId: '',
+    manufacturerId: "",
+    typeId: "",
+    modelId: "",
+    ownerId: "",
+    registrarId: "",
+    affiliationId: "",
   });
 
-  // Initialize form data when cistern data loads
+  // Reset state when cisternId changes (switching between different cisterns)
+  useEffect(() => {
+    setFormData({});
+    setSelectValues({
+      manufacturerId: "",
+      typeId: "",
+      modelId: "",
+      ownerId: "",
+      registrarId: "",
+      affiliationId: "",
+    });
+    // Force refetch data for the new cistern
+    if (refetch) {
+      refetch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cisternId]); // Intentionally not including refetch
+
+  // Initialize form data when cistern data loads or cisternId changes
   useEffect(() => {
     if (cistern) {
       setFormData({
@@ -88,12 +106,12 @@ export default function EditCisternPage() {
         commissioningDate: cistern.commissioningDate,
         registrationDate: cistern.registrationDate,
         reRegistrationDate: cistern.reRegistrationDate,
-        manufacturerId: cistern.manufacturer?.id || '',
-        typeId: cistern.type?.id || '',
-        modelId: cistern.model?.id || '',
-        ownerId: cistern.owner?.id || '',
-        registrarId: cistern.registrar?.id || '',
-        affiliationId: cistern.affiliation?.id || '',
+        manufacturerId: cistern.manufacturer?.id || "",
+        typeId: cistern.type?.id || "",
+        modelId: cistern.model?.id || "",
+        ownerId: cistern.owner?.id || "",
+        registrarId: cistern.registrar?.id || "",
+        affiliationId: cistern.affiliation?.id || "",
         techConditions: cistern.techConditions,
         pripiska: cistern.pripiska,
         rent: cistern.rent,
@@ -105,70 +123,88 @@ export default function EditCisternPage() {
     }
   }, [cistern]);
 
-  // Initialize select values when directories are loaded
+  // Initialize select values when directories are loaded or cisternId changes
   useEffect(() => {
-    if (cistern && !loadingManufacturers && !loadingWagonTypes && !loadingAffiliations && !loadingWagonModels && !loadingOwners && !loadingRegistrars) {
-      setSelectValues({
-        manufacturerId: cistern.manufacturer?.id || '',
-        typeId: cistern.type?.id || '',
-        modelId: cistern.model?.id || '',
-        ownerId: cistern.owner?.id || '',
-        registrarId: cistern.registrar?.id || '',
-        affiliationId: cistern.affiliation?.id || '',
-      });
+    if (
+      cistern && 
+      !loadingManufacturers && 
+      !loadingWagonTypes && 
+      !loadingAffiliations && 
+      !loadingWagonModels && 
+      !loadingOwners && 
+      !loadingRegistrars
+    ) {
+      const newSelectValues = {
+        manufacturerId: cistern.manufacturer?.id || "",
+        typeId: cistern.type?.id || "",
+        modelId: cistern.model?.id || "",
+        ownerId: cistern.owner?.id || "",
+        registrarId: cistern.registrar?.id || "",
+        affiliationId: cistern.affiliation?.id || "",
+      };
+      setSelectValues(newSelectValues);
     }
-  }, [cistern, loadingManufacturers, loadingWagonTypes, loadingAffiliations, loadingWagonModels, loadingOwners, loadingRegistrars]);
+  }, [
+    cistern,
+    cisternId,
+    loadingManufacturers,
+    loadingWagonTypes,
+    loadingAffiliations,
+    loadingWagonModels,
+    loadingOwners,
+    loadingRegistrars,
+  ]);
 
   const handleInputChange = (field: keyof UpdateRailwayCisternDTO, value: string | number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
 
     // Also update select values if it's a select field
-    if (['manufacturerId', 'typeId', 'modelId', 'ownerId', 'registrarId', 'affiliationId'].includes(field)) {
-      setSelectValues(prev => ({
+    if (["manufacturerId", "typeId", "modelId", "ownerId", "registrarId", "affiliationId"].includes(field)) {
+      setSelectValues((prev) => ({
         ...prev,
-        [field]: value
+        [field]: value,
       }));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       // Validate required fields
       if (!formData.number || !formData.serialNumber || !formData.registrationNumber) {
-        alert('Заполните все обязательные поля');
+        alert("Заполните все обязательные поля");
         return;
       }
 
       // Validate directory fields
       if (!selectValues.manufacturerId) {
-        alert('Выберите производителя');
+        alert("Выберите производителя");
         return;
       }
 
       if (!selectValues.typeId) {
-        alert('Выберите тип вагона');
+        alert("Выберите тип вагона");
         return;
       }
 
       if (!selectValues.affiliationId) {
-        alert('Выберите принадлежность');
+        alert("Выберите принадлежность");
         return;
       }
 
       await updateMutation.mutateAsync({
         id: cisternId,
-        data: formData as UpdateRailwayCisternDTO
+        data: formData as UpdateRailwayCisternDTO,
       });
-      
+
       router.push(`/cisterns/${cisternId}`);
     } catch (error) {
-      console.error('Error updating cistern:', error);
-      alert('Ошибка при обновлении цистерны');
+      console.error("Error updating cistern:", error);
+      alert("Ошибка при обновлении цистерны");
     }
   };
 
@@ -186,7 +222,7 @@ export default function EditCisternPage() {
         <Card>
           <CardContent className="p-6">
             <div className="text-center text-red-600">
-              Ошибка загрузки данных: {error instanceof Error ? error.message : 'Неизвестная ошибка'}
+              Ошибка загрузки данных: {error instanceof Error ? error.message : "Неизвестная ошибка"}
             </div>
           </CardContent>
         </Card>
@@ -240,9 +276,7 @@ export default function EditCisternPage() {
         </div>
         <Card>
           <CardContent className="p-6">
-            <div className="text-center text-gray-600">
-              Цистерна не найдена
-            </div>
+            <div className="text-center text-gray-600">Цистерна не найдена</div>
           </CardContent>
         </Card>
       </div>
@@ -265,14 +299,12 @@ export default function EditCisternPage() {
               <Train className="h-8 w-8" />
               Редактировать цистерну {cistern.number}
             </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
-              Изменение данных о железнодорожной цистерне
-            </p>
+            <p className="mt-2 text-gray-600 dark:text-gray-400">Изменение данных о железнодорожной цистерне</p>
           </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form key={cisternId} onSubmit={handleSubmit} className="space-y-6">
         <div className="grid gap-6 md:grid-cols-2">
           {/* Basic Information */}
           <Card>
@@ -285,8 +317,8 @@ export default function EditCisternPage() {
                 <Label htmlFor="number">Номер цистерны *</Label>
                 <Input
                   id="number"
-                  value={formData.number || ''}
-                  onChange={(e) => handleInputChange('number', e.target.value)}
+                  value={formData.number || ""}
+                  onChange={(e) => handleInputChange("number", e.target.value)}
                   placeholder="Введите номер цистерны"
                   required
                 />
@@ -296,8 +328,8 @@ export default function EditCisternPage() {
                 <Label htmlFor="serialNumber">Серийный номер *</Label>
                 <Input
                   id="serialNumber"
-                  value={formData.serialNumber || ''}
-                  onChange={(e) => handleInputChange('serialNumber', e.target.value)}
+                  value={formData.serialNumber || ""}
+                  onChange={(e) => handleInputChange("serialNumber", e.target.value)}
                   placeholder="Введите серийный номер"
                   required
                 />
@@ -308,8 +340,8 @@ export default function EditCisternPage() {
                 <Input
                   id="buildDate"
                   type="date"
-                  value={formData.buildDate || ''}
-                  onChange={(e) => handleInputChange('buildDate', e.target.value)}
+                  value={formData.buildDate || ""}
+                  onChange={(e) => handleInputChange("buildDate", e.target.value)}
                 />
               </div>
 
@@ -318,8 +350,8 @@ export default function EditCisternPage() {
                 <Input
                   id="commissioningDate"
                   type="date"
-                  value={formData.commissioningDate || ''}
-                  onChange={(e) => handleInputChange('commissioningDate', e.target.value)}
+                  value={formData.commissioningDate || ""}
+                  onChange={(e) => handleInputChange("commissioningDate", e.target.value)}
                 />
               </div>
             </CardContent>
@@ -339,8 +371,8 @@ export default function EditCisternPage() {
                     id="tareWeight"
                     type="number"
                     step="0.1"
-                    value={formData.tareWeight || ''}
-                    onChange={(e) => handleInputChange('tareWeight', parseFloat(e.target.value) || 0)}
+                    value={formData.tareWeight || ""}
+                    onChange={(e) => handleInputChange("tareWeight", parseFloat(e.target.value) || 0)}
                   />
                 </div>
 
@@ -350,8 +382,8 @@ export default function EditCisternPage() {
                     id="loadCapacity"
                     type="number"
                     step="0.1"
-                    value={formData.loadCapacity || ''}
-                    onChange={(e) => handleInputChange('loadCapacity', parseFloat(e.target.value) || 0)}
+                    value={formData.loadCapacity || ""}
+                    onChange={(e) => handleInputChange("loadCapacity", parseFloat(e.target.value) || 0)}
                   />
                 </div>
 
@@ -360,16 +392,16 @@ export default function EditCisternPage() {
                   <Input
                     id="length"
                     type="number"
-                    value={formData.length || ''}
-                    onChange={(e) => handleInputChange('length', parseInt(e.target.value) || 0)}
+                    value={formData.length || ""}
+                    onChange={(e) => handleInputChange("length", parseInt(e.target.value) || 0)}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="axleCount">Количество осей</Label>
-                  <Select 
-                    value={formData.axleCount?.toString() || '4'} 
-                    onValueChange={(value) => handleInputChange('axleCount', parseInt(value))}
+                  <Select
+                    value={formData.axleCount?.toString() || "4"}
+                    onValueChange={(value) => handleInputChange("axleCount", parseInt(value))}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -389,8 +421,8 @@ export default function EditCisternPage() {
                     id="volume"
                     type="number"
                     step="0.1"
-                    value={formData.volume || ''}
-                    onChange={(e) => handleInputChange('volume', parseFloat(e.target.value) || 0)}
+                    value={formData.volume || ""}
+                    onChange={(e) => handleInputChange("volume", parseFloat(e.target.value) || 0)}
                   />
                 </div>
 
@@ -400,8 +432,8 @@ export default function EditCisternPage() {
                     id="fillingVolume"
                     type="number"
                     step="0.1"
-                    value={formData.fillingVolume || ''}
-                    onChange={(e) => handleInputChange('fillingVolume', parseFloat(e.target.value) || 0)}
+                    value={formData.fillingVolume || ""}
+                    onChange={(e) => handleInputChange("fillingVolume", parseFloat(e.target.value) || 0)}
                   />
                 </div>
               </div>
@@ -419,8 +451,8 @@ export default function EditCisternPage() {
                 <Label htmlFor="registrationNumber">Регистрационный номер *</Label>
                 <Input
                   id="registrationNumber"
-                  value={formData.registrationNumber || ''}
-                  onChange={(e) => handleInputChange('registrationNumber', e.target.value)}
+                  value={formData.registrationNumber || ""}
+                  onChange={(e) => handleInputChange("registrationNumber", e.target.value)}
                   placeholder="Введите регистрационный номер"
                   required
                 />
@@ -431,8 +463,8 @@ export default function EditCisternPage() {
                 <Input
                   id="registrationDate"
                   type="date"
-                  value={formData.registrationDate || ''}
-                  onChange={(e) => handleInputChange('registrationDate', e.target.value)}
+                  value={formData.registrationDate || ""}
+                  onChange={(e) => handleInputChange("registrationDate", e.target.value)}
                 />
               </div>
 
@@ -441,8 +473,8 @@ export default function EditCisternPage() {
                 <Input
                   id="reRegistrationDate"
                   type="date"
-                  value={formData.reRegistrationDate || ''}
-                  onChange={(e) => handleInputChange('reRegistrationDate', e.target.value)}
+                  value={formData.reRegistrationDate || ""}
+                  onChange={(e) => handleInputChange("reRegistrationDate", e.target.value)}
                 />
               </div>
             </CardContent>
@@ -458,9 +490,10 @@ export default function EditCisternPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="manufacturerId">Производитель *</Label>
-                  <Select 
-                    value={selectValues.manufacturerId || ''} 
-                    onValueChange={(value) => handleInputChange('manufacturerId', value)}
+                  <Select
+                    key={`manufacturer-${selectValues.manufacturerId}`}
+                    value={selectValues.manufacturerId || ""}
+                    onValueChange={(value) => handleInputChange("manufacturerId", value)}
                     disabled={loadingManufacturers}
                   >
                     <SelectTrigger>
@@ -478,9 +511,10 @@ export default function EditCisternPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="typeId">Тип вагона *</Label>
-                  <Select 
-                    value={selectValues.typeId || ''} 
-                    onValueChange={(value) => handleInputChange('typeId', value)}
+                  <Select
+                    key={`type-${selectValues.typeId}`}
+                    value={selectValues.typeId || ""}
+                    onValueChange={(value) => handleInputChange("typeId", value)}
                     disabled={loadingWagonTypes}
                   >
                     <SelectTrigger>
@@ -498,12 +532,13 @@ export default function EditCisternPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="modelId">Модель вагона</Label>
-                  <Select 
-                    value={selectValues.modelId || 'none'} 
+                  <Select
+                    key={`model-${selectValues.modelId}`}
+                    value={selectValues.modelId || "none"}
                     onValueChange={(value) => {
-                      const actualValue = value === 'none' ? '' : value;
-                      handleInputChange('modelId', actualValue);
-                      setSelectValues(prev => ({ ...prev, modelId: actualValue }));
+                      const actualValue = value === "none" ? "" : value;
+                      handleInputChange("modelId", actualValue);
+                      setSelectValues((prev) => ({ ...prev, modelId: actualValue }));
                     }}
                     disabled={loadingWagonModels}
                   >
@@ -523,9 +558,10 @@ export default function EditCisternPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="affiliationId">Принадлежность *</Label>
-                  <Select 
-                    value={selectValues.affiliationId || ''} 
-                    onValueChange={(value) => handleInputChange('affiliationId', value)}
+                  <Select
+                    key={`affiliation-${selectValues.affiliationId}`}
+                    value={selectValues.affiliationId || ""}
+                    onValueChange={(value) => handleInputChange("affiliationId", value)}
                     disabled={loadingAffiliations}
                   >
                     <SelectTrigger>
@@ -543,12 +579,13 @@ export default function EditCisternPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="ownerId">Собственник</Label>
-                  <Select 
-                    value={selectValues.ownerId || 'none'} 
+                  <Select
+                    key={`owner-${selectValues.ownerId}`}
+                    value={selectValues.ownerId || "none"}
                     onValueChange={(value) => {
-                      const actualValue = value === 'none' ? '' : value;
-                      handleInputChange('ownerId', actualValue);
-                      setSelectValues(prev => ({ ...prev, ownerId: actualValue }));
+                      const actualValue = value === "none" ? "" : value;
+                      handleInputChange("ownerId", actualValue);
+                      setSelectValues((prev) => ({ ...prev, ownerId: actualValue }));
                     }}
                     disabled={loadingOwners}
                   >
@@ -568,12 +605,13 @@ export default function EditCisternPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="registrarId">Регистратор</Label>
-                  <Select 
-                    value={selectValues.registrarId || 'none'} 
+                  <Select
+                    key={`registrar-${selectValues.registrarId}`}
+                    value={selectValues.registrarId || "none"}
                     onValueChange={(value) => {
-                      const actualValue = value === 'none' ? '' : value;
-                      handleInputChange('registrarId', actualValue);
-                      setSelectValues(prev => ({ ...prev, registrarId: actualValue }));
+                      const actualValue = value === "none" ? "" : value;
+                      handleInputChange("registrarId", actualValue);
+                      setSelectValues((prev) => ({ ...prev, registrarId: actualValue }));
                     }}
                     disabled={loadingRegistrars}
                   >
@@ -604,9 +642,9 @@ export default function EditCisternPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="dangerClass">Класс опасности</Label>
-                  <Select 
-                    value={formData.dangerClass?.toString() || '3'} 
-                    onValueChange={(value) => handleInputChange('dangerClass', parseInt(value))}
+                  <Select
+                    value={formData.dangerClass?.toString() || "3"}
+                    onValueChange={(value) => handleInputChange("dangerClass", parseInt(value))}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -629,8 +667,8 @@ export default function EditCisternPage() {
                   <Label htmlFor="substance">Вещество</Label>
                   <Input
                     id="substance"
-                    value={formData.substance || ''}
-                    onChange={(e) => handleInputChange('substance', e.target.value)}
+                    value={formData.substance || ""}
+                    onChange={(e) => handleInputChange("substance", e.target.value)}
                     placeholder="Название перевозимого вещества"
                   />
                 </div>
@@ -641,8 +679,8 @@ export default function EditCisternPage() {
                     id="pressure"
                     type="number"
                     step="0.1"
-                    value={formData.pressure || ''}
-                    onChange={(e) => handleInputChange('pressure', parseFloat(e.target.value) || 0)}
+                    value={formData.pressure || ""}
+                    onChange={(e) => handleInputChange("pressure", parseFloat(e.target.value) || 0)}
                   />
                 </div>
 
@@ -652,8 +690,8 @@ export default function EditCisternPage() {
                     id="testPressure"
                     type="number"
                     step="0.1"
-                    value={formData.testPressure || ''}
-                    onChange={(e) => handleInputChange('testPressure', parseFloat(e.target.value) || 0)}
+                    value={formData.testPressure || ""}
+                    onChange={(e) => handleInputChange("testPressure", parseFloat(e.target.value) || 0)}
                   />
                 </div>
               </div>
@@ -673,8 +711,8 @@ export default function EditCisternPage() {
                   <Input
                     id="serviceLifeYears"
                     type="number"
-                    value={formData.serviceLifeYears || ''}
-                    onChange={(e) => handleInputChange('serviceLifeYears', parseInt(e.target.value) || 0)}
+                    value={formData.serviceLifeYears || ""}
+                    onChange={(e) => handleInputChange("serviceLifeYears", parseInt(e.target.value) || 0)}
                   />
                 </div>
 
@@ -684,8 +722,8 @@ export default function EditCisternPage() {
                     id="tareWeight2"
                     type="number"
                     step="0.1"
-                    value={formData.tareWeight2 || ''}
-                    onChange={(e) => handleInputChange('tareWeight2', parseFloat(e.target.value) || 0)}
+                    value={formData.tareWeight2 || ""}
+                    onChange={(e) => handleInputChange("tareWeight2", parseFloat(e.target.value) || 0)}
                   />
                 </div>
 
@@ -695,8 +733,8 @@ export default function EditCisternPage() {
                     id="tareWeight3"
                     type="number"
                     step="0.1"
-                    value={formData.tareWeight3 || ''}
-                    onChange={(e) => handleInputChange('tareWeight3', parseFloat(e.target.value) || 0)}
+                    value={formData.tareWeight3 || ""}
+                    onChange={(e) => handleInputChange("tareWeight3", parseFloat(e.target.value) || 0)}
                   />
                 </div>
 
@@ -706,8 +744,8 @@ export default function EditCisternPage() {
                     id="initialTareWeight"
                     type="number"
                     step="0.1"
-                    value={formData.initialTareWeight || ''}
-                    onChange={(e) => handleInputChange('initialTareWeight', parseFloat(e.target.value) || 0)}
+                    value={formData.initialTareWeight || ""}
+                    onChange={(e) => handleInputChange("initialTareWeight", parseFloat(e.target.value) || 0)}
                   />
                 </div>
               </div>
@@ -716,8 +754,8 @@ export default function EditCisternPage() {
                 <Label htmlFor="notes">Примечания</Label>
                 <Textarea
                   id="notes"
-                  value={formData.notes || ''}
-                  onChange={(e) => handleInputChange('notes', e.target.value)}
+                  value={formData.notes || ""}
+                  onChange={(e) => handleInputChange("notes", e.target.value)}
                   placeholder="Дополнительные примечания..."
                   rows={4}
                 />
@@ -736,7 +774,7 @@ export default function EditCisternPage() {
           </Link>
           <Button type="submit" disabled={updateMutation.isPending}>
             <Save className="h-4 w-4 mr-2" />
-            {updateMutation.isPending ? 'Сохранение...' : 'Сохранить изменения'}
+            {updateMutation.isPending ? "Сохранение..." : "Сохранить изменения"}
           </Button>
         </div>
       </form>

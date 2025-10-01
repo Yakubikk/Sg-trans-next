@@ -42,7 +42,9 @@ export const useCistern = (id: string) => {
     queryKey: cisternsKeys.detail(id),
     queryFn: () => cisternsApi.getById(id),
     enabled: !!id,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 0, // Don't use stale data, always fetch fresh when ID changes
+    refetchOnWindowFocus: false,
+    refetchOnMount: true, // Always refetch when component mounts
   });
 };
 
