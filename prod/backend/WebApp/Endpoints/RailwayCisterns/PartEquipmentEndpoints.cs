@@ -476,5 +476,112 @@ public static class PartEquipmentEndpoints
             .WithName("GetLastPartEquipmentsByCistern")
             .Produces<List<LastEquipmentDTO>>(StatusCodes.Status200OK)
             .RequirePermissions(Permission.Read);
+
+        // Получение записей по детали
+        group.MapGet("/by-part/{partId}", async (
+                [FromServices] ApplicationDbContext context,
+                Guid partId) =>
+            {
+                var equipments = await context.PartEquipments
+                    .Include(pe => pe.EquipmentType)
+                    .ThenInclude(et => et.PartType)
+                    .Include(pe => pe.JobDepot)
+                    .Include(pe => pe.Depot)
+                    .Include(pe => pe.RepairType)
+                    .Include(pe => pe.RailwayCistern)
+                    .ThenInclude(rc => rc.Manufacturer)
+                    .Include(pe => pe.RailwayCistern)
+                    .ThenInclude(rc => rc.Type)
+                    .Include(pe => pe.RailwayCistern)
+                    .ThenInclude(rc => rc.Model)
+                    .Include(pe => pe.RailwayCistern)
+                    .ThenInclude(rc => rc.Owner)
+                    .Include(pe => pe.Part)
+                    .ThenInclude(p => p.StampNumber)
+                    .Where(pe => pe.PartsId == partId)
+                    .Select(pe => new PartEquipmentDTO
+                    {
+                        Id = pe.Id,
+                        Operation = pe.Operation,
+                        DefectsId = pe.DefectsId,
+                        AdminOwnerId = pe.AdminOwnerId,
+                        JobDate = pe.JobDate,
+                        JobTypeId = pe.JobTypeId,
+                        ThicknessLeft = pe.ThicknessLeft,
+                        ThicknessRight = pe.ThicknessRight,
+                        TruckType = pe.TruckType,
+                        Notes = pe.Notes,
+                        DocumetnsId = pe.DocumetnsId,
+                        DocumetnDate = pe.DocumetnDate,
+                        RailwayCistern = pe.RailwayCistern != null
+                            ? new RailwayCisternDTO
+                            {
+                                Id = pe.RailwayCistern.Id,
+                                Number = pe.RailwayCistern.Number,
+                                Model = pe.RailwayCistern.Model.Name,
+                                Owner = pe.RailwayCistern.Owner.UNP,
+                            }
+                            : null,
+                        EquipmentType = pe.EquipmentType != null
+                            ? new EquipmentTypeDTO
+                            {
+                                Id = pe.EquipmentType.Id,
+                                Name = pe.EquipmentType.Name,
+                                Code = pe.EquipmentType.Code,
+                                PartTypeId = pe.EquipmentType.PartTypeId,
+                                PartTypeName = pe.EquipmentType.PartType.Name
+                            }
+                            : null,
+                        JobDepot = pe.JobDepot != null
+                            ? new DepotDTO
+                            {
+                                Id = pe.JobDepot.Id,
+                                Name = pe.JobDepot.Name,
+                                Code = pe.JobDepot.Code,
+                                Location = pe.JobDepot.Location,
+                                ShortName = pe.JobDepot.ShortName
+                            }
+                            : null,
+                        Depot = pe.Depot != null
+                            ? new DepotDTO
+                            {
+                                Id = pe.Depot.Id,
+                                Name = pe.Depot.Name,
+                                Code = pe.Depot.Code,
+                                Location = pe.Depot.Location,
+                                ShortName = pe.Depot.ShortName
+                            }
+                            : null,
+                        RepairType = pe.RepairType != null
+                            ? new RepairTypeDTO
+                            {
+                                Id = pe.RepairType.Id,
+                                Name = pe.RepairType.Name,
+                                Code = pe.RepairType.Code,
+                                Description = pe.RepairType.Description
+                            }
+                            : null,
+                        Part = pe.Part != null
+                            ? new PartInfoDTO
+                            {
+                                PartId = pe.Part.Id,
+                                SerialNumber = pe.Part.SerialNumber,
+                                ManufactureYear = pe.Part.ManufactureYear,
+                                StampInfo = pe.Part.StampNumber != null
+                                    ? new StampInfoDTO
+                                    {
+                                        Value = pe.Part.StampNumber.Value
+                                    }
+                                    : null
+                            }
+                            : null
+                    })
+                    .ToListAsync();
+
+                return Results.Ok(equipments);
+            })
+            .WithName("GetPartEquipmentsByPart")
+            .Produces<List<PartEquipmentDTO>>(StatusCodes.Status200OK)
+            .RequirePermissions(Permission.Read);
     }
 }
