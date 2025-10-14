@@ -89,6 +89,17 @@ public static class PartsEndpoints
                     Notes = p.Notes,
                     CreatedAt = p.CreatedAt,
                     UpdatedAt = p.UpdatedAt,
+                    Code = p.Code,
+                    Document = p.Document != null ? new DocumentDTO
+                    {
+                        Id = p.Document.Id,
+                        Number = p.Document.Number,
+                        Type = p.Document.Type,
+                        Date = p.Document.Date,
+                        Author = p.Document.Author,
+                        Price = p.Document.Price,
+                        Note = p.Document.Note
+                    } : null,
                     WheelPair = p.PartType.Code == 1 ? new WheelPairDTO
                     {
                         ThicknessLeft = p.WheelPair.ThicknessLeft,
@@ -185,6 +196,17 @@ public static class PartsEndpoints
                     Notes = p.Notes,
                     CreatedAt = p.CreatedAt,
                     UpdatedAt = p.UpdatedAt,
+                    Code = p.Code,
+                    Document = p.Document != null ? new DocumentDTO
+                    {
+                        Id = p.Document.Id,
+                        Number = p.Document.Number,
+                        Type = p.Document.Type,
+                        Date = p.Document.Date,
+                        Author = p.Document.Author,
+                        Price = p.Document.Price,
+                        Note = p.Document.Note
+                    } : null,
                     WheelPair = p.WheelPair != null ? new WheelPairDTO
                     {
                         ThicknessLeft = p.WheelPair.ThicknessLeft,
@@ -258,7 +280,9 @@ public static class PartsEndpoints
                 Notes = dto.Notes,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                CreatorId = Guid.Parse(httpContext.User.FindFirstValue("userId"))
+                CreatorId = Guid.Parse(httpContext.User.FindFirstValue("userId")),
+                Code = dto.Code,
+                DocumentId = dto.DocumentId
             };
 
             var wheelPair = new WheelPair
@@ -317,7 +341,9 @@ public static class PartsEndpoints
                 Notes = dto.Notes,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                CreatorId = Guid.Parse(httpContext.User.FindFirstValue("userId"))
+                CreatorId = Guid.Parse(httpContext.User.FindFirstValue("userId")),
+                Code = dto.Code,
+                DocumentId = dto.DocumentId
             };
 
             var sideFrame = new SideFrame
@@ -375,7 +401,9 @@ public static class PartsEndpoints
                 Notes = dto.Notes,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                CreatorId = Guid.Parse(httpContext.User.FindFirstValue("userId"))
+                CreatorId = Guid.Parse(httpContext.User.FindFirstValue("userId")),
+                Code = dto.Code,
+                DocumentId = dto.DocumentId
             };
 
             var bolster = new Bolster
@@ -433,7 +461,9 @@ public static class PartsEndpoints
                 Notes = dto.Notes,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                CreatorId = Guid.Parse(httpContext.User.FindFirstValue("userId"))
+                CreatorId = Guid.Parse(httpContext.User.FindFirstValue("userId")),
+                Code = dto.Code,
+                DocumentId = dto.DocumentId
             };
 
             var coupler = new Coupler
@@ -489,7 +519,9 @@ public static class PartsEndpoints
                 Notes = dto.Notes,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                CreatorId = Guid.Parse(httpContext.User.FindFirstValue("userId"))
+                CreatorId = Guid.Parse(httpContext.User.FindFirstValue("userId")),
+                Code = dto.Code,
+                DocumentId = dto.DocumentId
             };
 
             var shockAbsorber = new ShockAbsorber
@@ -553,6 +585,8 @@ public static class PartsEndpoints
             part.StatusId = dto.StatusId;
             part.Notes = dto.Notes;
             part.UpdatedAt = DateTime.UtcNow;
+            part.Code = dto.Code;
+            part.DocumentId = dto.DocumentId;
 
             // Обновляем специфичные поля
             part.WheelPair.ThicknessLeft = dto.ThicknessLeft;

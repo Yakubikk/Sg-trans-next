@@ -43,6 +43,10 @@ public static class ApiExtensions
         app.MapPartFilterEndpoints();
         app.MapEquipmentTypeEndpoints();
         app.MapPartEquipmentEndpoints();
+        
+        // New endpoints
+        app.MapStationEndpoints();
+        app.MapDocumentEndpoints();
     }
 
     public static void AddApiAuthentication(

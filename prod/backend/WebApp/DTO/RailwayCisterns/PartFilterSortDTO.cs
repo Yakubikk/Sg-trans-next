@@ -43,4 +43,11 @@ public class PartFilterCriteria
     public List<string>? Models { get; set; }
     public List<string>? ManufacturerCodes { get; set; }
     public DateRange? NextRepairDate { get; set; }
+
+    // Фильтры по коду и документу
+    public IntRange? Code { get; set; }
+    public Guid? DocumentId { get; set; }
+    public List<string>? DocumentNumbers { get; set; }
+    public List<int>? DocumentTypes { get; set; }
+    public DateRange? DocumentDate { get; set; }
 }

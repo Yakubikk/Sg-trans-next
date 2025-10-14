@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace WebApp.Data.Entities.RailwayCisterns;
 
 public class PartEquipment
@@ -16,8 +18,10 @@ public class PartEquipment
     public int ThicknessRight { get; set; }
     public int? TruckType { get; set; }
     public string? Notes { get; set; }
-    public int DocumetnsId { get; set; }
-    public DateOnly DocumetnDate { get; set; }
+    [Column("DocumetnsId")]
+    public Guid DocumentId { get; set; }
+    [Column("DocumetnDate")]
+    public DateOnly DocumentDate { get; set; }
     public Guid? DepotsId { get; set; }
     public Guid RepairTypesId { get; set; }
 
@@ -28,4 +32,5 @@ public class PartEquipment
     public Depot? Depot { get; set; }
     public RepairType RepairType { get; set; } = null!;
     public Part Part { get; set; } = null!;
+    public Document Document { get; set; } = null!;
 }

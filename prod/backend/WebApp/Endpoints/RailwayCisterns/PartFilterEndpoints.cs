@@ -167,6 +167,17 @@ public static class PartFilterEndpoints
                 p.Notes,
                 p.CreatedAt,
                 p.UpdatedAt,
+                p.Code,
+                Document = p.Document != null ? new 
+                {
+                    p.Document.Id,
+                    p.Document.Number,
+                    p.Document.Type,
+                    p.Document.Date,
+                    p.Document.Author,
+                    p.Document.Price,
+                    p.Document.Note
+                } : null,
                 WheelPair = p.PartType.Code == 1 && p.WheelPair != null ? new
                 {
                     p.WheelPair.ThicknessLeft,
@@ -377,6 +388,32 @@ public static class PartFilterEndpoints
                 case "updatedat":
                     selectedProperties["updatedAt"] = p.UpdatedAt;
                     break;
+
+                // Поля документа
+                case "code":
+                    selectedProperties["code"] = p.Code;
+                    break;
+                case "document.id":
+                    selectedProperties["documentId"] = p.Document?.Id;
+                    break;
+                case "document.number":
+                    selectedProperties["documentNumber"] = p.Document?.Number;
+                    break;
+                case "document.type":
+                    selectedProperties["documentType"] = p.Document?.Type;
+                    break;
+                case "document.date":
+                    selectedProperties["documentDate"] = p.Document?.Date;
+                    break;
+                case "document.author":
+                    selectedProperties["documentAuthor"] = p.Document?.Author;
+                    break;
+                case "document.price":
+                    selectedProperties["documentPrice"] = p.Document?.Price;
+                    break;
+                case "document.note":
+                    selectedProperties["documentNote"] = p.Document?.Note;
+                    break;
             }
         }
 
@@ -507,6 +544,33 @@ public static class PartFilterEndpoints
                                        p.ShockAbsorber.NextRepairDate <= filters.NextRepairDate.To);
         }
 
+        // Фильтры по коду
+        if (filters.Code != null)
+        {
+            if (filters.Code.From.HasValue)
+                query = query.Where(p => p.Code >= filters.Code.From);
+            if (filters.Code.To.HasValue)
+                query = query.Where(p => p.Code <= filters.Code.To);
+        }
+
+        // Фильтры по документу
+        if (filters.DocumentId.HasValue)
+            query = query.Where(p => p.DocumentId == filters.DocumentId);
+
+        if (filters.DocumentNumbers != null && filters.DocumentNumbers.Any())
+            query = query.Where(p => p.Document != null && filters.DocumentNumbers.Contains(p.Document.Number));
+
+        if (filters.DocumentTypes != null && filters.DocumentTypes.Any())
+            query = query.Where(p => p.Document != null && p.Document.Type.HasValue && filters.DocumentTypes.Contains(p.Document.Type.Value));
+
+        if (filters.DocumentDate != null)
+        {
+            if (filters.DocumentDate.From.HasValue)
+                query = query.Where(p => p.Document != null && p.Document.Date >= filters.DocumentDate.From);
+            if (filters.DocumentDate.To.HasValue)
+                query = query.Where(p => p.Document != null && p.Document.Date <= filters.DocumentDate.To);
+        }
+
         return query;
     }
 
@@ -558,6 +622,24 @@ public static class PartFilterEndpoints
             "nextrepairdate" => sort.Descending ? 
                 query.OrderByDescending(p => p.ShockAbsorber != null ? p.ShockAbsorber.NextRepairDate : null) : 
                 query.OrderBy(p => p.ShockAbsorber != null ? p.ShockAbsorber.NextRepairDate : null),
+            
+            // Поля документа и кода
+            "code" => sort.Descending ? query.OrderByDescending(p => p.Code) : query.OrderBy(p => p.Code),
+            "documentnumber" => sort.Descending ? 
+                query.OrderByDescending(p => p.Document != null ? p.Document.Number : "") : 
+                query.OrderBy(p => p.Document != null ? p.Document.Number : ""),
+            "documenttype" => sort.Descending ? 
+                query.OrderByDescending(p => p.Document != null ? p.Document.Type : 0) : 
+                query.OrderBy(p => p.Document != null ? p.Document.Type : 0),
+            "documentdate" => sort.Descending ? 
+                query.OrderByDescending(p => p.Document != null ? p.Document.Date : DateOnly.MinValue) : 
+                query.OrderBy(p => p.Document != null ? p.Document.Date : DateOnly.MinValue),
+            "documentauthor" => sort.Descending ? 
+                query.OrderByDescending(p => p.Document != null ? p.Document.Author : "") : 
+                query.OrderBy(p => p.Document != null ? p.Document.Author : ""),
+            "documentprice" => sort.Descending ? 
+                query.OrderByDescending(p => p.Document != null ? p.Document.Price : 0) : 
+                query.OrderBy(p => p.Document != null ? p.Document.Price : 0),
             
             _ => query.OrderByDescending(p => p.UpdatedAt) // сортировка по умолчанию
         };
@@ -613,7 +695,27 @@ public static class PartFilterEndpoints
                 query.ThenByDescending(p => p.ShockAbsorber != null ? p.ShockAbsorber.NextRepairDate : null) : 
                 query.ThenBy(p => p.ShockAbsorber != null ? p.ShockAbsorber.NextRepairDate : null),
             
+            // Поля документа и кода
+            "code" => sort.Descending ? query.ThenByDescending(p => p.Code) : query.ThenBy(p => p.Code),
+            "documentnumber" => sort.Descending ? 
+                query.ThenByDescending(p => p.Document != null ? p.Document.Number : "") : 
+                query.ThenBy(p => p.Document != null ? p.Document.Number : ""),
+            "documenttype" => sort.Descending ? 
+                query.ThenByDescending(p => p.Document != null ? p.Document.Type : 0) : 
+                query.ThenBy(p => p.Document != null ? p.Document.Type : 0),
+            "documentdate" => sort.Descending ? 
+                query.ThenByDescending(p => p.Document != null ? p.Document.Date : DateOnly.MinValue) : 
+                query.ThenBy(p => p.Document != null ? p.Document.Date : DateOnly.MinValue),
+            "documentauthor" => sort.Descending ? 
+                query.ThenByDescending(p => p.Document != null ? p.Document.Author : "") : 
+                query.ThenBy(p => p.Document != null ? p.Document.Author : ""),
+            "documentprice" => sort.Descending ? 
+                query.ThenByDescending(p => p.Document != null ? p.Document.Price : 0) : 
+                query.ThenBy(p => p.Document != null ? p.Document.Price : 0),
+            
             _ => query // если поле неизвестно, оставляем текущую сортировку
         };
     }
 }
+
+

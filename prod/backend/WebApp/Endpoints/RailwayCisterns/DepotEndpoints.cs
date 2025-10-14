@@ -121,5 +121,32 @@ public static class DepotEndpoints
         .Produces(StatusCodes.Status204NoContent)
         .Produces(StatusCodes.Status404NotFound)
         .RequirePermissions(Permission.Delete);
+
+        group.MapGet("/search", async ([FromServices] ApplicationDbContext context, [FromQuery] string? searchTerm) =>
+        {
+            var query = context.Set<Depot>().AsQueryable();
+            
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(d => d.ShortName.ToLower().Contains(searchTerm.ToLower()));
+            }
+
+            var result = await query
+                .Select(d => new
+                {
+                    Id = d.Id,
+                    ShortName = d.ShortName
+                })
+                .ToListAsync();
+            return Results.Ok(result);
+        })
+        .WithName("SearchDepotsByName")
+        .WithOpenApi(operation => 
+        {
+            operation.Parameters[0].Description = "Поиск по части короткого имени депо (без учета регистра). При пустой строке или отсутствии параметра возвращает все записи.";
+            return operation;
+        })
+        .Produces<List<object>>(StatusCodes.Status200OK)
+        .RequirePermissions(Permission.Read);
     }
 }

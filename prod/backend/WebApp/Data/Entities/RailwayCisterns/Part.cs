@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace WebApp.Data.Entities.RailwayCisterns;
 
 public class Part 
@@ -34,4 +36,11 @@ public class Part
     
     public ICollection<PartInstallation> PartInstallations { get; set; } = new List<PartInstallation>();
     public ICollection<Repair> Repairs { get; set; } = new List<Repair>();
+    
+    public int? Code { get; set; }
+    [Column("DocumetnsId")]
+    public Guid? DocumentId { get; set; }
+    public Document? Document { get; set; }
+    
+    public ICollection<PartEquipment> PartEquipments { get; set; } = new List<PartEquipment>();
 }

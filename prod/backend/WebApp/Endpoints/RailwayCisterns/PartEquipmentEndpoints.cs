@@ -46,6 +46,7 @@ public static class PartEquipmentEndpoints
                     .ThenInclude(rc => rc.Owner)
                     .Include(pe => pe.Part)
                     .ThenInclude(p => p.StampNumber)
+                    .Include(pe => pe.Document)
                     .AsQueryable();
 
                 if (cisternId.HasValue)
@@ -62,17 +63,30 @@ public static class PartEquipmentEndpoints
                     .Select(pe => new PartEquipmentDTO
                     {
                         Id = pe.Id,
+                        RailwayCisternsId = pe.RailwayCisternsId,
                         Operation = pe.Operation,
                         DefectsId = pe.DefectsId,
                         AdminOwnerId = pe.AdminOwnerId,
+                        PartsId = pe.PartsId,
+                        JobDepotsId = pe.JobDepotsId,
                         JobDate = pe.JobDate,
                         JobTypeId = pe.JobTypeId,
                         ThicknessLeft = pe.ThicknessLeft,
                         ThicknessRight = pe.ThicknessRight,
                         TruckType = pe.TruckType,
                         Notes = pe.Notes,
-                        DocumetnsId = pe.DocumetnsId,
-                        DocumetnDate = pe.DocumetnDate,
+                        DocumentId = pe.DocumentId,
+                        DocumentDate = pe.DocumentDate,
+                        Document = pe.Document != null ? new DocumentDTO
+                        {
+                            Id = pe.Document.Id,
+                            Number = pe.Document.Number,
+                            Type = pe.Document.Type,
+                            Date = pe.Document.Date,
+                            Author = pe.Document.Author,
+                            Price = pe.Document.Price,
+                            Note = pe.Document.Note
+                        } : null,
                         RailwayCistern = pe.RailwayCistern != null
                             ? new RailwayCisternDTO
                             {
@@ -174,21 +188,35 @@ public static class PartEquipmentEndpoints
                     .ThenInclude(rc => rc.Owner)
                     .Include(pe => pe.Part)
                     .ThenInclude(p => p.StampNumber)
+                    .Include(pe => pe.Document)
                     .Where(pe => pe.Id == id)
                     .Select(pe => new PartEquipmentDTO
                     {
                         Id = pe.Id,
+                        RailwayCisternsId = pe.RailwayCisternsId,
                         Operation = pe.Operation,
                         DefectsId = pe.DefectsId,
                         AdminOwnerId = pe.AdminOwnerId,
+                        PartsId = pe.PartsId,
+                        JobDepotsId = pe.JobDepotsId,
                         JobDate = pe.JobDate,
                         JobTypeId = pe.JobTypeId,
                         ThicknessLeft = pe.ThicknessLeft,
                         ThicknessRight = pe.ThicknessRight,
                         TruckType = pe.TruckType,
                         Notes = pe.Notes,
-                        DocumetnsId = pe.DocumetnsId,
-                        DocumetnDate = pe.DocumetnDate,
+                        DocumentId = pe.DocumentId,
+                        DocumentDate = pe.DocumentDate,
+                        Document = pe.Document != null ? new DocumentDTO
+                        {
+                            Id = pe.Document.Id,
+                            Number = pe.Document.Number,
+                            Type = pe.Document.Type,
+                            Date = pe.Document.Date,
+                            Author = pe.Document.Author,
+                            Price = pe.Document.Price,
+                            Note = pe.Document.Note
+                        } : null,
                         RailwayCistern = pe.RailwayCistern != null
                             ? new RailwayCisternDTO
                             {
@@ -282,21 +310,35 @@ public static class PartEquipmentEndpoints
                     .ThenInclude(rc => rc.Owner)
                     .Include(pe => pe.Part)
                     .ThenInclude(p => p.StampNumber)
+                    .Include(pe => pe.Document)
                     .Where(pe => pe.RailwayCisternsId == cisternId)
                     .Select(pe => new PartEquipmentDTO
                     {
                         Id = pe.Id,
+                        RailwayCisternsId = pe.RailwayCisternsId,
                         Operation = pe.Operation,
                         DefectsId = pe.DefectsId,
                         AdminOwnerId = pe.AdminOwnerId,
+                        PartsId = pe.PartsId,
+                        JobDepotsId = pe.JobDepotsId,
                         JobDate = pe.JobDate,
                         JobTypeId = pe.JobTypeId,
                         ThicknessLeft = pe.ThicknessLeft,
                         ThicknessRight = pe.ThicknessRight,
                         TruckType = pe.TruckType,
                         Notes = pe.Notes,
-                        DocumetnsId = pe.DocumetnsId,
-                        DocumetnDate = pe.DocumetnDate,
+                        DocumentId = pe.DocumentId,
+                        DocumentDate = pe.DocumentDate,
+                        Document = pe.Document != null ? new DocumentDTO
+                        {
+                            Id = pe.Document.Id,
+                            Number = pe.Document.Number,
+                            Type = pe.Document.Type,
+                            Date = pe.Document.Date,
+                            Author = pe.Document.Author,
+                            Price = pe.Document.Price,
+                            Note = pe.Document.Note
+                        } : null,
                         RailwayCistern = pe.RailwayCistern != null
                             ? new RailwayCisternDTO
                             {
@@ -380,6 +422,7 @@ public static class PartEquipmentEndpoints
                     .Include(pe => pe.RepairType)
                     .Include(pe => pe.Part)
                     .ThenInclude(p => p.StampNumber)
+                    .Include(pe => pe.Document)
                     .Where(pe => pe.RailwayCisternsId == cisternId &&
                                  pe.Operation == 2 &&
                                  pe.EquipmentType != null)
@@ -389,7 +432,7 @@ public static class PartEquipmentEndpoints
                         EquipmentTypeId = group.Key.EquipmentTypeId!.Value,
                         EquipmentTypeName = group.Key.Name,
                         LastEquipment = group
-                            .OrderByDescending(pe => pe.DocumetnDate)
+                            .OrderByDescending(pe => pe.DocumentDate)
                             .Select(pe => new PartEquipmentDTO
                             {
                                 Id = pe.Id,
@@ -402,8 +445,18 @@ public static class PartEquipmentEndpoints
                                 ThicknessRight = pe.ThicknessRight,
                                 TruckType = pe.TruckType,
                                 Notes = pe.Notes,
-                                DocumetnsId = pe.DocumetnsId,
-                                DocumetnDate = pe.DocumetnDate,
+                                DocumentId = pe.DocumentId,
+                                DocumentDate = pe.DocumentDate,
+                                Document = pe.Document != null ? new DocumentDTO
+                                {
+                                    Id = pe.Document.Id,
+                                    Number = pe.Document.Number,
+                                    Type = pe.Document.Type,
+                                    Date = pe.Document.Date,
+                                    Author = pe.Document.Author,
+                                    Price = pe.Document.Price,
+                                    Note = pe.Document.Note
+                                } : null,
                                 RailwayCistern = pe.RailwayCistern != null
                                     ? new RailwayCisternDTO
                                     {
@@ -498,21 +551,35 @@ public static class PartEquipmentEndpoints
                     .ThenInclude(rc => rc.Owner)
                     .Include(pe => pe.Part)
                     .ThenInclude(p => p.StampNumber)
+                    .Include(pe => pe.Document)
                     .Where(pe => pe.PartsId == partId)
                     .Select(pe => new PartEquipmentDTO
                     {
                         Id = pe.Id,
+                        RailwayCisternsId = pe.RailwayCisternsId,
                         Operation = pe.Operation,
                         DefectsId = pe.DefectsId,
                         AdminOwnerId = pe.AdminOwnerId,
+                        PartsId = pe.PartsId,
+                        JobDepotsId = pe.JobDepotsId,
                         JobDate = pe.JobDate,
                         JobTypeId = pe.JobTypeId,
                         ThicknessLeft = pe.ThicknessLeft,
                         ThicknessRight = pe.ThicknessRight,
                         TruckType = pe.TruckType,
                         Notes = pe.Notes,
-                        DocumetnsId = pe.DocumetnsId,
-                        DocumetnDate = pe.DocumetnDate,
+                        DocumentId = pe.DocumentId,
+                        DocumentDate = pe.DocumentDate,
+                        Document = pe.Document != null ? new DocumentDTO
+                        {
+                            Id = pe.Document.Id,
+                            Number = pe.Document.Number,
+                            Type = pe.Document.Type,
+                            Date = pe.Document.Date,
+                            Author = pe.Document.Author,
+                            Price = pe.Document.Price,
+                            Note = pe.Document.Note
+                        } : null,
                         RailwayCistern = pe.RailwayCistern != null
                             ? new RailwayCisternDTO
                             {

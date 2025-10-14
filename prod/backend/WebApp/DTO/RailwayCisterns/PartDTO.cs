@@ -20,6 +20,9 @@ public class PartDTO
     public BolsterDTO? Bolster { get; set; }
     public CouplerDTO? Coupler { get; set; }
     public ShockAbsorberDTO? ShockAbsorber { get; set; }
+    public int? Code { get; set; }
+    public Guid? DocumentId { get; set; }
+    public DocumentDTO? Document { get; set; }
 }
 
 public abstract class CreatePartDTOBase 
@@ -32,6 +35,8 @@ public abstract class CreatePartDTOBase
     public string? CurrentLocation { get; set; }
     public Guid StatusId { get; set; }
     public string? Notes { get; set; }
+    public int? Code { get; set; }
+    public Guid? DocumentId { get; set; }
 }
 
 public abstract class UpdatePartDTOBase
@@ -43,4 +48,6 @@ public abstract class UpdatePartDTOBase
     public string? CurrentLocation { get; set; }
     public Guid StatusId { get; set; }
     public string? Notes { get; set; }
+    public int? Code { get; set; }
+    public Guid? DocumentId { get; set; }
 }

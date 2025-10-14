@@ -40,6 +40,8 @@ public class ApplicationDbContext(
     public DbSet<StampNumber> StampNumbers { get; set; }
     public DbSet<EquipmentType> EquipmentTypes { get; set; }
     public DbSet<PartEquipment> PartEquipments { get; set; }
+    public DbSet<Station> Stations { get; set; }
+    public DbSet<Document> Documents { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -240,7 +242,9 @@ public class ApplicationDbContext(
             entity.Property(e => e.Notes).HasColumnType("text");
             entity.Property(e => e.CreatedAt).HasColumnType("timestamp with time zone");
             entity.Property(e => e.UpdatedAt).HasColumnType("timestamp with time zone");
-            
+            entity.Property(e => e.Code);
+            entity.Property(e => e.DocumentId);
+
             entity.HasOne(d => d.Depot)
                 .WithMany(p => p.Parts)
                 .HasForeignKey(d => d.DepotId)
@@ -477,10 +481,12 @@ public class ApplicationDbContext(
             entity.Property(e => e.JobTypeId).IsRequired().HasDefaultValue("0").HasColumnType("text");
             entity.Property(e => e.ThicknessLeft).IsRequired().HasDefaultValue(0);
             entity.Property(e => e.ThicknessRight).IsRequired().HasDefaultValue(0);
+            entity.Property(e => e.TruckType);
             entity.Property(e => e.Notes).HasColumnType("text");
-            entity.Property(e => e.DocumetnsId).IsRequired().HasDefaultValue(0);
-            entity.Property(e => e.DocumetnDate).IsRequired().HasColumnType("date");
+            entity.Property(e => e.DocumentId).IsRequired();
+            entity.Property(e => e.DocumentDate).IsRequired().HasColumnType("date");
             
+            // Связи с другими сущностями
             entity.HasOne(pe => pe.RailwayCistern)
                 .WithMany()
                 .HasForeignKey(pe => pe.RailwayCisternsId)
@@ -505,13 +511,63 @@ public class ApplicationDbContext(
                 .WithMany()
                 .HasForeignKey(pe => pe.RepairTypesId)
                 .OnDelete(DeleteBehavior.NoAction);
-            
+
+            // Связь с Part определена через Part.PartEquipments
             entity.HasOne(pe => pe.Part)
-                .WithMany()
+                .WithMany(p => p.PartEquipments)
                 .HasForeignKey(pe => pe.PartsId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasOne(pe => pe.Document)
+                .WithMany(d => d.PartEquipments)
+                .HasForeignKey(d => d.DocumentId)
                 .OnDelete(DeleteBehavior.NoAction);
         });
 
+        // Stations конфигурация
+        modelBuilder.Entity<Station>(entity =>
+        {
+            entity.ToTable("Stations");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasColumnType("text");
+            entity.Property(e => e.Code).IsRequired();
+            entity.Property(e => e.OsmId).HasColumnType("text");
+            entity.Property(e => e.UicRef);
+            entity.Property(e => e.Lat).IsRequired();
+            entity.Property(e => e.Lon).IsRequired();
+            entity.Property(e => e.Iso3166).HasColumnType("text");
+            entity.Property(e => e.Type).HasColumnType("text");
+            entity.Property(e => e.Operator).HasColumnType("text");
+            entity.Property(e => e.Country).HasColumnType("text");
+            entity.Property(e => e.Region).HasColumnType("text");
+            entity.Property(e => e.Division).HasColumnType("text");
+            entity.Property(e => e.Railway).HasColumnType("text");
+        });
+
+        // Documents конфигурация
+        modelBuilder.Entity<Document>(entity =>
+        {
+            entity.ToTable("Documents");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Number).IsRequired().HasColumnType("text");
+            entity.Property(e => e.Type);
+            entity.Property(e => e.Date).IsRequired().HasColumnType("date");
+            entity.Property(e => e.Author).IsRequired().HasColumnType("text");
+            entity.Property(e => e.Price).HasColumnType("money");
+            entity.Property(e => e.Note).HasColumnType("text");
+
+            // Связи с другими сущностями
+            entity.HasMany(d => d.Parts)
+                .WithOne(p => p.Document)
+                .HasForeignKey(p => p.DocumentId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasMany(d => d.PartEquipments)
+                .WithOne(pe => pe.Document)
+                .HasForeignKey(pe => pe.DocumentId)
+                .OnDelete(DeleteBehavior.NoAction);
+        });
+        
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
 
         var builder = modelBuilder.Entity<RolePermission>();
@@ -519,3 +575,4 @@ public class ApplicationDbContext(
         builder.HasKey(r => new { r.RoleId, r.PermissionId });
     }
 }
+
