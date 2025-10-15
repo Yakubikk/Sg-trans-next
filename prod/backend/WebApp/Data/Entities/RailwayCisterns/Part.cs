@@ -17,7 +17,7 @@ public class Part
     
     public string? SerialNumber { get; set; }
     public DateOnly? ManufactureYear { get; set; }
-    public string? CurrentLocation { get; set; }
+    public Guid? CurrentLocation { get; set; }
     
     public Guid StatusId { get; set; }
     public PartStatus Status { get; set; } = null!;
@@ -41,6 +41,6 @@ public class Part
     [Column("DocumetnsId")]
     public Guid? DocumentId { get; set; }
     public Document? Document { get; set; }
-    
+    public RailwayCistern? RailwayCistern { get; set; } 
     public ICollection<PartEquipment> PartEquipments { get; set; } = new List<PartEquipment>();
 }

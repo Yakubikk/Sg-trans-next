@@ -376,9 +376,9 @@ public static class PartFilterEndpoints
                 case "manufactureyear":
                     selectedProperties["manufactureYear"] = p.ManufactureYear;
                     break;
-                case "currentlocation":
-                    selectedProperties["currentLocation"] = p.CurrentLocation;
-                    break;
+                // case "currentlocation":
+                //     selectedProperties["currentLocation"] = p.CurrentLocation;
+                //     break;
                 case "notes":
                     selectedProperties["notes"] = p.Notes;
                     break;
@@ -456,9 +456,9 @@ public static class PartFilterEndpoints
             if (filters.ManufactureYear.To.HasValue)
                 query = query.Where(p => p.ManufactureYear <= filters.ManufactureYear.To);
         }
-
-        if (filters.Locations != null && filters.Locations.Any())
-            query = query.Where(p => p.CurrentLocation != null && filters.Locations.Contains(p.CurrentLocation));
+        //
+        // if (filters.Locations != null && filters.Locations.Any())
+        //     query = query.Where(p => p.CurrentLocation != null && filters.Locations.Contains(p.CurrentLocation));
 
         if (filters.StatusIds != null && filters.StatusIds.Any())
             query = query.Where(p => filters.StatusIds.Contains(p.StatusId));
@@ -583,7 +583,7 @@ public static class PartFilterEndpoints
                 : query.OrderBy(p => p.StampNumber != null ? p.StampNumber.Value : null),
             "serialnumber" => sort.Descending ? query.OrderByDescending(p => p.SerialNumber) : query.OrderBy(p => p.SerialNumber),
             "manufactureyear" => sort.Descending ? query.OrderByDescending(p => p.ManufactureYear) : query.OrderBy(p => p.ManufactureYear),
-            "currentlocation" => sort.Descending ? query.OrderByDescending(p => p.CurrentLocation) : query.OrderBy(p => p.CurrentLocation),
+            // "currentlocation" => sort.Descending ? query.OrderByDescending(p => p.CurrentLocation) : query.OrderBy(p => p.CurrentLocation),
             "statusname" => sort.Descending ? query.OrderByDescending(p => p.Status.Name) : query.OrderBy(p => p.Status.Name),
             "notes" => sort.Descending ? query.OrderByDescending(p => p.Notes) : query.OrderBy(p => p.Notes),
             "createdat" => sort.Descending ? query.OrderByDescending(p => p.CreatedAt) : query.OrderBy(p => p.CreatedAt),
@@ -655,7 +655,7 @@ public static class PartFilterEndpoints
                 query.ThenBy(p => p.StampNumber != null ? p.StampNumber.Value : null),
             "serialnumber" => sort.Descending ? query.ThenByDescending(p => p.SerialNumber) : query.ThenBy(p => p.SerialNumber),
             "manufactureyear" => sort.Descending ? query.ThenByDescending(p => p.ManufactureYear) : query.ThenBy(p => p.ManufactureYear),
-            "currentlocation" => sort.Descending ? query.ThenByDescending(p => p.CurrentLocation) : query.ThenBy(p => p.CurrentLocation),
+            // "currentlocation" => sort.Descending ? query.ThenByDescending(p => p.CurrentLocation) : query.ThenBy(p => p.CurrentLocation),
             "statusname" => sort.Descending ? query.ThenByDescending(p => p.Status.Name) : query.ThenBy(p => p.Status.Name),
             "notes" => sort.Descending ? query.ThenByDescending(p => p.Notes) : query.ThenBy(p => p.Notes),
             "createdat" => sort.Descending ? query.ThenByDescending(p => p.CreatedAt) : query.ThenBy(p => p.CreatedAt),

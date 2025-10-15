@@ -8,7 +8,6 @@ public class PartDTO
     public StampNumberDTO StampNumber { get; set; }
     public string? SerialNumber { get; set; }
     public DateOnly? ManufactureYear { get; set; }
-    public string? CurrentLocation { get; set; }
     public PartStatusDTO Status { get; set; }
     public string? Notes { get; set; }
     public DateTime CreatedAt { get; set; }
@@ -20,6 +19,7 @@ public class PartDTO
     public BolsterDTO? Bolster { get; set; }
     public CouplerDTO? Coupler { get; set; }
     public ShockAbsorberDTO? ShockAbsorber { get; set; }
+    public RailwayCisternIdAndNumberDTO? CurrentLocation { get; set; }
     public int? Code { get; set; }
     public Guid? DocumentId { get; set; }
     public DocumentDTO? Document { get; set; }
@@ -32,7 +32,7 @@ public abstract class CreatePartDTOBase
     public Guid StampNumberId { get; set; }
     public string? SerialNumber { get; set; }
     public DateOnly? ManufactureYear { get; set; }
-    public string? CurrentLocation { get; set; }
+    public Guid? CurrentLocation { get; set; }
     public Guid StatusId { get; set; }
     public string? Notes { get; set; }
     public int? Code { get; set; }
@@ -45,7 +45,7 @@ public abstract class UpdatePartDTOBase
     public Guid StampNumberId { get; set; }
     public string? SerialNumber { get; set; }
     public DateOnly? ManufactureYear { get; set; }
-    public string? CurrentLocation { get; set; }
+    public Guid? CurrentLocation { get; set; }
     public Guid StatusId { get; set; }
     public string? Notes { get; set; }
     public int? Code { get; set; }

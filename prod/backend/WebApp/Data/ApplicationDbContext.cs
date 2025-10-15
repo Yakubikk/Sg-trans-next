@@ -238,7 +238,6 @@ public class ApplicationDbContext(
             entity.HasKey(e => e.Id);
             
             entity.Property(e => e.SerialNumber).HasColumnType("text");
-            entity.Property(e => e.CurrentLocation).HasColumnType("text");
             entity.Property(e => e.Notes).HasColumnType("text");
             entity.Property(e => e.CreatedAt).HasColumnType("timestamp with time zone");
             entity.Property(e => e.UpdatedAt).HasColumnType("timestamp with time zone");
@@ -263,6 +262,11 @@ public class ApplicationDbContext(
             entity.HasOne(d => d.StampNumber)
                 .WithMany()
                 .HasForeignKey(d => d.StampNumberId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasOne(r => r.RailwayCistern)
+                .WithMany()
+                .HasForeignKey(r=>r.CurrentLocation)
                 .OnDelete(DeleteBehavior.NoAction);
         });
 

@@ -1,5 +1,11 @@
 namespace WebApp.DTO.RailwayCisterns;
 
+
+public class RailwayCisternIdAndNumberDTO
+{
+    public Guid Id { get; set; }
+    public string Number { get; set; }
+}
 public class RailwayCisternDetailDTO
 {
     public Guid Id { get; set; }

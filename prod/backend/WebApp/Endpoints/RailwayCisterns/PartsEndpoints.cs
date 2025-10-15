@@ -79,7 +79,11 @@ public static class PartsEndpoints
                     },
                     SerialNumber = p.SerialNumber,
                     ManufactureYear = p.ManufactureYear,
-                    CurrentLocation = p.CurrentLocation,
+                    CurrentLocation = p.RailwayCistern != null ? new RailwayCisternIdAndNumberDTO
+                    {
+                        Id = p.RailwayCistern.Id,
+                        Number = p.RailwayCistern.Number,
+                    } : null,
                     Status = new PartStatusDTO
                     {
                         Id = p.Status.Id,
@@ -186,7 +190,11 @@ public static class PartsEndpoints
                     },
                     SerialNumber = p.SerialNumber,
                     ManufactureYear = p.ManufactureYear,
-                    CurrentLocation = p.CurrentLocation,
+                    CurrentLocation = p.RailwayCistern != null ? new RailwayCisternIdAndNumberDTO
+                    {
+                        Id = p.RailwayCistern.Id,
+                        Number = p.RailwayCistern.Number,
+                    } : null,
                     Status = new PartStatusDTO
                     {
                         Id = p.Status.Id,
