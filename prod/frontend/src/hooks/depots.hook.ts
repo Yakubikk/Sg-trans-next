@@ -6,6 +6,7 @@ import type { SelectOption } from '@/types/directories';
 export const depotsKeys = {
   all: ['directories', 'depots'] as const,
   byId: (id: string) => [...depotsKeys.all, id] as const,
+  search: (searchTerm?: string) => [...depotsKeys.all, 'search', searchTerm] as const,
 };
 
 // Hooks
@@ -52,6 +53,14 @@ export const useDeleteDepot = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: depotsKeys.all });
     },
+  });
+};
+
+// Search depots by short name
+export const useSearchDepots = (searchTerm?: string) => {
+  return useQuery({
+    queryKey: depotsKeys.search(searchTerm),
+    queryFn: () => depotsApi.search(searchTerm),
   });
 };
 

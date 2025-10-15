@@ -23,18 +23,100 @@ export interface DepotDTO extends BaseEntity {
   name: string;
   code: string;
   location?: string;
+  shortName?: string;
 }
 
 export interface CreateDepotDTO {
   name: string;
   code: string;
   location?: string;
+  shortName?: string;
 }
 
 export interface UpdateDepotDTO {
   name: string;
   code: string;
   location?: string;
+  shortName?: string;
+}
+
+// Document (Документ)
+export interface DocumentDTO {
+  id: string;
+  number: string;
+  type: string;
+  date: string;
+  author?: string;
+  price?: number;
+  note?: string;
+}
+
+export interface CreateDocumentDTO {
+  number: string;
+  type: string;
+  date: string;
+  author?: string;
+  price?: number;
+  note?: string;
+}
+
+export interface UpdateDocumentDTO {
+  number: string;
+  type: string;
+  date: string;
+  author?: string;
+  price?: number;
+  note?: string;
+}
+
+// Station (Станция)
+export interface StationDTO {
+  id: string;
+  name: string;
+  code?: string;
+  osmId?: string;
+  uicRef?: string;
+  lat?: number;
+  lon?: number;
+  iso3166?: string;
+  type?: string;
+  operator?: string;
+  country?: string;
+  region?: string;
+  division?: string;
+  railway?: string;
+}
+
+export interface CreateStationDTO {
+  name: string;
+  code?: string;
+  osmId?: string;
+  uicRef?: string;
+  lat?: number;
+  lon?: number;
+  iso3166?: string;
+  type?: string;
+  operator?: string;
+  country?: string;
+  region?: string;
+  division?: string;
+  railway?: string;
+}
+
+export interface UpdateStationDTO {
+  name: string;
+  code?: string;
+  osmId?: string;
+  uicRef?: string;
+  lat?: number;
+  lon?: number;
+  iso3166?: string;
+  type?: string;
+  operator?: string;
+  country?: string;
+  region?: string;
+  division?: string;
+  railway?: string;
 }
 
 // Manufacturer (Производитель)
@@ -154,16 +236,19 @@ export interface UpdatePartTypeDTO {
 // PartStatus (Статус детали)
 export interface PartStatusDTO extends BaseEntity {
   name: string;
+  code: number;
   color?: string;
 }
 
 export interface CreatePartStatusDTO {
   name: string;
+  code: number;
   color?: string;
 }
 
 export interface UpdatePartStatusDTO {
   name: string;
+  code: number;
   color?: string;
 }
 
@@ -241,7 +326,7 @@ export interface PartDTO extends BaseEntity {
   depot?: DepotDTO;
   stampNumber: StampNumberDTO;
   serialNumber?: string;
-  manufactureYear?: string;
+  manufactureYear?: string | { year: number; month: number; day: number }; // DateOnly может прийти как объект
   currentLocation?: string;
   status: PartStatusDTO;
   notes?: string;
@@ -252,6 +337,9 @@ export interface PartDTO extends BaseEntity {
   bolster?: BolsterDTO;
   coupler?: CouplerDTO;
   shockAbsorber?: ShockAbsorberDTO;
+  code?: number;
+  documentId?: string;
+  document?: DocumentDTO;
 }
 
 export interface WheelPairDTO {
@@ -262,22 +350,23 @@ export interface WheelPairDTO {
 
 export interface SideFrameDTO {
   serviceLifeYears?: number;
-  extendedUntil?: string;
+  extendedUntil?: string | { year: number; month: number; day: number }; // DateOnly может прийти как объект
 }
 
 export interface BolsterDTO {
   serviceLifeYears?: number;
-  extendedUntil?: string;
+  extendedUntil?: string | { year: number; month: number; day: number }; // DateOnly может прийти как объект
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface CouplerDTO {
-  type?: string; // Тип автосцепки
+  // Автосцепка не имеет специфичных полей
 }
 
 export interface ShockAbsorberDTO {
   model?: string;
   manufacturerCode?: string;
-  nextRepairDate?: string;
+  nextRepairDate?: string | { year: number; month: number; day: number }; // DateOnly может прийти как объект
   serviceLifeYears?: number;
 }
 
@@ -496,6 +585,24 @@ export interface PaginatedPartEquipmentResponse {
   pageSize: number;
 }
 
+// Paginated response for Documents
+export interface PaginatedDocumentsResponse {
+  items: DocumentDTO[];
+  pageNumber: number;
+  totalPages: number;
+  totalCount: number;
+  pageSize: number;
+}
+
+// Paginated response for Stations
+export interface PaginatedStationsResponse {
+  items: StationDTO[];
+  pageNumber: number;
+  totalPages: number;
+  totalCount: number;
+  pageSize: number;
+}
+
 // Simple option type for selects
 export interface SelectOption {
   value: string;
@@ -578,4 +685,21 @@ export interface PaginatedFilteredPartsResponse {
   totalPages: number;
   totalCount: number;
   pageSize: number;
+}
+
+// Part Installation History (История установок детали)
+export interface PartInstallationDTO {
+  id: string;
+  partId: string;
+  wagonId?: string;
+  wagonNumber?: string;
+  installedAt: string;
+  installedBy?: string;
+  removedAt?: string;
+  removedBy?: string;
+  fromLocationId?: string;
+  fromLocationName?: string;
+  toLocationId: string;
+  toLocationName: string;
+  notes?: string;
 }

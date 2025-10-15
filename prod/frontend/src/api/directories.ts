@@ -57,6 +57,14 @@ import type {
   PartFilterSortDTO,
   PartFilterSortWithoutPaginationDTO,
   PaginatedFilteredPartsResponse,
+  DocumentDTO,
+  CreateDocumentDTO,
+  UpdateDocumentDTO,
+  PaginatedDocumentsResponse,
+  StationDTO,
+  CreateStationDTO,
+  UpdateStationDTO,
+  PaginatedStationsResponse,
 } from '@/types/directories';
 
 // Generic CRUD operations for directories
@@ -94,11 +102,15 @@ export const affiliationsApi = createDirectoryApi<
 >('affiliations');
 
 // Depots API
-export const depotsApi = createDirectoryApi<
-  DepotDTO,
-  CreateDepotDTO,
-  UpdateDepotDTO
->('depots');
+export const depotsApi = {
+  ...createDirectoryApi<DepotDTO, CreateDepotDTO, UpdateDepotDTO>('depots'),
+  
+  search: async (searchTerm?: string): Promise<{ id: string; shortName: string }[]> => {
+    const params = searchTerm ? `?searchTerm=${encodeURIComponent(searchTerm)}` : '';
+    const response = await api.get(`/api/depots/search${params}`);
+    return response.data;
+  },
+};
 
 // Manufacturers API
 export const manufacturersApi = createDirectoryApi<
@@ -195,7 +207,7 @@ export const convertToSelectOptions = {
     owners.map(o => ({ value: o.id, label: o.name })),
 
   depots: (depots: DepotDTO[]) =>
-    depots.map(d => ({ value: d.id, label: d.name })),
+    depots.map(d => ({ value: d.id, label: d.shortName || d.name })),
 
   registrars: (registrars: RegistrarDTO[]) =>
     registrars.map(r => ({ value: r.id, label: r.name })),
@@ -204,7 +216,7 @@ export const convertToSelectOptions = {
     stampNumbers.map(s => ({ value: s.id, label: s.value })),
 
   partTypes: (partTypes: PartTypeDTO[]) =>
-    partTypes.map(pt => ({ value: pt.id, label: pt.name })),
+    partTypes.map(pt => ({ value: pt.id, label: `${pt.name} [${pt.code}]` })),
 
   partStatuses: (partStatuses: PartStatusDTO[]) =>
     partStatuses.map(ps => ({ value: ps.id, label: ps.name })),
@@ -277,6 +289,11 @@ export const partsApi = {
   delete: async (id: string): Promise<void> => {
     await api.delete(`/api/parts/${id}`);
   },
+
+  getInstallationHistory: async (partId: string): Promise<PartEquipmentDTO[]> => {
+    const response = await api.get(`/api/part-equipments/by-part/${partId}`);
+    return response.data;
+  },
 };
 
 // Part Equipment API
@@ -324,5 +341,65 @@ export const partsFilterApi = {
   getBySavedFilter: async (filterId: string): Promise<Record<string, unknown>[]> => {
     const response = await api.get(`/api/parts/filter/saved/${filterId}`);
     return response.data;
+  },
+};
+
+// Documents API
+export const documentsApi = {
+  getAll: async (pageNumber = 1, pageSize = 10): Promise<PaginatedDocumentsResponse> => {
+    const params = new URLSearchParams({
+      pageNumber: pageNumber.toString(),
+      pageSize: pageSize.toString(),
+    });
+    const response = await api.get(`/api/documents?${params.toString()}`);
+    return response.data;
+  },
+
+  getById: async (id: string): Promise<DocumentDTO> => {
+    const response = await api.get(`/api/documents/${id}`);
+    return response.data;
+  },
+
+  create: async (data: CreateDocumentDTO): Promise<string> => {
+    const response = await api.post('/api/documents', data);
+    return response.data;
+  },
+
+  update: async (id: string, data: UpdateDocumentDTO): Promise<void> => {
+    await api.put(`/api/documents/${id}`, data);
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/api/documents/${id}`);
+  },
+};
+
+// Stations API
+export const stationsApi = {
+  getAll: async (pageNumber = 1, pageSize = 10): Promise<PaginatedStationsResponse> => {
+    const params = new URLSearchParams({
+      pageNumber: pageNumber.toString(),
+      pageSize: pageSize.toString(),
+    });
+    const response = await api.get(`/api/stations?${params.toString()}`);
+    return response.data;
+  },
+
+  getById: async (id: string): Promise<StationDTO> => {
+    const response = await api.get(`/api/stations/${id}`);
+    return response.data;
+  },
+
+  create: async (data: CreateStationDTO): Promise<string> => {
+    const response = await api.post('/api/stations', data);
+    return response.data;
+  },
+
+  update: async (id: string, data: UpdateStationDTO): Promise<void> => {
+    await api.put(`/api/stations/${id}`, data);
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/api/stations/${id}`);
   },
 };

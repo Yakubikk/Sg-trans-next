@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { 
   Card, 
   CardContent, 
@@ -24,6 +26,7 @@ import {
   Skeleton 
 } from "@/components/ui";
 import {
+  Plus,
   Edit,
   Trash2,
   Search,
@@ -32,24 +35,20 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Settings,
+  History,
 } from "lucide-react";
 import { useParts, useDeletePart, useFilterParts } from "@/hooks";
 import { usePartTypeOptions } from "@/hooks";
-import { PartCreateDialog } from "@/components/parts/part-create-dialog";
-import { PartEditDialog } from "@/components/parts/part-edit-dialog";
-import type { PartDTO, PartFilterSortDTO, PartFilterCriteria } from "@/types/directories";
 import { PartsFilter } from "@/components/parts-filter";
+import type { PartDTO, PartFilterSortDTO, PartFilterCriteria } from "@/types/directories";
 
 export default function PartsPage() {
+  const router = useRouter();
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [isFiltered, setIsFiltered] = useState(false);
-  
-  // Состояние для диалогов
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editingPartId, setEditingPartId] = useState<string | null>(null);
   
   // Состояние для фильтров
   const [filterOpen, setFilterOpen] = useState(false);
@@ -127,60 +126,42 @@ export default function PartsPage() {
   };
 
   const handleEdit = (partId: string) => {
-    setEditingPartId(partId);
-    setEditDialogOpen(true);
+    router.push(`/directories/parts/${partId}/edit`);
   };
 
-  const handleCloseEditDialog = () => {
-    setEditDialogOpen(false);
-    setEditingPartId(null);
+  const handleViewHistory = (partId: string) => {
+    router.push(`/directories/parts/${partId}/history`);
   };
 
   const getPartTypeDisplay = (part: PartDTO) => {
     return part.partType.name;
   };
 
-  const getPartSpecificInfo = (part: PartDTO) => {
-    const partTypeCode = part.partType.code;
-    
-    switch (partTypeCode) {
-      case 1: // Колесная пара
-        return part.wheelPair ? (
-          <div className="text-sm text-gray-600">
-            Толщина: {part.wheelPair.thicknessLeft}/{part.wheelPair.thicknessRight}
-            {part.wheelPair.wheelType && `, Тип: ${part.wheelPair.wheelType}`}
-          </div>
-        ) : null;
-      case 2: // Надрессорная балка
-        return part.bolster ? (
-          <div className="text-sm text-gray-600">
-            Срок службы: {part.bolster.serviceLifeYears} лет
-            {part.bolster.extendedUntil && `, Продлен до: ${part.bolster.extendedUntil}`}
-          </div>
-        ) : null;
-      case 3: // Боковая рама
-        return part.sideFrame ? (
-          <div className="text-sm text-gray-600">
-            Срок службы: {part.sideFrame.serviceLifeYears} лет
-            {part.sideFrame.extendedUntil && `, Продлен до: ${part.sideFrame.extendedUntil}`}
-          </div>
-        ) : null;
-      case 4: // Автосцепка
-        return part.coupler ? (
-          <div className="text-sm text-gray-600">
-            Автосцепка
-          </div>
-        ) : null;
-      case 10: // Поглощающий аппарат
-        return part.shockAbsorber ? (
-          <div className="text-sm text-gray-600">
-            Модель: {part.shockAbsorber.model}
-            {part.shockAbsorber.manufacturerCode && `, Код производителя: ${part.shockAbsorber.manufacturerCode}`}
-          </div>
-        ) : null;
-      default:
-        return null;
+  const formatYear = (yearData?: string | { year: number; month: number; day: number }) => {
+    if (!yearData) return "—";
+    if (typeof yearData === 'string') {
+      // Если строка в формате даты (например "2019-01-01"), извлекаем год
+      const yearMatch = yearData.match(/^(\d{4})/);
+      return yearMatch ? yearMatch[1] : yearData;
     }
+    // DateOnly format from backend
+    return yearData.year.toString();
+  };
+
+  const formatDate = (dateData?: string | { year: number; month: number; day: number }) => {
+    if (!dateData) return "";
+    if (typeof dateData === 'string') {
+      // Если строка в формате ISO (например "2019-01-01"), конвертируем в DD.MM.YYYY
+      const dateMatch = dateData.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (dateMatch) {
+        const [, year, month, day] = dateMatch;
+        return `${day}.${month}.${year}`;
+      }
+      return dateData;
+    }
+    // DateOnly format from backend
+    const { year, month, day } = dateData;
+    return `${day.toString().padStart(2, '0')}.${month.toString().padStart(2, '0')}.${year}`;
   };
 
   if (error) {
@@ -197,70 +178,86 @@ export default function PartsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
+      {/* Header */}
+      <div className="flex gap-3 max-lg:flex-col">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+          <Settings className="h-8 w-8" />
+          Детали
+        </h1>
+        <p className="mt-2 text-gray-600 dark:text-gray-400">
+          Справочник деталей железнодорожных цистерн
+          {isFiltered && (
+            <span className="ml-2 text-blue-600">
+              (применены фильтры)
+            </span>
+          )}
+        </p>
+      </div>
+
+      {/* Controls */}
+      <div className="flex justify-between items-center gap-4">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 z-10" />
+          <Input
+            placeholder="Поиск по заводскому номеру, типу, клейму..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+
+        <div className="flex gap-2">
+          {!isFiltered && (
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-fit">
+                <SelectValue placeholder="Тип детали" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Все типы</SelectItem>
+                {partTypes?.map((type: { value: string; label: string }) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          <PartsFilter 
+            open={filterOpen}
+            onOpenChange={setFilterOpen}
+            onFiltersChange={handleFilterApply}
+            onVisibleColumnsChange={setVisibleColumns}
+            filters={currentFilters}
+            visibleColumns={visibleColumns}
+            isLoading={isCurrentLoading}
+            filteredCount={filteredParts.length}
+            totalCount={currentData?.totalCount}
+          />
+          <Link href="/directories/parts/create">
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Добавить деталь
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* Content */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Settings className="h-6 w-6" />
-              <div>
-                <CardTitle>Детали</CardTitle>
-                <CardDescription>
-                  Справочник деталей железнодорожных цистерн
-                  {isFiltered && (
-                    <span className="ml-2 text-blue-600">
-                      (применены фильтры)
-                    </span>
-                  )}
-                </CardDescription>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <PartsFilter 
-                open={filterOpen}
-                onOpenChange={setFilterOpen}
-                onFiltersChange={handleFilterApply}
-                onVisibleColumnsChange={setVisibleColumns}
-                filters={currentFilters}
-                visibleColumns={visibleColumns}
-                isLoading={isCurrentLoading}
-                filteredCount={filteredParts.length}
-                totalCount={currentData?.totalCount}
-              />
-              <PartCreateDialog />
-            </div>
+          <div className="flex gap-2 items-center">
+            <CardTitle>
+              {isFiltered ? "Результаты фильтрации" : "Список деталей"}
+            </CardTitle>
+            <CardDescription>
+              {isFiltered
+                ? `Отфильтровано: ${filteredParts.length}`
+                : `Всего записей: ${currentData?.totalCount || 0}`}
+            </CardDescription>
           </div>
         </CardHeader>
-        <CardContent>
-          {/* Фильтры */}
-          <div className="flex justify-between mb-6">
-            <div className="flex-1 min-w-[200px] max-w-[512px]">
-              <div className="relative">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Поиск по заводскому номеру, типу, клейму..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-8"
-                />
-              </div>
-            </div>
-            {!isFiltered && (
-              <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="w-fit">
-                  <SelectValue placeholder="Тип детали" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Все типы</SelectItem>
-                  {partTypes?.map((type: { value: string; label: string }) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          </div>
+        <CardContent className="-mt-4">
 
           {/* Таблица */}
           {isCurrentLoading ? (
@@ -268,6 +265,19 @@ export default function PartsPage() {
               {Array.from({ length: 5 }).map((_, i) => (
                 <Skeleton key={i} className="h-12 w-full" />
               ))}
+            </div>
+          ) : !filteredParts.length ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-center">
+                <Settings className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                <p className="text-gray-600 dark:text-gray-400">
+                  {isFiltered
+                    ? "По заданным фильтрам детали не найдены"
+                    : searchTerm
+                    ? `Детали по запросу "${searchTerm}" не найдены`
+                    : "Нет данных для отображения"}
+                </p>
+              </div>
             </div>
           ) : (
             <>
@@ -281,7 +291,7 @@ export default function PartsPage() {
                     <TableHead>Местоположение</TableHead>
                     <TableHead>Статус</TableHead>
                     <TableHead>Депо</TableHead>
-                    <TableHead>Доп. информация</TableHead>
+                    <TableHead>Примечания</TableHead>
                     <TableHead>Действия</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -293,21 +303,30 @@ export default function PartsPage() {
                       </TableCell>
                       <TableCell>{part.stampNumber.value}</TableCell>
                       <TableCell>{part.serialNumber || "—"}</TableCell>
-                      <TableCell>{part.manufactureYear || "—"}</TableCell>
+                      <TableCell>{formatYear(part.manufactureYear)}</TableCell>
                       <TableCell>{part.currentLocation || "—"}</TableCell>
                       <TableCell>
                         <Badge variant="outline" style={{ borderColor: part.status.color }}>
                           {part.status.name}
                         </Badge>
                       </TableCell>
-                      <TableCell>{part.depot?.name || "—"}</TableCell>
-                      <TableCell>{getPartSpecificInfo(part)}</TableCell>
+                      <TableCell>{part.depot?.shortName || "—"}</TableCell>
+                      <TableCell>{part.notes || "—"}</TableCell>
                       <TableCell>
-                        <div className="flex space-x-2">
+                        <div className="flex justify-end gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleViewHistory(part.id)}
+                            title="История установок"
+                          >
+                            <History className="h-4 w-4" />
+                          </Button>
                           <Button 
                             variant="outline" 
                             size="sm"
                             onClick={() => handleEdit(part.id)}
+                            title="Редактировать"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -316,6 +335,7 @@ export default function PartsPage() {
                             size="sm"
                             onClick={() => handleDelete(part.id)}
                             disabled={deleteMutation.isPending}
+                            title="Удалить"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -323,23 +343,16 @@ export default function PartsPage() {
                       </TableCell>
                     </TableRow>
                   ))}
-                  {filteredParts.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={9} className="text-center py-8">
-                        Детали не найдены
-                      </TableCell>
-                    </TableRow>
-                  )}
                 </TableBody>
               </Table>
 
               {/* Пагинация */}
               {currentData && currentData.totalPages > 1 && (
-                <div className="flex items-center justify-between mt-4">
-                  <div className="text-sm text-gray-600">
-                    Показано {filteredParts.length} из {currentData.totalCount} записей
+                <div className="flex items-center justify-between mt-4 px-2">
+                  <div className="text-sm text-gray-700 dark:text-gray-300">
+                    Показано {((pageNumber - 1) * pageSize) + 1}-{Math.min(pageNumber * pageSize, currentData.totalCount)} из {currentData.totalCount} записей
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-1">
                     <Button
                       variant="outline"
                       size="sm"
@@ -356,7 +369,7 @@ export default function PartsPage() {
                     >
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <span className="text-sm">
+                    <span className="text-sm min-w-[120px] text-center">
                       Страница {pageNumber} из {currentData.totalPages}
                     </span>
                     <Button
@@ -382,13 +395,6 @@ export default function PartsPage() {
           )}
         </CardContent>
       </Card>
-
-      {/* Диалог редактирования */}
-      <PartEditDialog
-        partId={editingPartId}
-        open={editDialogOpen}
-        onOpenChange={handleCloseEditDialog}
-      />
     </div>
   );
 }
